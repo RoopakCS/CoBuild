@@ -1,10 +1,9 @@
 package com.cobuild.backend.auth;
 
 import com.cobuild.backend.auth.dto.AuthResponse;
-import com.cobuild.backend.user.User;
 import com.cobuild.backend.user.UserRepository;
-import com.cobuild.backend.user.dto.LoginRequest;
-import com.cobuild.backend.user.dto.RegisterRequest;
+import com.cobuild.backend.user.dto.request.LoginRequest;
+import com.cobuild.backend.user.dto.request.RegisterRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

@@ -1,7 +1,7 @@
 package com.cobuild.backend.user;
 
-import com.cobuild.backend.user.dto.UpdateProfileRequest;
-import com.cobuild.backend.user.dto.UserResponse;
+import com.cobuild.backend.user.dto.request.UpdateProfileRequest;
+import com.cobuild.backend.user.dto.response.UserResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

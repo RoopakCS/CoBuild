@@ -1,4 +1,4 @@
-package com.cobuild.backend.user.dto;
+package com.cobuild.backend.user.dto.request;
 
 import com.cobuild.backend.user.ExperienceLevel;
 import jakarta.validation.constraints.Size;

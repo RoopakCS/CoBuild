@@ -1,8 +1,8 @@
 package com.cobuild.backend.auth;
 
 import com.cobuild.backend.auth.dto.AuthResponse;
-import com.cobuild.backend.user.dto.LoginRequest;
-import com.cobuild.backend.user.dto.RegisterRequest;
+import com.cobuild.backend.user.dto.request.LoginRequest;
+import com.cobuild.backend.user.dto.request.RegisterRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

@@ -1,4 +1,4 @@
-package com.cobuild.backend.user.dto;
+package com.cobuild.backend.user.dto.request;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

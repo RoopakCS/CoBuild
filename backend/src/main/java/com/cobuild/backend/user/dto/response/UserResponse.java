@@ -1,4 +1,4 @@
-package com.cobuild.backend.user.dto;
+package com.cobuild.backend.user.dto.response;
 
 import com.cobuild.backend.user.ExperienceLevel;
 import lombok.AllArgsConstructor;
