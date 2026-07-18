@@ -1,0 +1,135 @@
+package com.cobuild.backend.project;
+
+import com.cobuild.backend.user.User;
+import com.cobuild.backend.user.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.UUID;
+
+@Service
+@RequiredArgsConstructor
+public class ProjectServiceImpl implements ProjectService {
+
+    private final ProjectRepository projectRepository;
+    private final UserRepository userRepository;
+
+    @Override
+    public ProjectResponse createProject(CreateProjectRequest request) {
+
+        // Temporary Owner
+        // Replace this with Logged In User after JWT
+
+        User owner = userRepository.findAll().stream()
+                .findFirst()
+                .orElseThrow(() ->
+                        new EntityNotFoundException("Owner not found"));
+
+        Project project = Project.builder()
+                .owner(owner)
+                .title(request.getTitle())
+                .description(request.getDescription())
+                .domain(request.getDomain())
+                .experienceLevel(request.getExperienceLevel())
+                .teamSize(request.getTeamSize())
+                .commitment(request.getCommitment())
+                .repositoryUrl(request.getRepositoryUrl())
+                .status(ProjectStatus.OPEN)
+                .build();
+
+        Project savedProject = projectRepository.save(project);
+
+        return mapToResponse(savedProject);
+    }
+
+    @Override
+    public ProjectResponse getProjectById(UUID id) {
+
+        Project project = projectRepository.findById(id)
+                .orElseThrow(() ->
+                        new EntityNotFoundException("Project not found"));
+
+        return mapToResponse(project);
+    }
+
+    @Override
+    public Page<ProjectResponse> getAllProjects(Pageable pageable) {
+
+        return projectRepository.findAll(pageable)
+                .map(this::mapToResponse);
+
+    }
+
+    @Override
+    public ProjectResponse updateProject(UUID id,
+                                         UpdateProjectRequest request) {
+
+        Project project = projectRepository.findById(id)
+                .orElseThrow(() ->
+                        new EntityNotFoundException("Project not found"));
+
+        project.setTitle(request.getTitle());
+        project.setDescription(request.getDescription());
+        project.setDomain(request.getDomain());
+        project.setExperienceLevel(request.getExperienceLevel());
+        project.setStatus(request.getStatus());
+        project.setTeamSize(request.getTeamSize());
+        project.setCommitment(request.getCommitment());
+        project.setRepositoryUrl(request.getRepositoryUrl());
+
+        Project updated = projectRepository.save(project);
+
+        return mapToResponse(updated);
+
+    }
+
+    @Override
+    public void deleteProject(UUID id) {
+
+        Project project = projectRepository.findById(id)
+                .orElseThrow(() ->
+                        new EntityNotFoundException("Project not found"));
+
+        projectRepository.delete(project);
+
+    }
+
+    @Override
+    public List<ProjectResponse> getProjectsByOwner(UUID ownerId) {
+
+        User owner = userRepository.findById(ownerId)
+                .orElseThrow(() ->
+                        new EntityNotFoundException("User not found"));
+
+        return projectRepository.findByOwner(owner)
+                .stream()
+                .map(this::mapToResponse)
+                .toList();
+
+    }
+
+    private ProjectResponse mapToResponse(Project project){
+
+        return ProjectResponse.builder()
+                .id(project.getId())
+                .title(project.getTitle())
+                .description(project.getDescription())
+                .domain(project.getDomain())
+                .experienceLevel(project.getExperienceLevel())
+                .status(project.getStatus())
+                .teamSize(project.getTeamSize())
+                .commitment(project.getCommitment())
+                .repositoryUrl(project.getRepositoryUrl())
+                .ownerId(project.getOwner().getId())
+                .ownerName(project.getOwner().getName())
+                .createdAt(project.getCreatedAt())
+                .updatedAt(project.getUpdatedAt())
+                .build();
+
+    }
+
+}
