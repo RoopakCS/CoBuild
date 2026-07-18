@@ -1,5 +1,8 @@
 package com.cobuild.backend.project;
 
+import com.cobuild.backend.project.dto.request.CreateProjectRequest;
+import com.cobuild.backend.project.dto.request.UpdateProjectRequest;
+import com.cobuild.backend.project.dto.response.ProjectResponse;
 import com.cobuild.backend.user.User;
 import com.cobuild.backend.user.UserRepository;
 import jakarta.persistence.EntityNotFoundException;

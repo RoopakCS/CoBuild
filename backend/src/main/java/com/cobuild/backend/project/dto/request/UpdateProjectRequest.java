@@ -1,5 +1,7 @@
-package com.cobuild.backend.project;
+package com.cobuild.backend.project.dto.request;
 
+import com.cobuild.backend.project.ExperienceLevel;
+import com.cobuild.backend.project.ProjectStatus;
 import lombok.Data;
 
 import java.util.List;

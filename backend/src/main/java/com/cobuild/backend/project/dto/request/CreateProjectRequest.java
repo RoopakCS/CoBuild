@@ -1,5 +1,6 @@
-package com.cobuild.backend.project;
+package com.cobuild.backend.project.dto.request;
 
+import com.cobuild.backend.project.ExperienceLevel;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;

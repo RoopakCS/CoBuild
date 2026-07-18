@@ -1,5 +1,8 @@
 package com.cobuild.backend.project;
 
+import com.cobuild.backend.project.dto.request.CreateProjectRequest;
+import com.cobuild.backend.project.dto.request.UpdateProjectRequest;
+import com.cobuild.backend.project.dto.response.ProjectResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
