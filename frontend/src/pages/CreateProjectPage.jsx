@@ -39,12 +39,12 @@ export function CreateProjectPage() {
 
   return (
     <div className="max-w-3xl mx-auto">
-      <div className="mb-10">
-        <h1 className="text-4xl md:text-5xl font-bold tracking-tighter text-slate-50">Create New Project</h1>
-        <p className="mt-3 text-lg text-slate-400 font-medium">Define your idea and find the right collaborators.</p>
+      <div className="mb-6 sm:mb-10">
+        <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tighter text-slate-50">Create New Project</h1>
+        <p className="mt-2 sm:mt-3 text-base sm:text-lg text-slate-400 font-medium">Define your idea and find the right collaborators.</p>
       </div>
       
-      <div className="bg-slate-800/40 backdrop-blur-md rounded-3xl border border-slate-700/50 p-8 shadow-2xl shadow-slate-900/50">
+      <div className="bg-slate-800/40 backdrop-blur-md rounded-2xl sm:rounded-3xl border border-slate-700/50 p-5 sm:p-8 shadow-2xl shadow-slate-900/50">
         <form onSubmit={handleSubmit} className="space-y-8">
           <div>
             <label className="block text-sm font-bold text-slate-300 mb-2">Title</label>

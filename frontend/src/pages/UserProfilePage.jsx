@@ -21,30 +21,30 @@ export function UserProfilePage() {
 
   return (
     <div className="max-w-4xl mx-auto pb-12">
-      <div className="mb-10">
-        <h1 className="text-4xl md:text-5xl font-bold tracking-tighter text-slate-50">{user.name}</h1>
-        <p className="mt-3 text-lg text-slate-400 font-medium">Developer Profile</p>
+      <div className="mb-6 sm:mb-10">
+        <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tighter text-slate-50">{user.name}</h1>
+        <p className="mt-2 sm:mt-3 text-base sm:text-lg text-slate-400 font-medium">Developer Profile</p>
       </div>
 
-      <div className="rounded-3xl border border-slate-700/50 bg-slate-800/40 p-8 md:p-10 shadow-2xl backdrop-blur-sm mb-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div className="rounded-2xl sm:rounded-3xl border border-slate-700/50 bg-slate-800/40 p-5 sm:p-8 md:p-10 shadow-2xl backdrop-blur-sm mb-8 sm:mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-8">
           <div>
-            <p className="text-xs text-slate-500 font-bold uppercase tracking-widest mb-2">Email</p>
-            <p className="text-lg font-semibold text-slate-200">{user.email}</p>
+            <p className="text-[10px] sm:text-xs text-slate-500 font-bold uppercase tracking-widest mb-1 sm:mb-2">Email</p>
+            <p className="text-base sm:text-lg font-semibold text-slate-200">{user.email}</p>
           </div>
           <div>
-            <p className="text-xs text-slate-500 font-bold uppercase tracking-widest mb-2">Experience</p>
-            <p className="text-lg font-semibold text-slate-200">{user.experienceLevel || 'Not specified'}</p>
+            <p className="text-[10px] sm:text-xs text-slate-500 font-bold uppercase tracking-widest mb-1 sm:mb-2">Experience</p>
+            <p className="text-base sm:text-lg font-semibold text-slate-200">{user.experienceLevel || 'Not specified'}</p>
           </div>
           <div className="col-span-1 md:col-span-2">
-            <p className="text-xs text-slate-500 font-bold uppercase tracking-widest mb-2">Bio</p>
-            <p className="text-slate-300 leading-relaxed text-lg">{user.bio || 'No bio provided'}</p>
+            <p className="text-[10px] sm:text-xs text-slate-500 font-bold uppercase tracking-widest mb-1 sm:mb-2">Bio</p>
+            <p className="text-slate-300 leading-relaxed text-base sm:text-lg">{user.bio || 'No bio provided'}</p>
           </div>
           <div className="col-span-1 md:col-span-2">
-            <p className="text-xs text-slate-500 font-bold uppercase tracking-widest mb-2">Links</p>
+            <p className="text-[10px] sm:text-xs text-slate-500 font-bold uppercase tracking-widest mb-1 sm:mb-2">Links</p>
             <div className="flex gap-6 mt-2">
-              {user.githubUrl ? <a href={user.githubUrl} target="_blank" rel="noreferrer" className="text-base font-bold text-green-400 hover:text-green-300 transition-colors">GitHub ↗</a> : <span className="text-slate-600">No GitHub</span>}
-              {user.linkedinUrl ? <a href={user.linkedinUrl} target="_blank" rel="noreferrer" className="text-base font-bold text-green-400 hover:text-green-300 transition-colors">LinkedIn ↗</a> : <span className="text-slate-600">No LinkedIn</span>}
+              {user.githubUrl ? <a href={user.githubUrl} target="_blank" rel="noreferrer" className="text-sm sm:text-base font-bold text-green-400 hover:text-green-300 transition-colors">GitHub ↗</a> : <span className="text-slate-600 text-sm">No GitHub</span>}
+              {user.linkedinUrl ? <a href={user.linkedinUrl} target="_blank" rel="noreferrer" className="text-sm sm:text-base font-bold text-green-400 hover:text-green-300 transition-colors">LinkedIn ↗</a> : <span className="text-slate-600 text-sm">No LinkedIn</span>}
             </div>
           </div>
         </div>

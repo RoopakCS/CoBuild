@@ -82,39 +82,39 @@ export function ProjectDetailsPage() {
 
   return (
     <div className="max-w-5xl mx-auto pb-12">
-      <button onClick={() => navigate(-1)} className="group flex items-center gap-2 text-sm font-bold text-slate-400 hover:text-green-400 mb-8 transition-colors">
+      <button onClick={() => navigate(-1)} className="group flex items-center gap-2 text-sm font-bold text-slate-400 hover:text-green-400 mb-6 sm:mb-8 transition-colors">
         <ArrowLeft size={16} weight="bold" className="transition-transform group-hover:-translate-x-1" />
         Back to projects
       </button>
 
-      <div className="rounded-3xl border border-slate-700/50 bg-slate-800/40 p-10 lg:p-14 shadow-2xl backdrop-blur-sm mb-10 relative overflow-hidden">
+      <div className="rounded-2xl sm:rounded-3xl border border-slate-700/50 bg-slate-800/40 p-5 sm:p-8 lg:p-12 shadow-2xl backdrop-blur-sm mb-6 sm:mb-10 relative overflow-hidden">
         {/* Subtle glow effect */}
         <div className="absolute top-0 right-0 w-96 h-96 bg-green-500/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none"></div>
         
-        <div className="flex flex-col md:flex-row md:items-start justify-between mb-10 gap-6 relative z-10">
-          <h1 className="text-4xl md:text-5xl font-bold tracking-tighter text-slate-50">{project.title}</h1>
+        <div className="flex flex-col sm:flex-row sm:items-start justify-between mb-6 sm:mb-10 gap-4 sm:gap-6 relative z-10">
+          <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold tracking-tighter text-slate-50">{project.title}</h1>
           {isOwner && (
             <button onClick={() => {
               if(window.confirm('Delete this project?')) deleteProject.mutate(id);
-            }} className="shrink-0 text-red-400 font-bold text-sm border border-red-500/30 bg-red-500/5 hover:bg-red-500/10 px-5 py-2.5 rounded-xl transition-all">
+            }} className="self-start shrink-0 text-red-400 font-bold text-xs sm:text-sm border border-red-500/30 bg-red-500/5 hover:bg-red-500/10 px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl transition-all">
               Delete Project
             </button>
           )}
         </div>
         
-        <p className="text-slate-300 mb-12 whitespace-pre-wrap leading-relaxed text-lg md:text-xl font-medium max-w-4xl relative z-10">{project.description}</p>
+        <p className="text-slate-300 mb-8 sm:mb-12 whitespace-pre-wrap leading-relaxed text-base sm:text-lg md:text-xl font-medium max-w-4xl relative z-10">{project.description}</p>
         
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 border-t border-slate-700/50 pt-10 relative z-10">
-          <div><p className="text-xs text-slate-500 font-bold uppercase tracking-widest mb-2">Domain</p><p className="text-lg font-semibold text-slate-200">{project.domain}</p></div>
-          <div><p className="text-xs text-slate-500 font-bold uppercase tracking-widest mb-2">Experience</p><p className="text-lg font-semibold text-slate-200">{project.experienceLevel}</p></div>
-          <div><p className="text-xs text-slate-500 font-bold uppercase tracking-widest mb-2">Team Size</p><p className="text-lg font-semibold text-slate-200">{project.teamSize}</p></div>
-          <div><p className="text-xs text-slate-500 font-bold uppercase tracking-widest mb-2">Owner</p><p className="text-lg font-semibold text-slate-200">{project.ownerName}</p></div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-8 border-t border-slate-700/50 pt-6 sm:pt-10 relative z-10">
+          <div><p className="text-[10px] sm:text-xs text-slate-500 font-bold uppercase tracking-widest mb-1 sm:mb-2">Domain</p><p className="text-sm sm:text-lg font-semibold text-slate-200">{project.domain}</p></div>
+          <div><p className="text-[10px] sm:text-xs text-slate-500 font-bold uppercase tracking-widest mb-1 sm:mb-2">Experience</p><p className="text-sm sm:text-lg font-semibold text-slate-200">{project.experienceLevel}</p></div>
+          <div><p className="text-[10px] sm:text-xs text-slate-500 font-bold uppercase tracking-widest mb-1 sm:mb-2">Team Size</p><p className="text-sm sm:text-lg font-semibold text-slate-200">{project.teamSize}</p></div>
+          <div><p className="text-[10px] sm:text-xs text-slate-500 font-bold uppercase tracking-widest mb-1 sm:mb-2">Owner</p><p className="text-sm sm:text-lg font-semibold text-slate-200">{project.ownerName}</p></div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-10">
         {/* Members */}
-        <div className="rounded-3xl border border-slate-700/50 bg-slate-800/30 p-8 shadow-xl backdrop-blur-sm">
+        <div className="rounded-2xl sm:rounded-3xl border border-slate-700/50 bg-slate-800/30 p-5 sm:p-8 shadow-xl backdrop-blur-sm">
           <h2 className="text-2xl font-bold mb-6 text-slate-50 tracking-tight">Team Members</h2>
           <div className="space-y-4">
             {members?.map(m => (
@@ -129,7 +129,7 @@ export function ProjectDetailsPage() {
         </div>
 
         {/* Apply or Manage Applications */}
-        <div className="rounded-3xl border border-slate-700/50 bg-slate-800/30 p-8 shadow-xl backdrop-blur-sm">
+        <div className="rounded-2xl sm:rounded-3xl border border-slate-700/50 bg-slate-800/30 p-5 sm:p-8 shadow-xl backdrop-blur-sm">
           {isOwner ? (
             <>
               <h2 className="text-2xl font-bold mb-6 text-slate-50 tracking-tight">Applications</h2>

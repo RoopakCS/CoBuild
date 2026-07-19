@@ -13,27 +13,27 @@ export function DashboardPage() {
 
   return (
     <div>
-      <div className="mb-12">
-        <h1 className="text-4xl md:text-5xl font-bold tracking-tighter text-slate-50">Projects</h1>
-        <p className="mt-3 text-lg text-slate-400 font-medium">Discover and collaborate on amazing builds.</p>
+      <div className="mb-8 sm:mb-12">
+        <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tighter text-slate-50">Projects</h1>
+        <p className="mt-2 sm:mt-3 text-base sm:text-lg text-slate-400 font-medium">Discover and collaborate on amazing builds.</p>
       </div>
 
       {isLoading ? (
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-2 xl:grid-cols-3">
           {[1, 2, 3].map((i) => (
             <div key={i} className="h-56 animate-pulse rounded-2xl bg-slate-800/50 border border-slate-700/50"></div>
           ))}
         </div>
       ) : error ? (
-        <div className="rounded-2xl border border-red-500/20 bg-red-500/10 p-8 text-center text-red-400 backdrop-blur-sm">
-          <p className="text-lg font-medium">{error?.response?.data?.message || error.message || 'Failed to fetch projects'}</p>
+        <div className="rounded-2xl border border-red-500/20 bg-red-500/10 p-6 sm:p-8 text-center text-red-400 backdrop-blur-sm">
+          <p className="text-base sm:text-lg font-medium">{error?.response?.data?.message || error.message || 'Failed to fetch projects'}</p>
           <button onClick={() => refetch()} className="mt-4 text-sm font-bold bg-slate-800 px-4 py-2 rounded-lg hover:bg-slate-700 transition-colors">Try again</button>
         </div>
       ) : projects.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-slate-700 bg-slate-800/20 py-32 text-center backdrop-blur-sm">
-          <FolderOpen size={56} className="mb-6 text-slate-500" weight="duotone" />
-          <h3 className="text-xl font-bold text-slate-200">No projects found</h3>
-          <p className="mt-2 text-slate-400 font-medium">Get started by creating your first project.</p>
+        <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-slate-700 bg-slate-800/20 py-16 sm:py-32 text-center backdrop-blur-sm px-4">
+          <FolderOpen size={48} className="mb-4 sm:mb-6 text-slate-500" weight="duotone" />
+          <h3 className="text-lg sm:text-xl font-bold text-slate-200">No projects found</h3>
+          <p className="mt-2 text-sm sm:text-base text-slate-400 font-medium">Get started by creating your first project.</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
