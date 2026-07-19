@@ -1,5 +1,8 @@
 package com.cobuild.backend.skill;
 
+import com.cobuild.backend.exception.DuplicateResourceException;
+import com.cobuild.backend.exception.ForbiddenException;
+import com.cobuild.backend.exception.ResourceNotFoundException;
 import com.cobuild.backend.skill.dto.request.CreateSkillRequest;
 import com.cobuild.backend.skill.dto.response.SkillResponse;
 import com.cobuild.backend.user.User;
@@ -26,10 +29,11 @@ public class SkillServiceImpl implements SkillService {
                 .getAuthentication();
 
         User user = userRepository.findByEmail(authentication.getName())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("User not found"));
 
         if (skillRepository.existsByUserAndName(user, request.getName())) {
-            throw new RuntimeException("Skill already exists");
+            throw new DuplicateResourceException("Skill already exists");
         }
 
         Skill skill = Skill.builder()
@@ -50,7 +54,8 @@ public class SkillServiceImpl implements SkillService {
                 .getAuthentication();
 
         User user = userRepository.findByEmail(authentication.getName())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("User not found"));
 
         return skillRepository.findByUser(user)
                 .stream()
@@ -61,8 +66,10 @@ public class SkillServiceImpl implements SkillService {
     @Override
     public SkillResponse updateSkill(Long skillId, CreateSkillRequest request) {
 
+
         Skill skill = skillRepository.findById(skillId)
-                .orElseThrow(() -> new RuntimeException("Skill not found"));
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Skill not found"));
 
         skill.setName(request.getName());
 
@@ -75,7 +82,21 @@ public class SkillServiceImpl implements SkillService {
     public void deleteSkill(Long skillId) {
 
         Skill skill = skillRepository.findById(skillId)
-                .orElseThrow(() -> new RuntimeException("Skill not found"));
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Skill not found"));
+
+        Authentication authentication = SecurityContextHolder
+                .getContext()
+                .getAuthentication();
+
+        User currentUser = userRepository.findByEmail(authentication.getName())
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("User not found"));
+
+        if (!skill.getUser().getId().equals(currentUser.getId())) {
+            throw new ForbiddenException(
+                    "You can only delete your own skills");
+        }
 
         skillRepository.delete(skill);
     }

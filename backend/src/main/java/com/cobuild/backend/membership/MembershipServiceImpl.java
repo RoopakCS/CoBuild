@@ -1,5 +1,8 @@
 package com.cobuild.backend.membership;
 
+import com.cobuild.backend.exception.DuplicateResourceException;
+import com.cobuild.backend.exception.ForbiddenException;
+import com.cobuild.backend.exception.ResourceNotFoundException;
 import com.cobuild.backend.membership.dto.request.AddMemberRequest;
 import com.cobuild.backend.membership.dto.response.MembershipResponse;
 import com.cobuild.backend.project.Project;
@@ -24,16 +27,18 @@ public class MembershipServiceImpl implements MembershipService {
     @Override
     public MembershipResponse addMember(AddMemberRequest request) {
 
+
         Project project = projectRepository.findById(request.getProjectId())
                 .orElseThrow(() ->
-                        new EntityNotFoundException("Project not found"));
+                        new ResourceNotFoundException("Project not found"));
 
         User user = userRepository.findById(request.getUserId())
                 .orElseThrow(() ->
-                        new EntityNotFoundException("User not found"));
+                        new ResourceNotFoundException("Project not found"));
 
         if (membershipRepository.existsByUserAndProject(user, project)) {
-            throw new IllegalStateException("User is already a member of this project");
+            throw new DuplicateResourceException(
+                    "User is already a member of this project");
         }
 
         Membership membership = Membership.builder()
@@ -53,7 +58,7 @@ public class MembershipServiceImpl implements MembershipService {
 
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() ->
-                        new EntityNotFoundException("Project not found"));
+                        new ResourceNotFoundException("Project not found"));
 
         return membershipRepository.findByProject(project)
                 .stream()
@@ -66,7 +71,7 @@ public class MembershipServiceImpl implements MembershipService {
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() ->
-                        new EntityNotFoundException("User not found"));
+                        new ResourceNotFoundException("User not found"));
 
         return membershipRepository.findByUser(user)
                 .stream()
@@ -79,16 +84,16 @@ public class MembershipServiceImpl implements MembershipService {
 
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() ->
-                        new EntityNotFoundException("Project not found"));
+                                new ResourceNotFoundException("Project not found"));
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() ->
-                        new EntityNotFoundException("User not found"));
+                        new ResourceNotFoundException("User not found"));
 
         Membership membership = membershipRepository
                 .findByUserAndProject(user, project)
                 .orElseThrow(() ->
-                        new EntityNotFoundException("Membership not found"));
+                        new ResourceNotFoundException("Membership not found"));
 
         membershipRepository.delete(membership);
     }

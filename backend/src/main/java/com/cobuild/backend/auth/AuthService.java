@@ -1,6 +1,8 @@
 package com.cobuild.backend.auth;
 
 import com.cobuild.backend.auth.dto.AuthResponse;
+import com.cobuild.backend.exception.DuplicateResourceException;
+import com.cobuild.backend.exception.ResourceNotFoundException;
 import com.cobuild.backend.security.jwt.JwtService;
 import com.cobuild.backend.security.user.UserPrincipal;
 import com.cobuild.backend.user.ExperienceLevel;
@@ -26,7 +28,7 @@ public class AuthService {
     public AuthResponse register(RegisterRequest request) {
 
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("Email already exists");
+            throw new DuplicateResourceException("Email already exists");
         }
 
         User user = User.builder()
@@ -57,7 +59,8 @@ public class AuthService {
         );
 
         User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("User not found"));
 
         String jwtToken = jwtService.generateToken(new com.cobuild.backend.security.user.UserPrincipal(user));
 

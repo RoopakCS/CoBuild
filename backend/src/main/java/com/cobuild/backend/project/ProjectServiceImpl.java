@@ -1,5 +1,6 @@
 package com.cobuild.backend.project;
 
+import com.cobuild.backend.exception.ResourceNotFoundException;
 import com.cobuild.backend.project.dto.request.CreateProjectRequest;
 import com.cobuild.backend.project.dto.request.UpdateProjectRequest;
 import com.cobuild.backend.project.dto.response.ProjectResponse;
@@ -30,7 +31,7 @@ public class ProjectServiceImpl implements ProjectService {
         User owner = userRepository.findAll().stream()
                 .findFirst()
                 .orElseThrow(() ->
-                        new EntityNotFoundException("Owner not found"));
+                        new ResourceNotFoundException("Owner not found"));
 
         Project project = Project.builder()
                 .owner(owner)
@@ -73,7 +74,7 @@ public class ProjectServiceImpl implements ProjectService {
 
         Project project = projectRepository.findById(id)
                 .orElseThrow(() ->
-                        new EntityNotFoundException("Project not found"));
+                        new ResourceNotFoundException("Project not found"));
 
         project.setTitle(request.getTitle());
         project.setDescription(request.getDescription());
@@ -95,7 +96,7 @@ public class ProjectServiceImpl implements ProjectService {
 
         Project project = projectRepository.findById(id)
                 .orElseThrow(() ->
-                        new EntityNotFoundException("Project not found"));
+                        new ResourceNotFoundException("Project not found"));
 
         projectRepository.delete(project);
 
