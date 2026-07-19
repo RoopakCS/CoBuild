@@ -1,4 +1,4 @@
-package com.cobuild.backend.auth.dto;
+package com.cobuild.backend.auth.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
