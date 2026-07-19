@@ -1,5 +1,6 @@
 package com.cobuild.backend.project;
 
+import com.cobuild.backend.exception.ForbiddenException;
 import com.cobuild.backend.exception.ResourceNotFoundException;
 import com.cobuild.backend.project.dto.request.CreateProjectRequest;
 import com.cobuild.backend.project.dto.request.UpdateProjectRequest;
@@ -8,8 +9,10 @@ import com.cobuild.backend.user.User;
 import com.cobuild.backend.user.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -28,10 +31,7 @@ public class ProjectServiceImpl implements ProjectService {
         // Temporary Owner
         // Replace this with Logged In User after JWT
 
-        User owner = userRepository.findAll().stream()
-                .findFirst()
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Owner not found"));
+        User owner = getCurrentUser();
 
         Project project = Project.builder()
                 .owner(owner)
@@ -76,14 +76,44 @@ public class ProjectServiceImpl implements ProjectService {
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Project not found"));
 
-        project.setTitle(request.getTitle());
-        project.setDescription(request.getDescription());
-        project.setDomain(request.getDomain());
-        project.setExperienceLevel(request.getExperienceLevel());
-        project.setStatus(request.getStatus());
-        project.setTeamSize(request.getTeamSize());
-        project.setCommitment(request.getCommitment());
-        project.setRepositoryUrl(request.getRepositoryUrl());
+        User currentUser = getCurrentUser();
+
+        if (!project.getOwner().getId().equals(currentUser.getId())) {
+            throw new ForbiddenException(
+                    "You are not allowed to update another user's project");
+        }
+
+        if (request.getTitle() != null) {
+            project.setTitle(request.getTitle());
+        }
+
+        if (request.getDescription() != null) {
+            project.setDescription(request.getDescription());
+        }
+
+        if (request.getDomain() != null) {
+            project.setDomain(request.getDomain());
+        }
+
+        if (request.getExperienceLevel() != null) {
+            project.setExperienceLevel(request.getExperienceLevel());
+        }
+
+        if (request.getStatus() != null) {
+            project.setStatus(request.getStatus());
+        }
+
+        if (request.getTeamSize() != null) {
+            project.setTeamSize(request.getTeamSize());
+        }
+
+        if (request.getCommitment() != null) {
+            project.setCommitment(request.getCommitment());
+        }
+
+        if (request.getRepositoryUrl() != null) {
+            project.setRepositoryUrl(request.getRepositoryUrl());
+        }
 
         Project updated = projectRepository.save(project);
 
@@ -97,6 +127,13 @@ public class ProjectServiceImpl implements ProjectService {
         Project project = projectRepository.findById(id)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Project not found"));
+
+        User currentUser = getCurrentUser();
+
+        if (!project.getOwner().getId().equals(currentUser.getId())) {
+            throw new ForbiddenException(
+                    "You are not allowed to delete another user's project");
+        }
 
         projectRepository.delete(project);
 
@@ -114,6 +151,17 @@ public class ProjectServiceImpl implements ProjectService {
                 .map(this::mapToResponse)
                 .toList();
 
+    }
+
+    private User getCurrentUser() {
+
+        Authentication authentication = SecurityContextHolder
+                .getContext()
+                .getAuthentication();
+
+        return userRepository.findByEmail(authentication.getName())
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("User not found"));
     }
 
     private ProjectResponse mapToResponse(Project project){

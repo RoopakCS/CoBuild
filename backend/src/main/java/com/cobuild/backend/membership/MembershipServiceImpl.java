@@ -9,9 +9,12 @@ import com.cobuild.backend.project.Project;
 import com.cobuild.backend.project.ProjectRepository;
 import com.cobuild.backend.user.User;
 import com.cobuild.backend.user.UserRepository;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.security.core.Authentication;
+
+
 
 import java.util.List;
 import java.util.UUID;
@@ -32,9 +35,16 @@ public class MembershipServiceImpl implements MembershipService {
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Project not found"));
 
+        User currentUser = getCurrentUser();
+
+        if (!project.getOwner().getId().equals(currentUser.getId())) {
+            throw new ForbiddenException(
+                    "Only the project owner can add members");
+        }
+
         User user = userRepository.findById(request.getUserId())
                 .orElseThrow(() ->
-                        new ResourceNotFoundException("Project not found"));
+                        new ResourceNotFoundException("User not found"));
 
         if (membershipRepository.existsByUserAndProject(user, project)) {
             throw new DuplicateResourceException(
@@ -85,6 +95,12 @@ public class MembershipServiceImpl implements MembershipService {
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() ->
                                 new ResourceNotFoundException("Project not found"));
+        User currentUser = getCurrentUser();
+
+        if (!project.getOwner().getId().equals(currentUser.getId())) {
+            throw new ForbiddenException(
+                    "Only the project owner can remove members");
+        }
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() ->
@@ -96,6 +112,17 @@ public class MembershipServiceImpl implements MembershipService {
                         new ResourceNotFoundException("Membership not found"));
 
         membershipRepository.delete(membership);
+    }
+
+    private User getCurrentUser() {
+
+        Authentication authentication = SecurityContextHolder
+                .getContext()
+                .getAuthentication();
+
+        return userRepository.findByEmail(authentication.getName())
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("User not found"));
     }
 
     private MembershipResponse mapToResponse(Membership membership) {
