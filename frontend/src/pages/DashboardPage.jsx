@@ -2,8 +2,50 @@ import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { CaretRight, FolderOpen } from '@phosphor-icons/react';
 import { projectsApi } from '../api/projects';
+import { usersApi } from '../api/users';
+import { membershipsApi } from '../api/memberships';
+import { applicationsApi } from '../api/applications';
 
 export function DashboardPage() {
+  const { data: user } = useQuery({ queryKey: ['users', 'me'], queryFn: usersApi.getMe });
+
+  const { data: myProjects } = useQuery({
+    queryKey: ['projects', 'owner', user?.id],
+    queryFn: () => projectsApi.getByOwner(user.id),
+    enabled: !!user?.id,
+  });
+
+  const { data: memberships } = useQuery({
+    queryKey: ['memberships', 'user', user?.id],
+    queryFn: () => membershipsApi.getUserMemberships(user.id),
+    enabled: !!user?.id,
+  });
+
+  const { data: myApplications } = useQuery({
+    queryKey: ['applications', 'me'],
+    queryFn: applicationsApi.getMyApplications,
+    enabled: !!user?.id,
+  });
+
+  const activeProjectsMap = new Map();
+  if (myProjects) {
+    myProjects.forEach(p => activeProjectsMap.set(p.id, { ...p, myRole: 'Owner' }));
+  }
+  if (memberships) {
+    memberships.forEach(m => {
+      if (!activeProjectsMap.has(m.projectId)) {
+        activeProjectsMap.set(m.projectId, { id: m.projectId, title: m.projectTitle, description: 'Member', status: 'ACTIVE', myRole: m.role });
+      }
+    });
+  }
+  if (myApplications) {
+    myApplications.forEach(app => {
+      if (app.status === 'ACCEPTED' && !activeProjectsMap.has(app.projectId)) {
+        activeProjectsMap.set(app.projectId, { id: app.projectId, title: app.projectTitle, description: 'Accepted Member', status: 'ACTIVE', myRole: 'Member' });
+      }
+    });
+  }
+  const activeProjects = Array.from(activeProjectsMap.values());
   const { data: pageData, isLoading, error, refetch } = useQuery({
     queryKey: ['projects'],
     queryFn: () => projectsApi.getAll({ page: 0, size: 20 }),
@@ -29,14 +71,51 @@ export function DashboardPage() {
           <p className="text-base sm:text-lg font-medium">{error?.response?.data?.message || error.message || 'Failed to fetch projects'}</p>
           <button onClick={() => refetch()} className="mt-4 text-sm font-bold bg-slate-800 px-4 py-2 rounded-lg hover:bg-slate-700 transition-colors">Try again</button>
         </div>
-      ) : projects.length === 0 ? (
+      ) : projects.length === 0 && activeProjects.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-slate-700 bg-slate-800/20 py-16 sm:py-32 text-center backdrop-blur-sm px-4">
           <FolderOpen size={48} className="mb-4 sm:mb-6 text-slate-500" weight="duotone" />
           <h3 className="text-lg sm:text-xl font-bold text-slate-200">No projects found</h3>
           <p className="mt-2 text-sm sm:text-base text-slate-400 font-medium">Get started by creating your first project.</p>
         </div>
       ) : (
-        <div className="flex flex-col gap-4">
+        <>
+          {activeProjects.length > 0 && (
+            <div className="mb-10 sm:mb-16">
+              <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-50 mb-4 sm:mb-6">
+                Your Active Projects
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {activeProjects.map((project) => (
+                  <Link 
+                    to={`/projects/${project.id}`} 
+                    key={project.id}
+                    className="group flex flex-col justify-between rounded-2xl border border-green-500/30 bg-slate-800/60 p-5 backdrop-blur-sm transition-all hover:border-green-500/60 hover:bg-slate-800/80 hover:shadow-lg hover:shadow-green-500/10"
+                  >
+                    <div>
+                      <div className="mb-2 flex items-center justify-between gap-3">
+                        <h3 className="font-bold text-lg text-slate-50 tracking-tight truncate">{project.title}</h3>
+                        <span className="shrink-0 inline-flex rounded-full bg-slate-900 px-2.5 py-0.5 text-[10px] font-bold text-green-400 border border-slate-700 uppercase tracking-wider">
+                          {project.myRole}
+                        </span>
+                      </div>
+                      <p className="text-sm font-medium text-slate-400 line-clamp-1 mb-4">{project.description}</p>
+                    </div>
+                    <div className="flex items-center text-green-400 text-xs font-bold gap-1 transition-transform group-hover:translate-x-1">
+                      Go to project <CaretRight weight="bold" />
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {projects.length > 0 && (
+            <div>
+              <div className="flex items-center gap-4 mb-6">
+                <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-50">Discover Projects</h2>
+                <div className="h-px flex-1 bg-slate-700/50"></div>
+              </div>
+              <div className="flex flex-col gap-4">
           {projects.map((project) => (
             <Link 
               to={`/projects/${project.id}`} 
@@ -74,6 +153,9 @@ export function DashboardPage() {
             </Link>
           ))}
         </div>
+            </div>
+          )}
+        </>
       )}
     </div>
   );

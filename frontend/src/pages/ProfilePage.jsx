@@ -40,7 +40,16 @@ export function ProfilePage() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['applications', 'me'] })
   });
 
-  if (userLoading) return <div className="text-slate-500 text-lg animate-pulse text-center py-10">Loading profile...</div>;
+  if (userLoading) return (
+    <div className="max-w-4xl space-y-6 sm:space-y-10 mx-auto pb-12 animate-pulse">
+      <div className="mb-6 sm:mb-10">
+        <div className="h-10 sm:h-12 w-48 bg-slate-800/80 rounded-lg mb-4"></div>
+        <div className="h-5 sm:h-6 w-64 bg-slate-800/50 rounded-lg"></div>
+      </div>
+      <div className="rounded-2xl sm:rounded-3xl border border-slate-700/50 bg-slate-800/40 p-5 sm:p-8 md:p-10 h-64"></div>
+      <div className="rounded-2xl sm:rounded-3xl border border-slate-700/50 bg-slate-800/40 p-5 sm:p-8 md:p-10 h-48"></div>
+    </div>
+  );
 
   return (
     <div className="max-w-4xl space-y-6 sm:space-y-10 mx-auto pb-12">
@@ -114,7 +123,12 @@ export function ProfilePage() {
       {/* Applications */}
       <div className="rounded-2xl sm:rounded-3xl border border-slate-700/50 bg-slate-800/40 p-5 sm:p-8 md:p-10 shadow-2xl backdrop-blur-sm">
         <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-50 mb-4 sm:mb-6">Applications</h2>
-        {appsLoading ? <div className="text-slate-500 animate-pulse py-4">Loading applications...</div> : (
+        {appsLoading ? (
+          <div className="space-y-4 animate-pulse">
+            <div className="h-24 bg-slate-800/50 rounded-2xl"></div>
+            <div className="h-24 bg-slate-800/50 rounded-2xl"></div>
+          </div>
+        ) : (
           <div className="space-y-4">
             {applications?.length === 0 && <div className="text-slate-500 font-medium text-center py-8">You haven't applied to any projects yet.</div>}
             {applications?.map(app => (

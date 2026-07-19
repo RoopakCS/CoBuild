@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
 import { projectsApi } from '../api/projects';
 
 export function CreateProjectPage() {
@@ -27,7 +28,7 @@ export function CreateProjectPage() {
       navigate(`/projects/${data.id}`);
     },
     onError: (err) => {
-      alert('Failed to create project: ' + (err.response?.data?.message || err.message));
+      toast.error('Failed to create project: ' + (err.response?.data?.message || err.message));
     }
   });
 

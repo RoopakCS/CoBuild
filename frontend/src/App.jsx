@@ -8,23 +8,28 @@ import { CreateProjectPage } from './pages/CreateProjectPage';
 import { MyProjectsPage } from './pages/MyProjectsPage';
 import { UserProfilePage } from './pages/UserProfilePage';
 
+import { Toaster } from 'sonner';
+
 function App() {
   return (
-    <Routes>
-      <Route path="/login" element={<AuthPage mode="login" />} />
-      <Route path="/register" element={<AuthPage mode="register" />} />
-      
-      <Route path="/" element={<Layout />}>
-        <Route index element={<DashboardPage />} />
-        <Route path="projects/new" element={<CreateProjectPage />} />
-        <Route path="projects/:id" element={<ProjectDetailsPage />} />
-        <Route path="my-projects" element={<MyProjectsPage />} />
-        <Route path="profile" element={<ProfilePage />} />
-        <Route path="users/:id" element={<UserProfilePage />} />
-      </Route>
-      
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+    <>
+      <Toaster theme="dark" position="top-right" />
+      <Routes>
+        <Route path="/login" element={<AuthPage mode="login" />} />
+        <Route path="/register" element={<AuthPage mode="register" />} />
+        
+        <Route path="/" element={<Layout />}>
+          <Route index element={<DashboardPage />} />
+          <Route path="projects/new" element={<CreateProjectPage />} />
+          <Route path="projects/:id" element={<ProjectDetailsPage />} />
+          <Route path="my-projects" element={<MyProjectsPage />} />
+          <Route path="profile" element={<ProfilePage />} />
+          <Route path="users/:id" element={<UserProfilePage />} />
+        </Route>
+        
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </>
   );
 }
 

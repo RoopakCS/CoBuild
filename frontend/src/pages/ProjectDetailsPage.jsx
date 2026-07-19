@@ -6,6 +6,7 @@ import { usersApi } from '../api/users';
 import { membershipsApi } from '../api/memberships';
 import { useState } from 'react';
 import { ArrowLeft } from '@phosphor-icons/react';
+import { toast } from 'sonner';
 
 export function ProjectDetailsPage() {
   const { id } = useParams();
@@ -40,7 +41,7 @@ export function ProjectDetailsPage() {
   const applyMutation = useMutation({
     mutationFn: (payload) => applicationsApi.apply(payload),
     onSuccess: () => {
-      alert('Applied successfully!');
+      toast.success('Applied successfully!');
       setCoverLetter('');
       queryClient.invalidateQueries({ queryKey: ['projects', id] });
     }
@@ -69,11 +70,20 @@ export function ProjectDetailsPage() {
       await membershipsApi.addMember({ projectId: id, userId: app.applicantId });
       queryClient.invalidateQueries({ queryKey: ['memberships', 'project', id] });
     } catch (e) {
-      alert('Failed to accept application');
+      toast.error('Failed to accept application');
     }
   };
 
-  if (isLoading) return <div className="text-slate-500 p-8 text-center text-lg animate-pulse">Loading project...</div>;
+  if (isLoading) return (
+    <div className="max-w-5xl mx-auto pb-12 animate-pulse">
+      <div className="h-6 w-32 bg-slate-800/50 rounded mb-8"></div>
+      <div className="rounded-2xl sm:rounded-3xl border border-slate-700/50 bg-slate-800/40 p-5 sm:p-8 lg:p-12 mb-6 sm:mb-10 h-64 sm:h-80"></div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-10">
+        <div className="rounded-2xl sm:rounded-3xl border border-slate-700/50 bg-slate-800/30 p-5 sm:p-8 h-48 sm:h-64"></div>
+        <div className="rounded-2xl sm:rounded-3xl border border-slate-700/50 bg-slate-800/30 p-5 sm:p-8 h-48 sm:h-64"></div>
+      </div>
+    </div>
+  );
   if (error || !project) return <div className="text-red-400 bg-red-500/10 p-8 text-center rounded-2xl border border-red-500/20">Failed to load project</div>;
 
   const isOwner = user?.id === project.ownerId;

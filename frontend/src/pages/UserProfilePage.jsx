@@ -16,7 +16,20 @@ export function UserProfilePage() {
     queryFn: () => membershipsApi.getUserMemberships(id),
   });
 
-  if (userLoading) return <div className="text-slate-500 text-lg animate-pulse text-center py-10">Loading profile...</div>;
+  if (userLoading) return (
+    <div className="max-w-4xl mx-auto pb-12 animate-pulse">
+      <div className="mb-6 sm:mb-10">
+        <div className="h-10 sm:h-12 w-64 bg-slate-800/80 rounded-lg mb-4"></div>
+        <div className="h-5 sm:h-6 w-32 bg-slate-800/50 rounded-lg"></div>
+      </div>
+      <div className="rounded-2xl sm:rounded-3xl border border-slate-700/50 bg-slate-800/40 p-5 sm:p-8 md:p-10 mb-8 sm:mb-12 h-64"></div>
+      <div className="h-8 w-48 bg-slate-800/80 rounded-lg mb-6"></div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="h-28 bg-slate-800/50 rounded-2xl"></div>
+        <div className="h-28 bg-slate-800/50 rounded-2xl"></div>
+      </div>
+    </div>
+  );
   if (!user) return <div className="text-red-400 bg-red-500/10 p-8 text-center rounded-2xl border border-red-500/20">User not found</div>;
 
   return (
@@ -52,7 +65,10 @@ export function UserProfilePage() {
 
       <h2 className="text-2xl font-bold tracking-tight text-slate-50 mb-6">Projects they are in</h2>
       {membershipsLoading ? (
-        <div className="text-slate-500 animate-pulse py-4">Loading projects...</div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-pulse">
+          <div className="h-24 bg-slate-800/50 rounded-2xl border border-slate-700/50"></div>
+          <div className="h-24 bg-slate-800/50 rounded-2xl border border-slate-700/50"></div>
+        </div>
       ) : memberships?.length === 0 ? (
         <div className="text-slate-500 font-medium py-4">This user hasn't joined any projects yet.</div>
       ) : (
