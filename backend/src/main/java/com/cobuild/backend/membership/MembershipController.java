@@ -1,0 +1,56 @@
+package com.cobuild.backend.membership;
+
+import com.cobuild.backend.membership.dto.request.AddMemberRequest;
+import com.cobuild.backend.membership.dto.response.MembershipResponse;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.UUID;
+
+@RestController
+@RequestMapping("/api/v1/memberships")
+@RequiredArgsConstructor
+public class MembershipController {
+
+    private final MembershipService membershipService;
+
+    @PostMapping
+    public ResponseEntity<MembershipResponse> addMember(
+            @Valid @RequestBody AddMemberRequest request) {
+
+        MembershipResponse response = membershipService.addMember(request);
+
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+
+    @GetMapping("/project/{projectId}")
+    public ResponseEntity<List<MembershipResponse>> getProjectMembers(
+            @PathVariable UUID projectId) {
+
+        return ResponseEntity.ok(
+                membershipService.getProjectMembers(projectId));
+    }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<MembershipResponse>> getUserMemberships(
+            @PathVariable UUID userId) {
+
+        return ResponseEntity.ok(
+                membershipService.getUserMemberships(userId));
+    }
+
+    @DeleteMapping("/project/{projectId}/user/{userId}")
+    public ResponseEntity<Void> removeMember(
+            @PathVariable UUID projectId,
+            @PathVariable UUID userId) {
+
+        membershipService.removeMember(projectId, userId);
+
+        return ResponseEntity.noContent().build();
+    }
+
+}
