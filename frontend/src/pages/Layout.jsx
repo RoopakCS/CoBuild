@@ -11,31 +11,31 @@ export function Layout() {
   };
 
   const navItems = [
-    { name: 'Dashboard', path: '/', icon: <FolderOpen size={20} /> },
-    { name: 'My Projects', path: '/my-projects', icon: <ListDashes size={20} /> },
-    { name: 'Profile', path: '/profile', icon: <UserCircle size={20} /> },
+    { name: 'Dashboard', path: '/', icon: <FolderOpen size={24} weight="duotone" /> },
+    { name: 'My Projects', path: '/my-projects', icon: <ListDashes size={24} weight="duotone" /> },
+    { name: 'Profile', path: '/profile', icon: <UserCircle size={24} weight="duotone" /> },
   ];
 
   return (
-    <div className="flex min-h-screen bg-zinc-50 text-zinc-900 font-sans selection:bg-zinc-200">
-      <aside className="w-64 border-r border-zinc-200 bg-white p-6 flex flex-col justify-between">
+    <div className="flex min-h-screen bg-slate-900 text-slate-50 font-sans selection:bg-green-500/30 selection:text-green-200">
+      <aside className="w-72 border-r border-slate-800 bg-slate-900/50 backdrop-blur-xl p-8 flex flex-col justify-between">
         <div>
-          <div className="flex items-center gap-2 mb-8">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-zinc-900 text-white">
-              <FolderOpen weight="bold" />
+          <div className="flex items-center gap-3 mb-12">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-green-500 text-slate-900 shadow-lg shadow-green-500/20">
+              <FolderOpen size={24} weight="bold" />
             </div>
-            <span className="text-lg font-medium tracking-tight">CoBuild</span>
+            <span className="text-2xl font-bold tracking-tighter">CoBuild</span>
           </div>
 
-          <nav className="space-y-1">
+          <nav className="space-y-2">
             {navItems.map((item) => (
               <Link
                 key={item.name}
                 to={item.path}
-                className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
+                className={`flex items-center gap-4 rounded-xl px-4 py-3 text-sm font-medium transition-all ${
                   location.pathname === item.path
-                    ? 'bg-zinc-100 text-zinc-900'
-                    : 'text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900'
+                    ? 'bg-slate-800 text-green-400 shadow-sm'
+                    : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-100'
                 }`}
               >
                 {item.icon}
@@ -48,23 +48,23 @@ export function Layout() {
         <div>
           <Link
             to="/projects/new"
-            className="flex w-full items-center justify-center gap-2 rounded-md bg-zinc-900 px-3 py-2 mb-4 text-sm font-medium text-white transition-colors hover:bg-zinc-800"
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-green-500 px-4 py-3 mb-4 text-sm font-bold text-slate-900 transition-all hover:bg-green-400 hover:shadow-lg hover:shadow-green-500/20 hover:-translate-y-0.5"
           >
-            <Plus weight="bold" />
+            <Plus weight="bold" size={20} />
             New Project
           </Link>
           <button
             onClick={handleLogout}
-            className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-zinc-600 transition-colors hover:bg-zinc-50 hover:text-zinc-900"
+            className="flex w-full items-center gap-4 rounded-xl px-4 py-3 text-sm font-medium text-slate-400 transition-all hover:bg-slate-800/50 hover:text-slate-100"
           >
-            <SignOut size={20} />
+            <SignOut size={20} weight="duotone" />
             Sign out
           </button>
         </div>
       </aside>
 
       <main className="flex-1 overflow-y-auto">
-        <div className="mx-auto max-w-5xl p-8">
+        <div className="mx-auto max-w-6xl p-10 lg:p-16">
           <Outlet />
         </div>
       </main>

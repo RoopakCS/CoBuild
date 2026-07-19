@@ -15,34 +15,44 @@ export function MyProjectsPage() {
 
   return (
     <div>
-      <div className="mb-8 flex items-center justify-between">
+      <div className="mb-12 flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
-          <h1 className="text-3xl font-medium tracking-tight">My Projects</h1>
-          <p className="mt-2 text-zinc-500">Manage the projects you have created.</p>
+          <h1 className="text-4xl md:text-5xl font-bold tracking-tighter text-slate-50">My Projects</h1>
+          <p className="mt-3 text-lg text-slate-400 font-medium">Manage the projects you have created.</p>
         </div>
-        <Link to="/projects/new" className="rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800">
-          Create New
+        <Link to="/projects/new" className="inline-flex shrink-0 items-center justify-center rounded-xl bg-green-500 px-6 py-3 text-sm font-bold text-slate-900 transition-all hover:bg-green-400 hover:shadow-lg hover:shadow-green-500/20 hover:-translate-y-0.5">
+          Create New Project
         </Link>
       </div>
 
       {isLoading ? (
-        <div className="text-zinc-500">Loading your projects...</div>
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+          {[1, 2].map(i => (
+            <div key={i} className="h-40 animate-pulse rounded-2xl bg-slate-800/50 border border-slate-700/50"></div>
+          ))}
+        </div>
       ) : projects?.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-zinc-300 py-16 text-center">
-          <FolderOpen size={48} className="mb-4 text-zinc-400" />
-          <h3 className="font-medium">You don't own any projects.</h3>
+        <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-slate-700 bg-slate-800/20 py-32 text-center backdrop-blur-sm">
+          <FolderOpen size={56} className="mb-6 text-slate-500" weight="duotone" />
+          <h3 className="text-xl font-bold text-slate-200">You don't own any projects.</h3>
+          <p className="mt-2 text-slate-400 font-medium">Get started by creating your first project.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
           {projects?.map(project => (
             <Link 
               to={`/projects/${project.id}`} 
               key={project.id}
-              className="rounded-2xl border border-zinc-200 bg-white p-6 hover:border-zinc-300"
+              className="group flex flex-col justify-between rounded-2xl border border-slate-700/50 bg-slate-800/40 p-6 backdrop-blur-sm transition-all hover:-translate-y-1 hover:border-green-500/30 hover:bg-slate-800/60 hover:shadow-2xl hover:shadow-green-500/10"
             >
-              <h3 className="font-medium text-zinc-900">{project.title}</h3>
-              <p className="text-sm text-zinc-500 line-clamp-2 mt-2">{project.description}</p>
-              <div className="mt-4 text-xs font-medium text-zinc-400">Manage Project &rarr;</div>
+              <div>
+                <h3 className="font-bold text-xl text-slate-50 tracking-tight">{project.title}</h3>
+                <p className="text-sm font-medium text-slate-400 line-clamp-2 mt-3 leading-relaxed">{project.description}</p>
+              </div>
+              <div className="mt-8 flex items-center justify-between border-t border-slate-700/50 pt-5 text-sm font-semibold text-green-400">
+                <span>Manage Project</span>
+                <span className="transition-transform group-hover:translate-x-1">&rarr;</span>
+              </div>
             </Link>
           ))}
         </div>

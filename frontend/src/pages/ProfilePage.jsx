@@ -40,79 +40,91 @@ export function ProfilePage() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['applications', 'me'] })
   });
 
-  if (userLoading) return <div>Loading...</div>;
+  if (userLoading) return <div className="text-slate-500 text-lg animate-pulse text-center py-10">Loading profile...</div>;
 
   return (
-    <div className="max-w-4xl space-y-8">
-      <div>
-        <h1 className="text-3xl font-medium tracking-tight">Your Profile</h1>
-        <p className="text-zinc-500 mt-2">Manage your information, skills, and applications.</p>
+    <div className="max-w-4xl space-y-10 mx-auto pb-12">
+      <div className="mb-10">
+        <h1 className="text-4xl md:text-5xl font-bold tracking-tighter text-slate-50">Your Profile</h1>
+        <p className="mt-3 text-lg text-slate-400 font-medium">Manage your information, skills, and applications.</p>
       </div>
       
       {/* Profile Info */}
-      <div className="rounded-2xl border border-zinc-200 bg-white p-8">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-medium">Basic Info</h2>
+      <div className="rounded-3xl border border-slate-700/50 bg-slate-800/40 p-8 md:p-10 shadow-2xl backdrop-blur-sm">
+        <div className="flex justify-between items-center mb-8">
+          <h2 className="text-2xl font-bold tracking-tight text-slate-50">Basic Info</h2>
           <button 
             onClick={() => { setIsEditing(!isEditing); setEditForm(user); }}
-            className="text-sm font-medium text-blue-600"
+            className="text-sm font-bold text-green-400 hover:text-green-300 transition-colors bg-green-500/10 px-4 py-2 rounded-xl"
           >
-            {isEditing ? 'Cancel' : 'Edit'}
+            {isEditing ? 'Cancel' : 'Edit Profile'}
           </button>
         </div>
 
         {isEditing ? (
-          <form className="space-y-4" onSubmit={e => { e.preventDefault(); updateProfile.mutate(editForm); }}>
-            <input className="w-full border p-2 rounded" placeholder="Bio" value={editForm.bio || ''} onChange={e => setEditForm({...editForm, bio: e.target.value})} />
-            <input className="w-full border p-2 rounded" placeholder="GitHub URL" value={editForm.githubUrl || ''} onChange={e => setEditForm({...editForm, githubUrl: e.target.value})} />
-            <input className="w-full border p-2 rounded" placeholder="LinkedIn URL" value={editForm.linkedinUrl || ''} onChange={e => setEditForm({...editForm, linkedinUrl: e.target.value})} />
-            <select className="w-full border p-2 rounded" value={editForm.experienceLevel || 'BEGINNER'} onChange={e => setEditForm({...editForm, experienceLevel: e.target.value})}>
+          <form className="space-y-5" onSubmit={e => { e.preventDefault(); updateProfile.mutate(editForm); }}>
+            <input className="w-full bg-slate-900/50 border border-slate-700 text-slate-100 placeholder-slate-500 p-4 rounded-xl focus:outline-none focus:border-green-500 focus:ring-4 focus:ring-green-500/10 transition-all" placeholder="Bio" value={editForm.bio || ''} onChange={e => setEditForm({...editForm, bio: e.target.value})} />
+            <input className="w-full bg-slate-900/50 border border-slate-700 text-slate-100 placeholder-slate-500 p-4 rounded-xl focus:outline-none focus:border-green-500 focus:ring-4 focus:ring-green-500/10 transition-all" placeholder="GitHub URL" value={editForm.githubUrl || ''} onChange={e => setEditForm({...editForm, githubUrl: e.target.value})} />
+            <input className="w-full bg-slate-900/50 border border-slate-700 text-slate-100 placeholder-slate-500 p-4 rounded-xl focus:outline-none focus:border-green-500 focus:ring-4 focus:ring-green-500/10 transition-all" placeholder="LinkedIn URL" value={editForm.linkedinUrl || ''} onChange={e => setEditForm({...editForm, linkedinUrl: e.target.value})} />
+            <select className="w-full bg-slate-900/50 border border-slate-700 text-slate-100 placeholder-slate-500 p-4 rounded-xl focus:outline-none focus:border-green-500 focus:ring-4 focus:ring-green-500/10 transition-all appearance-none" value={editForm.experienceLevel || 'BEGINNER'} onChange={e => setEditForm({...editForm, experienceLevel: e.target.value})}>
               <option value="BEGINNER">Beginner</option>
               <option value="INTERMEDIATE">Intermediate</option>
               <option value="EXPERT">Expert</option>
             </select>
-            <button type="submit" className="bg-zinc-900 text-white px-4 py-2 rounded">Save</button>
+            <div className="pt-4 flex justify-end">
+              <button type="submit" disabled={updateProfile.isPending} className="bg-green-500 text-slate-900 font-bold px-8 py-3 rounded-xl hover:bg-green-400 hover:shadow-lg hover:shadow-green-500/20 hover:-translate-y-0.5 transition-all disabled:opacity-50">Save Changes</button>
+            </div>
           </form>
         ) : (
-          <div className="grid grid-cols-2 gap-4">
-            <p className="font-medium">{user.name}</p>
-            <p className="text-zinc-500">{user.email}</p>
-            <p className="col-span-2 text-sm">{user.bio || 'No bio'}</p>
-            <p className="text-sm">Exp: {user.experienceLevel || 'Not set'}</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-slate-900/30 p-6 rounded-2xl border border-slate-700/30">
+            <div><p className="text-xs text-slate-500 font-bold uppercase tracking-widest mb-1">Name</p><p className="font-semibold text-slate-200 text-lg">{user.name}</p></div>
+            <div><p className="text-xs text-slate-500 font-bold uppercase tracking-widest mb-1">Email</p><p className="font-semibold text-slate-400">{user.email}</p></div>
+            <div className="col-span-1 md:col-span-2"><p className="text-xs text-slate-500 font-bold uppercase tracking-widest mb-1">Bio</p><p className="text-slate-300 leading-relaxed">{user.bio || 'No bio set.'}</p></div>
+            <div><p className="text-xs text-slate-500 font-bold uppercase tracking-widest mb-1">Experience</p><p className="font-semibold text-slate-200">{user.experienceLevel || 'Not set'}</p></div>
+            <div className="flex gap-4">
+              <div><p className="text-xs text-slate-500 font-bold uppercase tracking-widest mb-1">Links</p>
+                <div className="flex gap-3 mt-1">
+                  {user.githubUrl ? <a href={user.githubUrl} target="_blank" className="text-sm font-bold text-slate-300 hover:text-green-400 transition-colors">GitHub ↗</a> : <span className="text-sm text-slate-600">No GitHub</span>}
+                  {user.linkedinUrl ? <a href={user.linkedinUrl} target="_blank" className="text-sm font-bold text-slate-300 hover:text-green-400 transition-colors">LinkedIn ↗</a> : <span className="text-sm text-slate-600">No LinkedIn</span>}
+                </div>
+              </div>
+            </div>
           </div>
         )}
       </div>
 
       {/* Skills */}
-      <div className="rounded-2xl border border-zinc-200 bg-white p-8">
-        <h2 className="text-xl font-medium mb-4">Skills</h2>
-        <div className="flex gap-2 mb-4">
-          <input className="border p-2 rounded text-sm flex-1" placeholder="Add a skill" value={skillInput} onChange={e => setSkillInput(e.target.value)} />
-          <button onClick={() => addSkill.mutate({ name: skillInput })} className="bg-zinc-900 text-white px-4 py-2 rounded text-sm">Add</button>
+      <div className="rounded-3xl border border-slate-700/50 bg-slate-800/40 p-8 md:p-10 shadow-2xl backdrop-blur-sm">
+        <h2 className="text-2xl font-bold tracking-tight text-slate-50 mb-6">Skills</h2>
+        <div className="flex gap-3 mb-8">
+          <input className="bg-slate-900/50 border border-slate-700 text-slate-100 placeholder-slate-500 p-3 px-4 rounded-xl flex-1 focus:outline-none focus:border-green-500 focus:ring-4 focus:ring-green-500/10 transition-all" placeholder="Add a skill (e.g. React)" value={skillInput} onChange={e => setSkillInput(e.target.value)} onKeyDown={(e) => { if(e.key === 'Enter') addSkill.mutate({name: skillInput}); }} />
+          <button onClick={() => addSkill.mutate({ name: skillInput })} disabled={!skillInput.trim()} className="bg-slate-200 text-slate-900 font-bold px-6 py-3 rounded-xl hover:bg-white transition-colors disabled:opacity-50">Add</button>
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-3">
+          {skills?.length === 0 && <span className="text-slate-500 font-medium">No skills added yet.</span>}
           {skills?.map(skill => (
-            <span key={skill.id} className="bg-zinc-100 px-3 py-1 rounded text-sm flex items-center gap-2">
+            <span key={skill.id} className="bg-slate-900 border border-slate-700 px-4 py-2 rounded-lg text-sm font-medium text-slate-300 flex items-center gap-3">
               {skill.name}
-              <button onClick={() => deleteSkill.mutate(skill.id)} className="text-red-500">&times;</button>
+              <button onClick={() => deleteSkill.mutate(skill.id)} className="text-slate-500 hover:text-red-400 transition-colors font-bold text-lg leading-none mt-[-2px]">&times;</button>
             </span>
           ))}
         </div>
       </div>
 
       {/* Applications */}
-      <div className="rounded-2xl border border-zinc-200 bg-white p-8">
-        <h2 className="text-xl font-medium mb-4">Applications</h2>
-        {appsLoading ? <p>Loading...</p> : (
+      <div className="rounded-3xl border border-slate-700/50 bg-slate-800/40 p-8 md:p-10 shadow-2xl backdrop-blur-sm">
+        <h2 className="text-2xl font-bold tracking-tight text-slate-50 mb-6">Applications</h2>
+        {appsLoading ? <div className="text-slate-500 animate-pulse py-4">Loading applications...</div> : (
           <div className="space-y-4">
+            {applications?.length === 0 && <div className="text-slate-500 font-medium text-center py-8">You haven't applied to any projects yet.</div>}
             {applications?.map(app => (
-              <div key={app.id} className="border p-4 rounded-xl flex justify-between items-center">
+              <div key={app.id} className="bg-slate-900/40 border border-slate-700/80 p-5 rounded-2xl flex flex-col md:flex-row md:justify-between md:items-center gap-4">
                 <div>
-                  <h3 className="font-medium">{app.projectTitle}</h3>
-                  <p className="text-sm text-zinc-500">Status: {app.status}</p>
+                  <h3 className="font-bold text-lg text-slate-200">{app.projectTitle}</h3>
+                  <p className="text-sm font-medium text-slate-400 mt-1">Status: <span className={`font-bold ${app.status === 'PENDING' ? 'text-yellow-400' : app.status === 'ACCEPTED' ? 'text-green-400' : 'text-slate-500'}`}>{app.status}</span></p>
                 </div>
                 {app.status !== 'WITHDRAWN' && app.status !== 'ACCEPTED' && app.status !== 'REJECTED' && (
-                  <button onClick={() => withdrawApp.mutate(app.id)} className="text-sm text-red-600 border border-red-200 px-3 py-1 rounded">Withdraw</button>
+                  <button onClick={() => withdrawApp.mutate(app.id)} className="text-sm font-bold text-red-400 bg-red-500/10 hover:bg-red-500/20 px-4 py-2 rounded-xl transition-colors self-start md:self-auto">Withdraw</button>
                 )}
               </div>
             ))}
