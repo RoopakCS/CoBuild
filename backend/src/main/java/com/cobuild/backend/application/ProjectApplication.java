@@ -19,7 +19,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
-
+import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -27,7 +27,18 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "project_applications")
+@Table(
+    name = "project_applications",
+    uniqueConstraints = {
+        @UniqueConstraint(
+            name = "uk_project_applicant",
+            columnNames = {
+                "project_id",
+                "applcant_id"
+            }
+        )
+    }
+)
 @Getter
 @Setter
 @NoArgsConstructor
