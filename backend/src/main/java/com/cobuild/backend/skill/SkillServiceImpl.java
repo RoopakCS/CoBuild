@@ -3,10 +3,10 @@ package com.cobuild.backend.skill;
 import com.cobuild.backend.exception.DuplicateResourceException;
 import com.cobuild.backend.exception.ForbiddenException;
 import com.cobuild.backend.exception.ResourceNotFoundException;
+import com.cobuild.backend.security.user.UserPrincipal;
 import com.cobuild.backend.skill.dto.request.CreateSkillRequest;
 import com.cobuild.backend.skill.dto.response.SkillResponse;
 import com.cobuild.backend.user.User;
-import com.cobuild.backend.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,26 +19,19 @@ import java.util.List;
 public class SkillServiceImpl implements SkillService {
 
     private final SkillRepository skillRepository;
-    private final UserRepository userRepository;
 
     @Override
     public SkillResponse addSkill(CreateSkillRequest request) {
 
-        Authentication authentication = SecurityContextHolder
-                .getContext()
-                .getAuthentication();
+        User currentUser = getCurrentUser();
 
-        User user = userRepository.findByEmail(authentication.getName())
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("User not found"));
-
-        if (skillRepository.existsByUserAndName(user, request.getName())) {
+        if (skillRepository.existsByUserAndName(currentUser, request.getName())) {
             throw new DuplicateResourceException("Skill already exists");
         }
 
         Skill skill = Skill.builder()
                 .name(request.getName())
-                .user(user)
+                .user(currentUser)
                 .build();
 
         Skill savedSkill = skillRepository.save(skill);
@@ -49,15 +42,9 @@ public class SkillServiceImpl implements SkillService {
     @Override
     public List<SkillResponse> getMySkills() {
 
-        Authentication authentication = SecurityContextHolder
-                .getContext()
-                .getAuthentication();
+        User currentUser = getCurrentUser();
 
-        User user = userRepository.findByEmail(authentication.getName())
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("User not found"));
-
-        return skillRepository.findByUser(user)
+        return skillRepository.findByUser(currentUser)
                 .stream()
                 .map(this::mapToResponse)
                 .toList();
@@ -66,10 +53,16 @@ public class SkillServiceImpl implements SkillService {
     @Override
     public SkillResponse updateSkill(Long skillId, CreateSkillRequest request) {
 
-
         Skill skill = skillRepository.findById(skillId)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Skill not found"));
+
+        User currentUser = getCurrentUser();
+
+        if (!skill.getUser().getId().equals(currentUser.getId())) {
+            throw new ForbiddenException(
+                    "You can only update your own skills");
+        }
 
         skill.setName(request.getName());
 
@@ -85,13 +78,7 @@ public class SkillServiceImpl implements SkillService {
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Skill not found"));
 
-        Authentication authentication = SecurityContextHolder
-                .getContext()
-                .getAuthentication();
-
-        User currentUser = userRepository.findByEmail(authentication.getName())
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("User not found"));
+        User currentUser = getCurrentUser();
 
         if (!skill.getUser().getId().equals(currentUser.getId())) {
             throw new ForbiddenException(
@@ -101,6 +88,31 @@ public class SkillServiceImpl implements SkillService {
         skillRepository.delete(skill);
     }
 
+    /**
+     * Returns the currently authenticated user.
+     */
+    private User getCurrentUser() {
+
+        Authentication authentication = SecurityContextHolder
+                .getContext()
+                .getAuthentication();
+
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new ForbiddenException("User is not authenticated");
+        }
+
+        Object principal = authentication.getPrincipal();
+
+        if (!(principal instanceof UserPrincipal userPrincipal)) {
+            throw new ForbiddenException("Invalid authentication principal");
+        }
+
+        return userPrincipal.getUser();
+    }
+
+    /**
+     * Converts Skill entity to SkillResponse DTO.
+     */
     private SkillResponse mapToResponse(Skill skill) {
 
         return SkillResponse.builder()
