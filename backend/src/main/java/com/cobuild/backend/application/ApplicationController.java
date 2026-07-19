@@ -60,7 +60,7 @@ public class ApplicationController {
             @PathVariable UUID applicationId,
             @Valid @RequestBody UpdateApplicationStatusRequest request,
             Authentication authentication) {
-        ApplicationResponse response = applicationService.updateApplication(applicationId, request.status(), authentication.getName());
+        ApplicationResponse response = applicationService.updateStatus(applicationId, request.status(), authentication.getName());
 
         return ResponseEntity.ok(response);
     }

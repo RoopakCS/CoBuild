@@ -1,6 +1,5 @@
 package com.cobuild.backend.user;
 
-import com.cobuild.backend.user.ExperienceLevel;
 import jakarta.persistence.*;
 import lombok.*;
 
