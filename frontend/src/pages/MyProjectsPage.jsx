@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { projectsApi } from '../api/projects';
 import { usersApi } from '../api/users';
-import { FolderOpen } from '@phosphor-icons/react';
+import { FolderOpen, CaretRight } from '@phosphor-icons/react';
 
 export function MyProjectsPage() {
   const { data: user } = useQuery({ queryKey: ['users', 'me'], queryFn: usersApi.getMe });
@@ -14,7 +14,7 @@ export function MyProjectsPage() {
   });
 
   return (
-    <div>
+    <div className="max-w-5xl mx-auto pb-12">
       <div className="mb-6 sm:mb-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-6">
         <div>
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tighter text-slate-50">My Projects</h1>
@@ -26,9 +26,9 @@ export function MyProjectsPage() {
       </div>
 
       {isLoading ? (
-        <div className="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-2 xl:grid-cols-3">
+        <div className="flex flex-col gap-4">
           {[1, 2].map(i => (
-            <div key={i} className="h-40 animate-pulse rounded-2xl bg-slate-800/50 border border-slate-700/50"></div>
+            <div key={i} className="h-32 animate-pulse rounded-2xl bg-slate-800/50 border border-slate-700/50"></div>
           ))}
         </div>
       ) : projects?.length === 0 ? (
@@ -38,20 +38,30 @@ export function MyProjectsPage() {
           <p className="mt-2 text-sm sm:text-base text-slate-400 font-medium">Get started by creating your first project.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+        <div className="flex flex-col gap-4">
           {projects?.map(project => (
             <Link 
               to={`/projects/${project.id}`} 
               key={project.id}
-              className="group flex flex-col justify-between rounded-2xl border border-slate-700/50 bg-slate-800/40 p-6 backdrop-blur-sm transition-all hover:-translate-y-1 hover:border-green-500/30 hover:bg-slate-800/60 hover:shadow-2xl hover:shadow-green-500/10"
+              className="group flex flex-col sm:flex-row sm:items-center justify-between rounded-2xl border border-slate-700/50 bg-slate-800/40 p-5 sm:p-6 backdrop-blur-sm transition-all hover:border-green-500/30 hover:bg-slate-800/60 hover:shadow-lg hover:shadow-green-500/10"
             >
-              <div>
-                <h3 className="font-bold text-xl text-slate-50 tracking-tight">{project.title}</h3>
-                <p className="text-sm font-medium text-slate-400 line-clamp-2 mt-3 leading-relaxed">{project.description}</p>
+              <div className="flex-1 min-w-0 pr-4">
+                <div className="mb-2 flex items-center gap-3">
+                  <h3 className="font-bold text-xl text-slate-50 tracking-tight truncate">{project.title}</h3>
+                  <span className="shrink-0 inline-flex rounded-full bg-green-500/10 px-2.5 py-0.5 text-xs font-bold text-green-400 border border-green-500/20">
+                    {project.status || 'ACTIVE'}
+                  </span>
+                </div>
+                <p className="text-sm font-medium text-slate-400 line-clamp-1 mb-3">{project.description}</p>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-slate-500 font-bold uppercase tracking-wider">Role:</span>
+                  <span className="text-sm font-semibold text-slate-300">Owner</span>
+                </div>
               </div>
-              <div className="mt-8 flex items-center justify-between border-t border-slate-700/50 pt-5 text-sm font-semibold text-green-400">
-                <span>Manage Project</span>
-                <span className="transition-transform group-hover:translate-x-1">&rarr;</span>
+              <div className="mt-4 sm:mt-0 flex items-center justify-between sm:justify-center gap-3 shrink-0 sm:border-l sm:border-slate-700/50 sm:pl-6 sm:h-full">
+                <div className="flex items-center text-green-400 text-sm font-bold gap-1 transition-transform group-hover:translate-x-1">
+                  Manage <CaretRight weight="bold" />
+                </div>
               </div>
             </Link>
           ))}
