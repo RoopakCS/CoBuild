@@ -2,6 +2,7 @@ package com.cobuild.backend.auth;
 
 import com.cobuild.backend.auth.dto.AuthResponse;
 import com.cobuild.backend.security.jwt.JwtService;
+import com.cobuild.backend.security.user.UserPrincipal;
 import com.cobuild.backend.user.ExperienceLevel;
 import com.cobuild.backend.user.User;
 import com.cobuild.backend.user.UserRepository;
@@ -35,11 +36,15 @@ public class AuthService {
                 .experienceLevel(ExperienceLevel.BEGINNER)
                 .build();
 
-        userRepository.save(user);
+        User savedUser = userRepository.save(user);
+
+        String jwtToken = jwtService.generateToken(new UserPrincipal(savedUser));
 
         return AuthResponse.builder()
+                .token(jwtToken)
                 .message("User Registered Successfully")
                 .build();
+
     }
 
     public AuthResponse login(LoginRequest request) {
