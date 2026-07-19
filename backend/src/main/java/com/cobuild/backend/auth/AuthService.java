@@ -1,10 +1,16 @@
 package com.cobuild.backend.auth;
 
 import com.cobuild.backend.auth.dto.AuthResponse;
+import com.cobuild.backend.security.jwt.JwtService;
+import com.cobuild.backend.user.ExperienceLevel;
+import com.cobuild.backend.user.User;
 import com.cobuild.backend.user.UserRepository;
 import com.cobuild.backend.user.dto.request.LoginRequest;
 import com.cobuild.backend.user.dto.request.RegisterRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -12,14 +18,24 @@ import org.springframework.stereotype.Service;
 public class AuthService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
+    private final AuthenticationManager authenticationManager;
 
     public AuthResponse register(RegisterRequest request) {
 
-        // TODO:
-        // 1. Check if email already exists
-        // 2. Encrypt password
-        // 3. Save user
-        // 4. Return success response
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new RuntimeException("Email already exists");
+        }
+
+        User user = User.builder()
+                .name(request.getName())
+                .email(request.getEmail())
+                .passwordHash(passwordEncoder.encode(request.getPassword()))
+                .experienceLevel(ExperienceLevel.BEGINNER)
+                .build();
+
+        userRepository.save(user);
 
         return AuthResponse.builder()
                 .message("User Registered Successfully")
@@ -28,13 +44,20 @@ public class AuthService {
 
     public AuthResponse login(LoginRequest request) {
 
-        // TODO:
-        // 1. Find user by email
-        // 2. Verify password
-        // 3. Generate JWT
-        // 4. Return token
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        request.getEmail(),
+                        request.getPassword()
+                )
+        );
+
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        String jwtToken = jwtService.generateToken(new com.cobuild.backend.security.user.UserPrincipal(user));
 
         return AuthResponse.builder()
+                .token(jwtToken)
                 .message("Login Successful")
                 .build();
     }
