@@ -7,14 +7,13 @@ import com.cobuild.backend.membership.dto.request.AddMemberRequest;
 import com.cobuild.backend.membership.dto.response.MembershipResponse;
 import com.cobuild.backend.project.Project;
 import com.cobuild.backend.project.ProjectRepository;
+import com.cobuild.backend.security.user.UserPrincipal;
 import com.cobuild.backend.user.User;
 import com.cobuild.backend.user.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.security.core.Authentication;
-
-
 
 import java.util.List;
 import java.util.UUID;
@@ -29,7 +28,6 @@ public class MembershipServiceImpl implements MembershipService {
 
     @Override
     public MembershipResponse addMember(AddMemberRequest request) {
-
 
         Project project = projectRepository.findById(request.getProjectId())
                 .orElseThrow(() ->
@@ -58,9 +56,7 @@ public class MembershipServiceImpl implements MembershipService {
                 .status(MembershipStatus.ACTIVE)
                 .build();
 
-        Membership savedMembership = membershipRepository.save(membership);
-
-        return mapToResponse(savedMembership);
+        return mapToResponse(membershipRepository.save(membership));
     }
 
     @Override
@@ -94,7 +90,8 @@ public class MembershipServiceImpl implements MembershipService {
 
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() ->
-                                new ResourceNotFoundException("Project not found"));
+                        new ResourceNotFoundException("Project not found"));
+
         User currentUser = getCurrentUser();
 
         if (!project.getOwner().getId().equals(currentUser.getId())) {
@@ -116,23 +113,39 @@ public class MembershipServiceImpl implements MembershipService {
 
     private User getCurrentUser() {
 
-        Authentication authentication = SecurityContextHolder
-                .getContext()
-                .getAuthentication();
+        Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
 
-        return userRepository.findByEmail(authentication.getName())
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("User not found"));
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new ForbiddenException("Unauthorized");
+        }
+
+        Object principal = authentication.getPrincipal();
+
+        if (!(principal instanceof UserPrincipal userPrincipal)) {
+            throw new ForbiddenException("Unauthorized");
+        }
+
+        User user = userPrincipal.getUser();
+
+        if (user == null) {
+            throw new ForbiddenException("Unauthorized");
+        }
+
+        return user;
     }
 
     private MembershipResponse mapToResponse(Membership membership) {
 
+        User user = membership.getUser();
+        Project project = membership.getProject();
+
         return MembershipResponse.builder()
                 .id(membership.getId())
-                .userId(membership.getUser().getId())
-                .userName(membership.getUser().getName())
-                .projectId(membership.getProject().getId())
-                .projectTitle(membership.getProject().getTitle())
+                .userId(user != null ? user.getId() : null)
+                .userName(user != null ? user.getName() : null)
+                .projectId(project != null ? project.getId() : null)
+                .projectTitle(project != null ? project.getTitle() : null)
                 .role(membership.getRole())
                 .status(membership.getStatus())
                 .joinedAt(membership.getJoinedAt())

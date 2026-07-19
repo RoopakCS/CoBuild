@@ -1,4 +1,4 @@
-package com.cobuild.backend.application.dto;
+package com.cobuild.backend.application.dto.response;
 
 import java.time.LocalDateTime;
 import java.util.UUID;

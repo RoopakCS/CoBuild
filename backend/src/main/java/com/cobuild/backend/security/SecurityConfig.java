@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -20,28 +21,27 @@ public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http)
-            throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) {
 
-        http
-                .csrf(csrf -> csrf.disable())
+        try {
+            http
+                    .csrf(AbstractHttpConfigurer::disable)
+                    .sessionManagement(session ->
+                            session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                    .authorizeHttpRequests(auth -> auth
+                            .requestMatchers("/api/auth/**").permitAll()
+                            .anyRequest().authenticated()
+                    )
+                    .addFilterBefore(
+                            jwtAuthenticationFilter,
+                            UsernamePasswordAuthenticationFilter.class
+                    );
 
-                .sessionManagement(session ->
-                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            return http.build();
 
-                .authorizeHttpRequests(auth -> auth
-
-                        .requestMatchers("/api/auth/**").permitAll()
-
-                        .anyRequest().authenticated()
-                )
-
-                .addFilterBefore(
-                        jwtAuthenticationFilter,
-                        UsernamePasswordAuthenticationFilter.class
-                );
-
-        return http.build();
+        } catch (Exception e) {
+            throw new IllegalStateException("Failed to configure Spring Security", e);
+        }
     }
 
     @Bean
@@ -51,10 +51,12 @@ public class SecurityConfig {
 
     @Bean
     public AuthenticationManager authenticationManager(
-            AuthenticationConfiguration configuration)
-            throws Exception {
+            AuthenticationConfiguration configuration) {
 
-        return configuration.getAuthenticationManager();
+        try {
+            return configuration.getAuthenticationManager();
+        } catch (Exception e) {
+            throw new IllegalStateException("Failed to create AuthenticationManager", e);
+        }
     }
-
 }

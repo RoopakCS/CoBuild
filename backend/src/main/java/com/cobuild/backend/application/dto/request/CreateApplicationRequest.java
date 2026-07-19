@@ -1,4 +1,4 @@
-package com.cobuild.backend.application.dto;
+package com.cobuild.backend.application.dto.request;
 
 import jakarta.validation.constraints.Size;
 

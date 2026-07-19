@@ -5,13 +5,12 @@ import com.cobuild.backend.exception.ResourceNotFoundException;
 import com.cobuild.backend.project.dto.request.CreateProjectRequest;
 import com.cobuild.backend.project.dto.request.UpdateProjectRequest;
 import com.cobuild.backend.project.dto.response.ProjectResponse;
+import com.cobuild.backend.security.user.UserPrincipal;
 import com.cobuild.backend.user.User;
-import com.cobuild.backend.user.UserRepository;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -23,13 +22,9 @@ import java.util.UUID;
 public class ProjectServiceImpl implements ProjectService {
 
     private final ProjectRepository projectRepository;
-    private final UserRepository userRepository;
 
     @Override
     public ProjectResponse createProject(CreateProjectRequest request) {
-
-        // Temporary Owner
-        // Replace this with Logged In User after JWT
 
         User owner = getCurrentUser();
 
@@ -55,7 +50,7 @@ public class ProjectServiceImpl implements ProjectService {
 
         Project project = projectRepository.findById(id)
                 .orElseThrow(() ->
-                        new EntityNotFoundException("Project not found"));
+                        new ResourceNotFoundException("Project not found"));
 
         return mapToResponse(project);
     }
@@ -65,12 +60,12 @@ public class ProjectServiceImpl implements ProjectService {
 
         return projectRepository.findAll(pageable)
                 .map(this::mapToResponse);
-
     }
 
     @Override
-    public ProjectResponse updateProject(UUID id,
-                                         UpdateProjectRequest request) {
+    public ProjectResponse updateProject(
+            UUID id,
+            UpdateProjectRequest request) {
 
         Project project = projectRepository.findById(id)
                 .orElseThrow(() ->
@@ -83,42 +78,33 @@ public class ProjectServiceImpl implements ProjectService {
                     "You are not allowed to update another user's project");
         }
 
-        if (request.getTitle() != null) {
+        if (request.getTitle() != null)
             project.setTitle(request.getTitle());
-        }
 
-        if (request.getDescription() != null) {
+        if (request.getDescription() != null)
             project.setDescription(request.getDescription());
-        }
 
-        if (request.getDomain() != null) {
+        if (request.getDomain() != null)
             project.setDomain(request.getDomain());
-        }
 
-        if (request.getExperienceLevel() != null) {
+        if (request.getExperienceLevel() != null)
             project.setExperienceLevel(request.getExperienceLevel());
-        }
 
-        if (request.getStatus() != null) {
+        if (request.getStatus() != null)
             project.setStatus(request.getStatus());
-        }
 
-        if (request.getTeamSize() != null) {
+        if (request.getTeamSize() != null)
             project.setTeamSize(request.getTeamSize());
-        }
 
-        if (request.getCommitment() != null) {
+        if (request.getCommitment() != null)
             project.setCommitment(request.getCommitment());
-        }
 
-        if (request.getRepositoryUrl() != null) {
+        if (request.getRepositoryUrl() != null)
             project.setRepositoryUrl(request.getRepositoryUrl());
-        }
 
-        Project updated = projectRepository.save(project);
+        Project updatedProject = projectRepository.save(project);
 
-        return mapToResponse(updated);
-
+        return mapToResponse(updatedProject);
     }
 
     @Override
@@ -136,35 +122,38 @@ public class ProjectServiceImpl implements ProjectService {
         }
 
         projectRepository.delete(project);
-
     }
 
     @Override
     public List<ProjectResponse> getProjectsByOwner(UUID ownerId) {
 
-        User owner = userRepository.findById(ownerId)
+        User owner = projectRepository.findById(ownerId)
+                .map(Project::getOwner)
                 .orElseThrow(() ->
-                        new EntityNotFoundException("User not found"));
+                        new ResourceNotFoundException("User not found"));
 
         return projectRepository.findByOwner(owner)
                 .stream()
                 .map(this::mapToResponse)
                 .toList();
-
     }
 
     private User getCurrentUser() {
 
-        Authentication authentication = SecurityContextHolder
-                .getContext()
-                .getAuthentication();
+        Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
 
-        return userRepository.findByEmail(authentication.getName())
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("User not found"));
+        if (authentication == null ||
+                !(authentication.getPrincipal() instanceof UserPrincipal userPrincipal)) {
+            throw new ForbiddenException("Unauthorized");
+        }
+
+        return userPrincipal.getUser();
     }
 
-    private ProjectResponse mapToResponse(Project project){
+    private ProjectResponse mapToResponse(Project project) {
+
+        User owner = project.getOwner();
 
         return ProjectResponse.builder()
                 .id(project.getId())
@@ -176,12 +165,10 @@ public class ProjectServiceImpl implements ProjectService {
                 .teamSize(project.getTeamSize())
                 .commitment(project.getCommitment())
                 .repositoryUrl(project.getRepositoryUrl())
-                .ownerId(project.getOwner().getId())
-                .ownerName(project.getOwner().getName())
+                .ownerId(owner != null ? owner.getId() : null)
+                .ownerName(owner != null ? owner.getName() : null)
                 .createdAt(project.getCreatedAt())
                 .updatedAt(project.getUpdatedAt())
                 .build();
-
     }
-
 }

@@ -1,7 +1,7 @@
 package com.cobuild.backend.application;
 
-import com.cobuild.backend.application.dto.ApplicationResponse;
-import com.cobuild.backend.application.dto.CreateApplicationRequest;
+import com.cobuild.backend.application.dto.response.ApplicationResponse;
+import com.cobuild.backend.application.dto.request.CreateApplicationRequest;
 import com.cobuild.backend.exception.BadRequestException;
 import com.cobuild.backend.exception.DuplicateResourceException;
 import com.cobuild.backend.exception.ForbiddenException;
