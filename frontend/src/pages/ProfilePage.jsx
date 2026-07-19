@@ -69,7 +69,7 @@ export function ProfilePage() {
             <select className="w-full bg-slate-900/50 border border-slate-700 text-slate-100 placeholder-slate-500 p-4 rounded-xl focus:outline-none focus:border-green-500 focus:ring-4 focus:ring-green-500/10 transition-all appearance-none" value={editForm.experienceLevel || 'BEGINNER'} onChange={e => setEditForm({...editForm, experienceLevel: e.target.value})}>
               <option value="BEGINNER">Beginner</option>
               <option value="INTERMEDIATE">Intermediate</option>
-              <option value="EXPERT">Expert</option>
+              <option value="ADVANCED">Advanced</option>
             </select>
             <div className="pt-4 flex justify-end">
               <button type="submit" disabled={updateProfile.isPending} className="bg-green-500 text-slate-900 font-bold px-8 py-3 rounded-xl hover:bg-green-400 hover:shadow-lg hover:shadow-green-500/20 hover:-translate-y-0.5 transition-all disabled:opacity-50">Save Changes</button>

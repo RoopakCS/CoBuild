@@ -137,7 +137,7 @@ export function ProjectDetailsPage() {
                 {apps?.map(app => (
                   <div key={app.id} className="border border-slate-700/80 bg-slate-900/40 p-5 rounded-2xl">
                     <p className="text-base font-bold text-slate-200">{app.applicantName} <span className={`text-xs font-bold px-2 py-1 rounded ml-2 ${app.status === 'PENDING' ? 'bg-yellow-500/20 text-yellow-400' : app.status === 'ACCEPTED' ? 'bg-green-500/20 text-green-400' : 'bg-slate-700 text-slate-400'}`}>{app.status}</span></p>
-                    <p className="text-sm font-medium text-slate-400 mt-3 mb-5 leading-relaxed">{app.coverLetter}</p>
+                    <p className="text-sm font-medium text-slate-400 mt-3 mb-5 leading-relaxed">{app.message}</p>
                     {app.status === 'PENDING' && (
                       <div className="flex gap-3">
                         <button onClick={() => handleAccept(app)} className="text-sm font-bold bg-green-500 hover:bg-green-400 text-slate-900 px-4 py-2 rounded-xl transition-colors">Accept</button>
@@ -162,7 +162,7 @@ export function ProjectDetailsPage() {
           ) : (
             <>
               <h2 className="text-2xl font-bold mb-6 text-slate-50 tracking-tight">Join Project</h2>
-              <form onSubmit={e => { e.preventDefault(); applyMutation.mutate({ projectId: id, coverLetter, role: 'MEMBER' }); }} className="flex flex-col h-full">
+              <form onSubmit={e => { e.preventDefault(); applyMutation.mutate({ projectId: id, message: coverLetter }); }} className="flex flex-col h-full">
                 <label className="block text-sm font-bold text-slate-300 mb-2">Cover Letter</label>
                 <textarea 
                   rows={5} 

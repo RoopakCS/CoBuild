@@ -7,6 +7,7 @@ import com.cobuild.backend.project.dto.request.UpdateProjectRequest;
 import com.cobuild.backend.project.dto.response.ProjectResponse;
 import com.cobuild.backend.security.user.UserPrincipal;
 import com.cobuild.backend.user.User;
+import com.cobuild.backend.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,6 +23,7 @@ import java.util.UUID;
 public class ProjectServiceImpl implements ProjectService {
 
     private final ProjectRepository projectRepository;
+    private final UserRepository userRepository;
 
     @Override
     public ProjectResponse createProject(CreateProjectRequest request) {
@@ -127,8 +129,7 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public List<ProjectResponse> getProjectsByOwner(UUID ownerId) {
 
-        User owner = projectRepository.findById(ownerId)
-                .map(Project::getOwner)
+        User owner = userRepository.findById(ownerId)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("User not found"));
 
