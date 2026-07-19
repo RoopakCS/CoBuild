@@ -1,5 +1,7 @@
 package com.cobuild.backend.membership.dto.response;
 
+import com.cobuild.backend.membership.MembershipRole;
+import com.cobuild.backend.membership.MembershipStatus;
 import lombok.Builder;
 import lombok.Getter;
 

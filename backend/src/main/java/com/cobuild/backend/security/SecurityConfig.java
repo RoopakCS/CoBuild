@@ -1,4 +1,4 @@
-package com.cobuild.backend.security.config;
+package com.cobuild.backend.security;
 
 import com.cobuild.backend.security.jwt.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
