@@ -1,5 +1,5 @@
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
-import { FolderOpen, UserCircle, SignOut, Plus } from '@phosphor-icons/react';
+import { FolderOpen, UserCircle, SignOut, Plus, ListDashes } from '@phosphor-icons/react';
 
 export function Layout() {
   const navigate = useNavigate();
@@ -12,12 +12,12 @@ export function Layout() {
 
   const navItems = [
     { name: 'Dashboard', path: '/', icon: <FolderOpen size={20} /> },
+    { name: 'My Projects', path: '/my-projects', icon: <ListDashes size={20} /> },
     { name: 'Profile', path: '/profile', icon: <UserCircle size={20} /> },
   ];
 
   return (
     <div className="flex min-h-screen bg-zinc-50 text-zinc-900 font-sans selection:bg-zinc-200">
-      {/* Sidebar */}
       <aside className="w-64 border-r border-zinc-200 bg-white p-6 flex flex-col justify-between">
         <div>
           <div className="flex items-center gap-2 mb-8">
@@ -63,7 +63,6 @@ export function Layout() {
         </div>
       </aside>
 
-      {/* Main Content */}
       <main className="flex-1 overflow-y-auto">
         <div className="mx-auto max-w-5xl p-8">
           <Outlet />
