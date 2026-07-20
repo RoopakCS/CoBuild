@@ -34,7 +34,7 @@ import lombok.Setter;
             name = "uk_project_applicant",
             columnNames = {
                 "project_id",
-                "applcant_id"
+                "applicant_id"
             }
         )
     }

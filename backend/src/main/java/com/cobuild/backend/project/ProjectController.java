@@ -46,7 +46,7 @@ public class ProjectController {
     }
 
     /**
-     * Get Project By Id
+     * Get Project By id
      */
     @GetMapping("/{id}")
     public ResponseEntity<ProjectResponse> getProjectById(

@@ -66,10 +66,23 @@ public class UserService {
         Authentication authentication =
                 SecurityContextHolder.getContext().getAuthentication();
 
-        UserPrincipal userPrincipal =
-                (UserPrincipal) authentication.getPrincipal();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new RuntimeException("User is not authenticated");
+        }
 
-        return userPrincipal.getUser();
+        Object principal = authentication.getPrincipal();
+
+        if (!(principal instanceof UserPrincipal userPrincipal)) {
+            throw new RuntimeException("Invalid authentication principal");
+        }
+
+        User user = userPrincipal.getUser();
+
+        if (user == null) {
+            throw new RuntimeException("Authenticated user not found");
+        }
+
+        return user;
     }
 
     /**

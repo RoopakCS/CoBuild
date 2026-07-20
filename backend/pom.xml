@@ -98,6 +98,7 @@
 			<scope>runtime</scope>
 		</dependency>
 
+
 		<!-- JSON Support -->
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>

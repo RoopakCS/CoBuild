@@ -1,8 +1,8 @@
 package com.cobuild.backend.application;
 
-import com.cobuild.backend.application.dto.ApplicationResponse;
-import com.cobuild.backend.application.dto.CreateApplicationRequest;
-import com.cobuild.backend.application.dto.UpdateApplicationStatusRequest;
+import com.cobuild.backend.application.dto.response.ApplicationResponse;
+import com.cobuild.backend.application.dto.request.CreateApplicationRequest;
+import com.cobuild.backend.application.dto.request.UpdateApplicationStatusRequest;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;

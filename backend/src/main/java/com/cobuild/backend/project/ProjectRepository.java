@@ -13,19 +13,21 @@ public interface ProjectRepository
         extends JpaRepository<Project, UUID>,
             JpaSpecificationExecutor<Project> {
 
-    Page<Project> findAll(Pageable pageable);
-
-    Page<Project> findByDomainIgnoreCase(String domain, Pageable pageable);
-
-    Page<Project> findByExperienceLevel(ExperienceLevel experienceLevel,
-                                        Pageable pageable);
-
-    Page<Project> findByStatus(ProjectStatus status,
-                               Pageable pageable);
-
-    Page<Project> findByTitleContainingIgnoreCase(String keyword,
-                                                  Pageable pageable);
-
     List<Project> findByOwner(User owner);
 
+    Page<Project> findByDomainIgnoreCase(
+            String domain,
+            Pageable pageable);
+
+    Page<Project> findByExperienceLevel(
+            ExperienceLevel experienceLevel,
+            Pageable pageable);
+
+    Page<Project> findByStatus(
+            ProjectStatus status,
+            Pageable pageable);
+
+    Page<Project> findByTitleContainingIgnoreCase(
+            String title,
+            Pageable pageable);
 }
