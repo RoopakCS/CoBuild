@@ -9,6 +9,8 @@ public record ApplicationResponse(
         UUID id,
         UUID projectId,
         String projectTitle,
+        UUID roleId,
+        String roleTitle,
         UUID applicantId,
         String applicantName,
         String message,
