@@ -2,11 +2,18 @@ package com.cobuild.backend.role;
 
 import com.cobuild.backend.project.Project;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.NoArgsConstructor;
+
 import java.util.List;
 import java.util.UUID;
 
 @Entity
 @Table(name = "project_roles")
+@Getter
+@Setter
+@NoArgsConstructor
 public class ProjectRole {
 
     @Id
@@ -39,6 +46,4 @@ public class ProjectRole {
             throw new IllegalStateException("filledCount cannot exceed openingsCount");
         }
     }
-
-    // getters/setters
 }
