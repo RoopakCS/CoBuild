@@ -173,27 +173,51 @@ public class ApplicationService {
                                         "Application can only be accepted or rejected");
                 }
 
-                if(newStatus == ApplicationStatus.ACCEPTED) {
+                if (newStatus == ApplicationStatus.ACCEPTED) {
                         ProjectRole role = application.getRole();
 
-                        if(role.getFilledCount() >= role.getOpeningsCount()) {
+                        if (role.getFilledCount() >= role.getOpeningsCount()) {
                                 throw new BadRequestException("This role is already full");
                         }
 
-                        Membership membership = Membership.builder().project(application.getProject()).user(application.getApplicant()).membershipRole(MembershipRole.MEMBER).build();
+                        Membership membership = Membership.builder().project(application.getProject())
+                                        .user(application.getApplicant()).membershipRole(MembershipRole.MEMBER).projectRole(role).build();
 
-                         membershipRepository.save(membership);
+                        membershipRepository.save(membership);
+
+                        application.setStatus(
+                                        ApplicationStatus.ACCEPTED);
 
                         // Increment filled count
                         role.setFilledCount(
-                                role.getFilledCount() + 1
-                        );
+                                        role.getFilledCount() + 1);
 
                         projectRoleRepository.save(role);
+
+                        if (role.getFilledCount() >= role.getOpeningsCount()) {
+
+                                List<ProjectApplication> pendingApplications = applicationRepository
+                                                .findByRoleIdAndStatus(
+                                                                role.getId(),
+                                                                ApplicationStatus.PENDING);
+
+                                for (ProjectApplication pendingApplication : pendingApplications) {
+
+                                        if (!pendingApplication.getId().equals(application.getId())) {
+                                                pendingApplication.setStatus(
+                                                                ApplicationStatus.REJECTED);
+                                        }
+                                }
+
+                                applicationRepository.saveAll(pendingApplications);
+                        }
+
                 }
-                
-                // Update status
-                application.setStatus(newStatus);
+
+                if (newStatus == ApplicationStatus.REJECTED) {
+                        application.setStatus(
+                                        ApplicationStatus.REJECTED);
+                }
 
                 ProjectApplication savedApplication = applicationRepository.save(application);
 
