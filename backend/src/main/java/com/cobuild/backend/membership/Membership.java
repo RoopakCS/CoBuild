@@ -1,6 +1,7 @@
 package com.cobuild.backend.membership;
 
 import com.cobuild.backend.project.Project;
+import com.cobuild.backend.role.ProjectRole;
 import com.cobuild.backend.user.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -30,8 +31,12 @@ public class Membership {
     private Project project;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private MembershipRole role;
+    @Column(name = "membership_role", nullable = false)
+    private MembershipRole membershipRole;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "project_role_id", nullable = false)
+    private ProjectRole projectRole;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

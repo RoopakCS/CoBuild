@@ -6,6 +6,9 @@ import com.cobuild.backend.exception.BadRequestException;
 import com.cobuild.backend.exception.DuplicateResourceException;
 import com.cobuild.backend.exception.ForbiddenException;
 import com.cobuild.backend.exception.ResourceNotFoundException;
+import com.cobuild.backend.membership.Membership;
+import com.cobuild.backend.membership.MembershipRepository;
+import com.cobuild.backend.membership.MembershipRole;
 import com.cobuild.backend.project.Project;
 import com.cobuild.backend.project.ProjectRepository;
 import com.cobuild.backend.project.ProjectStatus;
@@ -28,6 +31,7 @@ public class ApplicationService {
         private final UserRepository userRepository;
         private final ProjectRepository projectRepository;
         private final ProjectRoleRepository projectRoleRepository;
+        private final MembershipRepository membershipRepository;
 
         @Transactional
         public ApplicationResponse apply(
@@ -169,6 +173,25 @@ public class ApplicationService {
                                         "Application can only be accepted or rejected");
                 }
 
+                if(newStatus == ApplicationStatus.ACCEPTED) {
+                        ProjectRole role = application.getRole();
+
+                        if(role.getFilledCount() >= role.getOpeningsCount()) {
+                                throw new BadRequestException("This role is already full");
+                        }
+
+                        Membership membership = Membership.builder().project(application.getProject()).user(application.getApplicant()).membershipRole(MembershipRole.MEMBER).build();
+
+                         membershipRepository.save(membership);
+
+                        // Increment filled count
+                        role.setFilledCount(
+                                role.getFilledCount() + 1
+                        );
+
+                        projectRoleRepository.save(role);
+                }
+                
                 // Update status
                 application.setStatus(newStatus);
 

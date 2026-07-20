@@ -52,7 +52,7 @@ public class MembershipServiceImpl implements MembershipService {
         Membership membership = Membership.builder()
                 .user(user)
                 .project(project)
-                .role(MembershipRole.MEMBER)
+                .membershipRole(MembershipRole.MEMBER)
                 .status(MembershipStatus.ACTIVE)
                 .build();
 
@@ -146,7 +146,7 @@ public class MembershipServiceImpl implements MembershipService {
                 .userName(user != null ? user.getName() : null)
                 .projectId(project != null ? project.getId() : null)
                 .projectTitle(project != null ? project.getTitle() : null)
-                .role(membership.getRole())
+                .role(membership.getMembershipRole())
                 .status(membership.getStatus())
                 .joinedAt(membership.getJoinedAt())
                 .build();
