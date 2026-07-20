@@ -28,7 +28,7 @@ export function Layout() {
       <div className="sticky top-4 sm:top-6 z-40 mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8 mb-6 sm:mb-8">
         <header className="flex items-center justify-between rounded-2xl border border-slate-700/50 bg-slate-800/40 px-4 sm:px-6 py-3 shadow-2xl shadow-black/50 backdrop-blur-xl">
           
-          {/* Left: Logo (Text Only) */}
+          {/* Left: Logo */}
           <div className="flex w-1/4 items-center">
             <Link to="/" className="flex items-center">
               <span className="text-xl font-bold tracking-tighter text-slate-50">CoBuild</span>

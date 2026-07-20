@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 import com.cobuild.backend.project.Project;
+import com.cobuild.backend.role.ProjectRole;
 import com.cobuild.backend.user.User;
 
 import jakarta.persistence.Column;
@@ -27,18 +28,12 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(
-    name = "project_applications",
-    uniqueConstraints = {
-        @UniqueConstraint(
-            name = "uk_project_applicant",
-            columnNames = {
+@Table(name = "project_applications", uniqueConstraints = {
+        @UniqueConstraint(name = "uk_project_applicant", columnNames = {
                 "project_id",
                 "applicant_id"
-            }
-        )
-    }
-)
+        })
+})
 @Getter
 @Setter
 @NoArgsConstructor
@@ -56,6 +51,10 @@ public class ProjectApplication {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "applicant_id", nullable = false)
     private User applicant;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "role_id", nullable = false)
+    private ProjectRole role;
 
     @Column(columnDefinition = "TEXT")
     private String message;
@@ -77,7 +76,7 @@ public class ProjectApplication {
         createdAt = now;
         updatedAt = now;
 
-        if(status == null) {
+        if (status == null) {
             status = ApplicationStatus.PENDING;
         }
     }

@@ -33,8 +33,8 @@ export function AuthPage({ mode }) {
     <div className="flex min-h-screen items-center justify-center bg-slate-900 p-4 sm:p-6 font-sans text-slate-50 selection:bg-green-500/30 selection:text-green-200">
       <div className="w-full max-w-md rounded-2xl sm:rounded-3xl border border-slate-700/50 bg-slate-800/40 p-6 sm:p-10 shadow-2xl backdrop-blur-md">
         <div className="mb-6 sm:mb-10 text-center">
-          <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-green-500 mb-6 shadow-lg shadow-green-500/20">
-            <span className="text-xl font-bold text-slate-900">CB</span>
+          <div className="mb-6 flex justify-center">
+            <span className="text-4xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-green-600">CoBuild</span>
           </div>
           <h1 className="text-3xl font-bold tracking-tight text-slate-50">
             {isLogin ? 'Welcome back' : 'Create account'}
