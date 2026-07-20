@@ -35,10 +35,16 @@ public class ProjectResponse {
 
     private String ownerName;
 
+    // Existing field
     private List<String> skills;
+
+    // NEW
+    private List<ProjectRoleResponse> roles;
+
+    // NEW
+    private boolean isFull;
 
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;
-
 }

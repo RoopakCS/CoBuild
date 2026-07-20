@@ -10,7 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+import org.springframework.web.bind.annotation.RequestParam;
 import java.util.List;
 import java.util.UUID;
 
@@ -38,10 +38,31 @@ public class ProjectController {
      */
     @GetMapping
     public ResponseEntity<Page<ProjectResponse>> getAllProjects(
+
+            @RequestParam(required = false) String search,
+
+            @RequestParam(required = false) String domain,
+
+            @RequestParam(required = false)
+            ExperienceLevel experienceLevel,
+
+            @RequestParam(required = false)
+            ProjectStatus status,
+
+            @RequestParam(required = false)
+            List<String> skills,
+
             Pageable pageable) {
 
         return ResponseEntity.ok(
-                projectService.getAllProjects(pageable)
+                projectService.getAllProjects(
+                        search,
+                        domain,
+                        experienceLevel,
+                        status,
+                        skills,
+                        pageable
+                )
         );
     }
 

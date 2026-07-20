@@ -15,7 +15,13 @@ public interface ProjectService {
 
     ProjectResponse getProjectById(UUID id);
 
-    Page<ProjectResponse> getAllProjects(Pageable pageable);
+    Page<ProjectResponse> getAllProjects(
+            String search,
+            String domain,
+            ExperienceLevel experienceLevel,
+            ProjectStatus status,
+            List<String> skills,
+            Pageable pageable);
 
     ProjectResponse updateProject(UUID id,
                                   UpdateProjectRequest request);

@@ -1,5 +1,10 @@
 package com.cobuild.backend.project;
 
+
+
+import com.cobuild.backend.role.ProjectRole;
+import java.util.List;
+
 import com.cobuild.backend.user.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -66,5 +71,8 @@ public class Project {
     public void onUpdate() {
         updatedAt = LocalDateTime.now();
     }
+
+    @OneToMany(mappedBy = "project", fetch = FetchType.LAZY)
+    private List<ProjectRole> roles;
 
 }

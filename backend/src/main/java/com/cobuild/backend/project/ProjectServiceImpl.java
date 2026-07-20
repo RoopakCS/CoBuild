@@ -14,6 +14,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import com.cobuild.backend.project.dto.response.ProjectRoleResponse;
+import com.cobuild.backend.role.RoleSkill;
+
+import com.cobuild.backend.project.ProjectSpecification;
 
 import java.util.List;
 import java.util.UUID;
@@ -58,12 +62,26 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public Page<ProjectResponse> getAllProjects(Pageable pageable) {
+    public Page<ProjectResponse> getAllProjects(
+            String search,
+            String domain,
+            ExperienceLevel experienceLevel,
+            ProjectStatus status,
+            List<String> skills,
+            Pageable pageable) {
 
-        return projectRepository.findAll(pageable)
+        return projectRepository.findAll(
+                        ProjectSpecification.withFilters(
+                                search,
+                                domain,
+                                experienceLevel,
+                                status,
+                                skills
+                        ),
+                        pageable
+                )
                 .map(this::mapToResponse);
     }
-
     @Override
     public ProjectResponse updateProject(
             UUID id,
@@ -156,6 +174,34 @@ public class ProjectServiceImpl implements ProjectService {
 
         User owner = project.getOwner();
 
+        List<ProjectRoleResponse> roleResponses = List.of();
+        boolean isFull = false;
+
+        if (project.getRoles() != null) {
+
+            roleResponses = project.getRoles()
+                    .stream()
+                    .map(role -> ProjectRoleResponse.builder()
+                            .id(role.getId())
+                            .title(role.getTitle())
+                            .description(role.getDescription())
+                            .openingsCount(role.getOpeningsCount())
+                            .filledCount(role.getFilledCount())
+                            .skills(
+                                    role.getSkills()
+                                            .stream()
+                                            .map(RoleSkill::getSkillName)
+                                            .toList()
+                            )
+                            .build())
+                    .toList();
+
+            isFull = project.getRoles()
+                    .stream()
+                    .allMatch(role ->
+                            role.getFilledCount() >= role.getOpeningsCount());
+        }
+
         return ProjectResponse.builder()
                 .id(project.getId())
                 .title(project.getTitle())
@@ -168,6 +214,19 @@ public class ProjectServiceImpl implements ProjectService {
                 .repositoryUrl(project.getRepositoryUrl())
                 .ownerId(owner != null ? owner.getId() : null)
                 .ownerName(owner != null ? owner.getName() : null)
+
+                // Existing field
+                .skills(
+                        roleResponses.stream()
+                                .flatMap(role -> role.getSkills().stream())
+                                .distinct()
+                                .toList()
+                )
+
+                // New fields
+                .roles(roleResponses)
+                .isFull(isFull)
+
                 .createdAt(project.getCreatedAt())
                 .updatedAt(project.getUpdatedAt())
                 .build();
