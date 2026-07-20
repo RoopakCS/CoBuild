@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -57,4 +58,11 @@ public class User {
     public void onUpdate() {
         updatedAt = LocalDateTime.now();
     }
+
+    @Column(columnDefinition = "TEXT")
+
+    private String profilePhotoUrl;
+
+    @ElementCollection
+    private List<String> skills;
 }
