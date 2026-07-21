@@ -1,12 +1,21 @@
 package com.cobuild.backend.user;
 
+import com.cobuild.backend.membership.MembershipRepository;
+import com.cobuild.backend.project.ProjectMapper;
+import com.cobuild.backend.project.ProjectRepository;
 import com.cobuild.backend.security.user.UserPrincipal;
 import com.cobuild.backend.user.dto.request.UpdateProfileRequest;
+import com.cobuild.backend.user.dto.response.UserProfileResponse;
 import com.cobuild.backend.user.dto.response.UserResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import com.cobuild.backend.membership.Membership;
+import com.cobuild.backend.membership.MembershipStatus;
+import com.cobuild.backend.project.dto.response.ProjectResponse;
+
+import java.util.List;
 
 import java.util.UUID;
 
@@ -16,20 +25,26 @@ public class UserService {
 
     private final UserRepository userRepository;
 
+    private final ProjectRepository projectRepository;
+
+    private final MembershipRepository membershipRepository;
+
+    private final ProjectMapper projectMapper;
+
     /**
      * Returns the currently authenticated user's profile.
      */
-    public UserResponse getCurrentUser() {
+    public UserProfileResponse getCurrentUserProfile() {
 
         User user = getAuthenticatedUser();
 
-        return mapToResponse(user);
+        return mapToProfileResponse(user);
     }
 
     /**
      * Updates the currently authenticated user's profile.
      */
-    public UserResponse updateProfile(UpdateProfileRequest request) {
+    public UserProfileResponse updateProfile(UpdateProfileRequest request) {
 
         User user = getAuthenticatedUser();
 
@@ -44,18 +59,18 @@ public class UserService {
 
         User updatedUser = userRepository.save(user);
 
-        return mapToResponse(updatedUser);
+        return mapToProfileResponse(updatedUser);
     }
 
     /**
      * Returns a user's public profile by ID.
      */
-    public UserResponse getUserById(UUID id) {
+    public UserProfileResponse getUserProfile(UUID id) {
 
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        return mapToResponse(user);
+        return mapToProfileResponse(user);
     }
 
     /**
@@ -100,6 +115,36 @@ public class UserService {
                 .linkedinUrl(user.getLinkedinUrl())
                 .experienceLevel(user.getExperienceLevel())
                 .createdAt(user.getCreatedAt())
+                .build();
+    }
+
+    private UserProfileResponse mapToProfileResponse(User user) {
+
+        List<ProjectResponse> createdProjects = projectRepository
+                .findByOwner(user)
+                .stream()
+                .map(projectMapper::toResponse)
+                .toList();
+
+        List<ProjectResponse> collaboratedProjects = membershipRepository
+                .findByUserAndStatus(user, MembershipStatus.ACTIVE)
+                .stream()
+                .map(Membership::getProject)
+                .map(projectMapper::toResponse)
+                .toList();
+
+        return UserProfileResponse.builder()
+                .id(user.getId())
+                .name(user.getName())
+                .email(user.getEmail())
+                .bio(user.getBio())
+                .profileImageUrl(user.getProfileImageUrl())
+                .githubUrl(user.getGithubUrl())
+                .linkedinUrl(user.getLinkedinUrl())
+                .experienceLevel(user.getExperienceLevel())
+                .skills(user.getSkills())
+                .createdProjects(createdProjects)
+                .collaboratedProjects(collaboratedProjects)
                 .build();
     }
 }

@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.cobuild.backend.user.dto.response.UserProfileResponse;
 
 import java.util.UUID;
 
@@ -18,26 +19,33 @@ public class UserController {
 
     // Get currently logged-in user
     @GetMapping("/me")
-    public ResponseEntity<UserResponse> getCurrentUser() {
-        UserResponse response = userService.getCurrentUser();
+    public ResponseEntity<UserProfileResponse> getCurrentUser() {
+
+        UserProfileResponse response =
+                userService.getCurrentUserProfile();
+
         return ResponseEntity.ok(response);
     }
 
     // Update current user's profile
     @PutMapping("/me")
-    public ResponseEntity<UserResponse> updateProfile(
+    public ResponseEntity<UserProfileResponse> updateProfile(
             @Valid @RequestBody UpdateProfileRequest request) {
 
-        UserResponse response = userService.updateProfile(request);
+        UserProfileResponse response =
+                userService.updateProfile(request);
+
         return ResponseEntity.ok(response);
     }
 
     // Get any user's public profile
     @GetMapping("/{id}")
-    public ResponseEntity<UserResponse> getUserById(
+    public ResponseEntity<UserProfileResponse> getUserById(
             @PathVariable UUID id) {
 
-        UserResponse response = userService.getUserById(id);
+        UserProfileResponse response =
+                userService.getUserProfile(id);
+
         return ResponseEntity.ok(response);
     }
 }

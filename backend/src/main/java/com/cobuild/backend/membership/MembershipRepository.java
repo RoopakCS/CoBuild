@@ -29,4 +29,8 @@ public interface MembershipRepository
             UUID projectId,
             UUID userId);
 
+    List<Membership> findByUserAndStatus(
+            User user,
+            MembershipStatus status);
+
 }

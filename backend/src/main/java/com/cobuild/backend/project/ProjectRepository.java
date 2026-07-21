@@ -23,6 +23,7 @@ public interface ProjectRepository
             ExperienceLevel experienceLevel,
             Pageable pageable);
 
+
     Page<Project> findByStatus(
             ProjectStatus status,
             Pageable pageable);

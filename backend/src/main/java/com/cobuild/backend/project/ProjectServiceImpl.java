@@ -28,6 +28,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     private final ProjectRepository projectRepository;
     private final UserRepository userRepository;
+    private final ProjectMapper projectMapper;
 
     @Override
     public ProjectResponse createProject(CreateProjectRequest request) {
@@ -48,7 +49,7 @@ public class ProjectServiceImpl implements ProjectService {
 
         Project savedProject = projectRepository.save(project);
 
-        return mapToResponse(savedProject);
+        return projectMapper.toResponse(savedProject);
     }
 
     @Override
@@ -58,7 +59,7 @@ public class ProjectServiceImpl implements ProjectService {
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Project not found"));
 
-        return mapToResponse(project);
+        return projectMapper.toResponse(project);
     }
 
     @Override
@@ -80,7 +81,7 @@ public class ProjectServiceImpl implements ProjectService {
                         ),
                         pageable
                 )
-                .map(this::mapToResponse);
+                .map(projectMapper::toResponse);
     }
     @Override
     public ProjectResponse updateProject(
@@ -124,7 +125,7 @@ public class ProjectServiceImpl implements ProjectService {
 
         Project updatedProject = projectRepository.save(project);
 
-        return mapToResponse(updatedProject);
+        return projectMapper.toResponse(updatedProject);
     }
 
     @Override
@@ -153,7 +154,7 @@ public class ProjectServiceImpl implements ProjectService {
 
         return projectRepository.findByOwner(owner)
                 .stream()
-                .map(this::mapToResponse)
+                .map(projectMapper::toResponse)
                 .toList();
     }
 
@@ -170,65 +171,65 @@ public class ProjectServiceImpl implements ProjectService {
         return userPrincipal.getUser();
     }
 
-    private ProjectResponse mapToResponse(Project project) {
-
-        User owner = project.getOwner();
-
-        List<ProjectRoleResponse> roleResponses = List.of();
-        boolean isFull = false;
-
-        if (project.getRoles() != null) {
-
-            roleResponses = project.getRoles()
-                    .stream()
-                    .map(role -> ProjectRoleResponse.builder()
-                            .id(role.getId())
-                            .title(role.getTitle())
-                            .description(role.getDescription())
-                            .openingsCount(role.getOpeningsCount())
-                            .filledCount(role.getFilledCount())
-                            .skills(
-                                    role.getSkills()
-                                            .stream()
-                                            .map(RoleSkill::getSkillName)
-                                            .toList()
-                            )
-                            .build())
-                    .toList();
-
-            isFull = project.getRoles()
-                    .stream()
-                    .allMatch(role ->
-                            role.getFilledCount() >= role.getOpeningsCount());
-        }
-
-        return ProjectResponse.builder()
-                .id(project.getId())
-                .title(project.getTitle())
-                .description(project.getDescription())
-                .domain(project.getDomain())
-                .experienceLevel(project.getExperienceLevel())
-                .status(project.getStatus())
-                .teamSize(project.getTeamSize())
-                .commitment(project.getCommitment())
-                .repositoryUrl(project.getRepositoryUrl())
-                .ownerId(owner != null ? owner.getId() : null)
-                .ownerName(owner != null ? owner.getName() : null)
-
-                // Existing field
-                .skills(
-                        roleResponses.stream()
-                                .flatMap(role -> role.getSkills().stream())
-                                .distinct()
-                                .toList()
-                )
-
-                // New fields
-                .roles(roleResponses)
-                .isFull(isFull)
-
-                .createdAt(project.getCreatedAt())
-                .updatedAt(project.getUpdatedAt())
-                .build();
-    }
+//    private ProjectResponse mapToResponse(Project project) {
+//
+//        User owner = project.getOwner();
+//
+//        List<ProjectRoleResponse> roleResponses = List.of();
+//        boolean isFull = false;
+//
+//        if (project.getRoles() != null) {
+//
+//            roleResponses = project.getRoles()
+//                    .stream()
+//                    .map(role -> ProjectRoleResponse.builder()
+//                            .id(role.getId())
+//                            .title(role.getTitle())
+//                            .description(role.getDescription())
+//                            .openingsCount(role.getOpeningsCount())
+//                            .filledCount(role.getFilledCount())
+//                            .skills(
+//                                    role.getSkills()
+//                                            .stream()
+//                                            .map(RoleSkill::getSkillName)
+//                                            .toList()
+//                            )
+//                            .build())
+//                    .toList();
+//
+//            isFull = project.getRoles()
+//                    .stream()
+//                    .allMatch(role ->
+//                            role.getFilledCount() >= role.getOpeningsCount());
+//        }
+//
+//        return ProjectResponse.builder()
+//                .id(project.getId())
+//                .title(project.getTitle())
+//                .description(project.getDescription())
+//                .domain(project.getDomain())
+//                .experienceLevel(project.getExperienceLevel())
+//                .status(project.getStatus())
+//                .teamSize(project.getTeamSize())
+//                .commitment(project.getCommitment())
+//                .repositoryUrl(project.getRepositoryUrl())
+//                .ownerId(owner != null ? owner.getId() : null)
+//                .ownerName(owner != null ? owner.getName() : null)
+//
+//                // Existing field
+//                .skills(
+//                        roleResponses.stream()
+//                                .flatMap(role -> role.getSkills().stream())
+//                                .distinct()
+//                                .toList()
+//                )
+//
+//                // New fields
+//                .roles(roleResponses)
+//                .isFull(isFull)
+//
+//                .createdAt(project.getCreatedAt())
+//                .updatedAt(project.getUpdatedAt())
+//                .build();
+//    }
 }
