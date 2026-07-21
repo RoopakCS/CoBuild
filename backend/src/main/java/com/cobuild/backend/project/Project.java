@@ -5,6 +5,8 @@ package com.cobuild.backend.project;
 import com.cobuild.backend.role.ProjectRole;
 import java.util.List;
 
+import com.cobuild.backend.membership.Membership;
+import com.cobuild.backend.application.ProjectApplication;
 import com.cobuild.backend.user.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -72,7 +74,13 @@ public class Project {
         updatedAt = LocalDateTime.now();
     }
 
-    @OneToMany(mappedBy = "project", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "project", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProjectRole> roles;
+
+    @OneToMany(mappedBy = "project", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Membership> memberships;
+
+    @OneToMany(mappedBy = "project", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProjectApplication> applications;
 
 }

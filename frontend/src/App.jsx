@@ -5,6 +5,7 @@ import { DashboardPage } from './pages/DashboardPage';
 import { ProjectDetailsPage } from './pages/ProjectDetailsPage';
 import { ProfilePage } from './pages/ProfilePage';
 import { CreateProjectPage } from './pages/CreateProjectPage';
+import { EditProjectPage } from './pages/EditProjectPage';
 import { MyProjectsPage } from './pages/MyProjectsPage';
 import { UserProfilePage } from './pages/UserProfilePage';
 
@@ -22,6 +23,7 @@ function App() {
           <Route index element={<DashboardPage />} />
           <Route path="projects/new" element={<CreateProjectPage />} />
           <Route path="projects/:id" element={<ProjectDetailsPage />} />
+          <Route path="projects/:id/edit" element={<EditProjectPage />} />
           <Route path="my-projects" element={<MyProjectsPage />} />
           <Route path="profile" element={<ProfilePage />} />
           <Route path="users/:id" element={<UserProfilePage />} />

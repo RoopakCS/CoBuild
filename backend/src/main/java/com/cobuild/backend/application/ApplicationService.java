@@ -68,11 +68,19 @@ public class ApplicationService {
                         throw new BadRequestException("You cannot apply to your own project");
                 }
 
-                boolean alreadyApplied = applicationRepository.existsByProjectIdAndApplicantId(projectId, applicantId);
+                boolean hasPendingApplication = applicationRepository.existsByProjectIdAndApplicantIdAndStatusIn(
+                                projectId, applicantId, List.of(ApplicationStatus.PENDING));
 
-                if (alreadyApplied) {
-                        throw new DuplicateResourceException("You have already applied to this project");
+                if (hasPendingApplication) {
+                        throw new DuplicateResourceException("You already have a pending application for this project");
                 }
+
+                membershipRepository.findByProjectIdAndUserId(projectId, applicantId)
+                                .ifPresent(membership -> {
+                                        if (membership.getStatus() == com.cobuild.backend.membership.MembershipStatus.ACTIVE) {
+                                                throw new DuplicateResourceException("You are already an active member of this project");
+                                        }
+                                });
 
                 ProjectApplication application = ProjectApplication.builder()
                                 .project(project)

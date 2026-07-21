@@ -1,6 +1,8 @@
 package com.cobuild.backend.role;
 
 import com.cobuild.backend.project.Project;
+import com.cobuild.backend.application.ProjectApplication;
+import com.cobuild.backend.membership.Membership;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -36,8 +38,14 @@ public class ProjectRole {
     @Column(name = "filled_count", nullable = false)
     private int filledCount = 0;
 
-    @OneToMany(mappedBy = "role")
+    @OneToMany(mappedBy = "role", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<RoleSkill> skills;
+
+    @OneToMany(mappedBy = "projectRole", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Membership> memberships;
+
+    @OneToMany(mappedBy = "role", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProjectApplication> applications;
 
     @PrePersist
     @PreUpdate

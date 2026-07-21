@@ -11,6 +11,11 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import com.cobuild.backend.security.user.UserPrincipal;
+import com.cobuild.backend.user.User;
+import com.cobuild.backend.exception.ForbiddenException;
 
 @Service
 public class ProjectRoleServiceImpl implements ProjectRoleService {
@@ -32,6 +37,11 @@ public class ProjectRoleServiceImpl implements ProjectRoleService {
     public ProjectRoleResponse createRole(UUID projectId, CreateRoleRequest request) {
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new EntityNotFoundException("Project not found: " + projectId));
+
+        User currentUser = getCurrentUser();
+        if (!project.getOwner().getId().equals(currentUser.getId())) {
+            throw new ForbiddenException("Only the project owner can create roles");
+        }
 
         if (request.getOpeningsCount() < 1) {
             throw new IllegalArgumentException("openingsCount must be at least 1");
@@ -62,6 +72,11 @@ public class ProjectRoleServiceImpl implements ProjectRoleService {
     public ProjectRoleResponse updateRole(UUID projectId, UUID roleId, UpdateRoleRequest request) {
         ProjectRole role = getRoleOrThrow(roleId);
         validateBelongsToProject(role, projectId);
+
+        User currentUser = getCurrentUser();
+        if (!role.getProject().getOwner().getId().equals(currentUser.getId())) {
+            throw new ForbiddenException("Only the project owner can update roles");
+        }
 
         if (request.getTitle() != null) {
             role.setTitle(request.getTitle());
@@ -95,6 +110,11 @@ public class ProjectRoleServiceImpl implements ProjectRoleService {
     public void deleteRole(UUID projectId, UUID roleId) {
         ProjectRole role = getRoleOrThrow(roleId);
         validateBelongsToProject(role, projectId);
+
+        User currentUser = getCurrentUser();
+        if (!role.getProject().getOwner().getId().equals(currentUser.getId())) {
+            throw new ForbiddenException("Only the project owner can delete roles");
+        }
 
         if (role.getFilledCount() > 0) {
             throw new IllegalStateException(
@@ -170,5 +190,13 @@ public class ProjectRoleServiceImpl implements ProjectRoleService {
                 skillNames
         );
 
+    }
+
+    private User getCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !(authentication.getPrincipal() instanceof UserPrincipal userPrincipal)) {
+            throw new ForbiddenException("Unauthorized");
+        }
+        return userPrincipal.getUser();
     }
 }

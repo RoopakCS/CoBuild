@@ -140,12 +140,12 @@ export function DashboardPage() {
                   placeholder="Search projects..." 
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="bg-slate-900/50 border border-slate-700 text-slate-100 placeholder-slate-500 px-4 py-2 rounded-xl text-sm focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
+                  className="bg-slate-900/50 border border-slate-700 text-slate-100 placeholder-slate-500 px-4 py-2 rounded-xl text-sm focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20"
                 />
                 <select 
                   value={level}
                   onChange={(e) => setLevel(e.target.value)}
-                  className="bg-slate-900/50 border border-slate-700 text-slate-100 placeholder-slate-500 px-4 py-2 rounded-xl text-sm focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-500/20 appearance-none"
+                  className="bg-slate-900/50 border border-slate-700 text-slate-100 placeholder-slate-500 px-4 py-2 rounded-xl text-sm focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 appearance-none"
                 >
                   <option value="">Any Level</option>
                   <option value="BEGINNER">Beginner</option>

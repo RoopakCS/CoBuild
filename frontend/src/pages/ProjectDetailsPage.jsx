@@ -107,30 +107,47 @@ export function ProjectDetailsPage() {
 
   return (
     <div className="max-w-5xl mx-auto pb-12">
-      <button onClick={() => navigate(-1)} className="group flex items-center gap-2 text-sm font-bold text-slate-400 hover:text-green-400 mb-6 sm:mb-8 transition-colors">
-        <ArrowLeft size={16} weight="bold" className="transition-transform group-hover:-translate-x-1" />
-        Back to projects
-      </button>
+      <div className="flex justify-between items-center mb-6 sm:mb-8">
+        <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-slate-400 hover:text-slate-200 transition-colors font-medium text-sm">
+          <ArrowLeft weight="bold" /> Back
+        </button>
+      </div>
 
       <div className="rounded-2xl sm:rounded-3xl border border-slate-700/50 bg-slate-800/40 p-5 sm:p-8 lg:p-12 shadow-2xl backdrop-blur-sm mb-6 sm:mb-10 relative overflow-hidden">
         {/* Subtle glow effect */}
         <div className="absolute top-0 right-0 w-96 h-96 bg-green-500/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none"></div>
         
         <div className="flex flex-col sm:flex-row sm:items-start justify-between mb-6 sm:mb-10 gap-4 sm:gap-6 relative z-10">
-          <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold tracking-tighter text-slate-50">{project.title}</h1>
+          <div>
+            <div className="flex items-center gap-3 mb-4">
+              <span className={`px-3 py-1 text-xs font-bold rounded-full ${project.status === 'OPEN' ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
+                {project.status}
+              </span>
+              <span className="text-sm font-medium text-slate-400 px-3 py-1 bg-slate-800 rounded-full border border-slate-700/50">{project.domain}</span>
+            </div>
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tighter text-slate-50">{project.title}</h1>
+          </div>
           {isOwner && (
-            <button onClick={() => {
-              if(window.confirm('Delete this project?')) deleteProject.mutate(id);
-            }} className="self-start shrink-0 text-red-400 font-bold text-xs sm:text-sm border border-red-500/30 bg-red-500/5 hover:bg-red-500/10 px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl transition-all">
-              Delete Project
-            </button>
+            <div className="flex gap-3 shrink-0">
+              <button 
+                onClick={() => navigate(`/projects/${id}/edit`)}
+                className="text-sm font-bold bg-slate-800 hover:bg-slate-700 text-slate-100 px-5 py-2.5 rounded-xl transition-all border border-slate-700"
+              >
+                Edit Project
+              </button>
+              <button onClick={() => {
+                if(window.confirm('Delete this project?')) deleteProject.mutate(id);
+              }} className="text-sm font-bold bg-red-600 hover:bg-red-500 text-white px-5 py-2.5 rounded-xl transition-all hover:shadow-lg hover:shadow-red-500/20 disabled:opacity-50">
+                {deleteProject.isPending ? 'Deleting...' : 'Delete Project'}
+              </button>
+            </div>
           )}
         </div>
         
         <p className="text-slate-300 mb-8 sm:mb-12 whitespace-pre-wrap leading-relaxed text-base sm:text-lg md:text-xl font-medium max-w-4xl relative z-10">{project.description}</p>
         
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-8 border-t border-slate-700/50 pt-6 sm:pt-10 relative z-10">
-          <div><p className="text-[10px] sm:text-xs text-slate-500 font-bold uppercase tracking-widest mb-1 sm:mb-2">Domain</p><p className="text-sm sm:text-lg font-semibold text-slate-200">{project.domain}</p></div>
+          <div><p className="text-[10px] sm:text-xs text-slate-500 font-bold uppercase tracking-widest mb-1 sm:mb-2">Commitment</p><p className="text-sm sm:text-lg font-semibold text-slate-200">{project.commitment}</p></div>
           <div><p className="text-[10px] sm:text-xs text-slate-500 font-bold uppercase tracking-widest mb-1 sm:mb-2">Experience</p><p className="text-sm sm:text-lg font-semibold text-slate-200">{project.experienceLevel}</p></div>
           <div><p className="text-[10px] sm:text-xs text-slate-500 font-bold uppercase tracking-widest mb-1 sm:mb-2">Team Size</p><p className="text-sm sm:text-lg font-semibold text-slate-200">{project.teamSize}</p></div>
           <div><p className="text-[10px] sm:text-xs text-slate-500 font-bold uppercase tracking-widest mb-1 sm:mb-2">Owner</p><p className="text-sm sm:text-lg font-semibold text-slate-200">{project.ownerName}</p></div>
@@ -213,7 +230,7 @@ export function ProjectDetailsPage() {
                   <label className="block text-sm font-bold text-slate-300 mb-2">Select Role</label>
                   <select 
                     required
-                    className="w-full bg-slate-900/50 border border-slate-700 text-slate-100 placeholder-slate-500 p-4 rounded-xl focus:outline-none focus:border-red-500 focus:ring-4 focus:ring-red-500/10 transition-all appearance-none"
+                    className="w-full bg-slate-900/50 border border-slate-700 text-slate-100 placeholder-slate-500 p-4 rounded-xl focus:outline-none focus:border-green-500 focus:ring-4 focus:ring-green-500/10 transition-all appearance-none"
                     value={selectedRoleId}
                     onChange={e => setSelectedRoleId(e.target.value)}
                   >
@@ -228,12 +245,12 @@ export function ProjectDetailsPage() {
                   rows={5} 
                   required 
                   placeholder="Why would you be a good fit?" 
-                  className="w-full bg-slate-900/50 border border-slate-700 text-slate-100 placeholder-slate-500 p-4 rounded-xl mb-6 focus:outline-none focus:border-red-500 focus:ring-4 focus:ring-red-500/10 transition-all resize-none" 
+                  className="w-full bg-slate-900/50 border border-slate-700 text-slate-100 placeholder-slate-500 p-4 rounded-xl mb-6 focus:outline-none focus:border-green-500 focus:ring-4 focus:ring-green-500/10 transition-all resize-none"
                   value={coverLetter} 
                   onChange={e => setCoverLetter(e.target.value)} 
                 />
-                <button type="submit" disabled={applyMutation.isPending || !selectedRoleId} className="mt-auto w-full bg-red-600 hover:bg-red-500 hover:shadow-lg hover:shadow-red-500/20 text-white font-bold p-4 rounded-xl text-base disabled:opacity-50 disabled:hover:shadow-none transition-all focus:outline-none focus:ring-4 focus:ring-red-500/30">
-                  {applyMutation.isPending ? 'Sending...' : 'Submit Application'}
+                <button type="submit" disabled={applyMutation.isPending || !selectedRoleId} className="mt-auto w-full bg-green-500 hover:bg-green-400 hover:shadow-lg hover:shadow-green-500/20 text-slate-900 font-bold p-4 rounded-xl text-base disabled:opacity-50 disabled:hover:shadow-none transition-all focus:outline-none focus:ring-4 focus:ring-green-500/30">
+                  {applyMutation.isPending ? 'Applying...' : 'Submit Application'}
                 </button>
               </form>
             </>
