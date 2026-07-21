@@ -52,10 +52,13 @@ export function MyProjectsPage() {
                     {project.status || 'ACTIVE'}
                   </span>
                 </div>
-                <p className="text-sm font-medium text-slate-400 line-clamp-1 mb-3">{project.description}</p>
-                <div className="flex items-center gap-2">
-                  <span className="text-xs text-slate-500 font-bold uppercase tracking-wider">Role:</span>
-                  <span className="text-sm font-semibold text-slate-300">Owner</span>
+                <p className="text-sm font-medium text-slate-400 line-clamp-2 mb-3">{project.description}</p>
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mb-4 text-xs font-medium text-slate-400">
+                  <div className="flex items-center gap-1.5"><span className="text-slate-500 font-bold uppercase tracking-wider">Role:</span><span className="text-slate-300 font-semibold">Owner</span></div>
+                  {project.domain && <div className="flex items-center gap-1.5 px-2 py-0.5 rounded bg-slate-800 border border-slate-700/50">{project.domain}</div>}
+                  {project.commitment && <div className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-slate-600"></span>{project.commitment}</div>}
+                  {project.experienceLevel && <div className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-slate-600"></span>{project.experienceLevel}</div>}
+                  {project.teamSize && <div className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-slate-600"></span>Team: {project.teamSize}</div>}
                 </div>
               </div>
               <div className="mt-4 sm:mt-0 flex items-center justify-between sm:justify-center gap-3 shrink-0 sm:border-l sm:border-slate-700/50 sm:pl-6 sm:h-full">

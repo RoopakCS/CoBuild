@@ -7,6 +7,7 @@ import { membershipsApi } from '../api/memberships';
 import { useState } from 'react';
 import { ArrowLeft } from '@phosphor-icons/react';
 import { toast } from 'sonner';
+import { ConfirmModal } from '../components/ConfirmModal';
 
 export function ProjectDetailsPage() {
   const { id } = useParams();
@@ -14,6 +15,7 @@ export function ProjectDetailsPage() {
   const queryClient = useQueryClient();
   const [coverLetter, setCoverLetter] = useState('');
   const [selectedRoleId, setSelectedRoleId] = useState('');
+  const [confirmModal, setConfirmModal] = useState({ isOpen: false, type: null, title: '', message: '' });
 
   const { data: user } = useQuery({ queryKey: ['users', 'me'], queryFn: usersApi.getMe });
   
@@ -44,6 +46,8 @@ export function ProjectDetailsPage() {
     onSuccess: () => {
       toast.success('Applied successfully!');
       setCoverLetter('');
+      queryClient.invalidateQueries({ queryKey: ['applications', 'me'] });
+      queryClient.invalidateQueries({ queryKey: ['applications', 'project', id] });
       queryClient.invalidateQueries({ queryKey: ['projects', id] });
     }
   });
@@ -55,7 +59,10 @@ export function ProjectDetailsPage() {
 
   const removeMember = useMutation({
     mutationFn: membershipsApi.removeMember,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['memberships', 'project', id] })
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['memberships', 'project', id] });
+      queryClient.invalidateQueries({ queryKey: ['projects', id] });
+    }
   });
 
   const leaveProject = useMutation({
@@ -63,6 +70,8 @@ export function ProjectDetailsPage() {
     onSuccess: () => {
       toast.success('You have left the project');
       queryClient.invalidateQueries({ queryKey: ['memberships', 'project', id] });
+      queryClient.invalidateQueries({ queryKey: ['memberships', 'user', user?.id] });
+      queryClient.invalidateQueries({ queryKey: ['projects', id] });
       queryClient.invalidateQueries({ queryKey: ['projects'] });
     }
   });
@@ -136,7 +145,12 @@ export function ProjectDetailsPage() {
                 Edit Project
               </button>
               <button onClick={() => {
-                if(window.confirm('Delete this project?')) deleteProject.mutate(id);
+                setConfirmModal({
+                  isOpen: true,
+                  type: 'deleteProject',
+                  title: 'Delete Project',
+                  message: 'Are you sure you want to delete this project? This action cannot be undone.'
+                });
               }} className="text-sm font-bold bg-red-600 hover:bg-red-500 text-white px-5 py-2.5 rounded-xl transition-all hover:shadow-lg hover:shadow-red-500/20 disabled:opacity-50">
                 {deleteProject.isPending ? 'Deleting...' : 'Delete Project'}
               </button>
@@ -163,7 +177,12 @@ export function ProjectDetailsPage() {
               <div key={m.id} className="flex items-center justify-between border-b border-slate-700/50 pb-4 last:border-0 last:pb-0">
                 <span className="text-base font-semibold text-slate-200">{m.userName} <span className="text-sm font-normal text-slate-500 ml-2">({m.role})</span></span>
                 {isOwner && m.userId !== project.ownerId && (
-                  <button onClick={() => removeMember.mutate({ projectId: id, userId: m.userId })} className="text-sm font-bold text-red-400 hover:text-red-300 bg-red-500/10 px-3 py-1.5 rounded-lg transition-colors">Remove</button>
+                  <button 
+                    onClick={() => removeMember.mutate({ projectId: id, userId: m.userId })} 
+                    disabled={removeMember.isPending && removeMember.variables?.userId === m.userId}
+                    className="text-sm font-bold text-red-400 hover:text-red-300 bg-red-500/10 px-3 py-1.5 rounded-lg transition-colors disabled:opacity-50">
+                    {removeMember.isPending && removeMember.variables?.userId === m.userId ? 'Removing...' : 'Remove'}
+                  </button>
                 )}
               </div>
             ))}
@@ -182,8 +201,18 @@ export function ProjectDetailsPage() {
                     <p className="text-sm font-medium text-slate-400 mt-3 mb-5 leading-relaxed">{app.message}</p>
                     {app.status === 'PENDING' && (
                       <div className="flex gap-3">
-                        <button onClick={() => handleAccept(app)} className="text-sm font-bold bg-green-500 hover:bg-green-400 text-slate-900 px-4 py-2 rounded-xl transition-colors">Accept</button>
-                        <button onClick={() => updateAppStatus.mutate({ applicationId: app.id, status: 'REJECTED' })} className="text-sm font-bold border border-slate-600 text-slate-300 hover:bg-slate-700 hover:text-slate-100 px-4 py-2 rounded-xl transition-colors">Reject</button>
+                        <button 
+                          onClick={() => handleAccept(app)} 
+                          disabled={updateAppStatus.isPending && updateAppStatus.variables?.applicationId === app.id}
+                          className="text-sm font-bold bg-green-500 hover:bg-green-400 text-slate-900 px-4 py-2 rounded-xl transition-colors disabled:opacity-50">
+                          {updateAppStatus.isPending && updateAppStatus.variables?.applicationId === app.id && updateAppStatus.variables?.status === 'ACCEPTED' ? 'Accepting...' : 'Accept'}
+                        </button>
+                        <button 
+                          onClick={() => updateAppStatus.mutate({ applicationId: app.id, status: 'REJECTED' })} 
+                          disabled={updateAppStatus.isPending && updateAppStatus.variables?.applicationId === app.id}
+                          className="text-sm font-bold border border-slate-600 text-slate-300 hover:bg-slate-700 hover:text-slate-100 px-4 py-2 rounded-xl transition-colors disabled:opacity-50">
+                          {updateAppStatus.isPending && updateAppStatus.variables?.applicationId === app.id && updateAppStatus.variables?.status === 'REJECTED' ? 'Rejecting...' : 'Reject'}
+                        </button>
                       </div>
                     )}
                   </div>
@@ -197,9 +226,12 @@ export function ProjectDetailsPage() {
               <p className="mb-6">You are an active member of this project.</p>
               <button 
                 onClick={() => {
-                  if(window.confirm('Are you sure you want to leave this project?')) {
-                    leaveProject.mutate(myMembership.id);
-                  }
+                  setConfirmModal({
+                    isOpen: true,
+                    type: 'leaveProject',
+                    title: 'Leave Project',
+                    message: 'Are you sure you want to leave this project? You will need to apply again if you wish to return.'
+                  });
                 }}
                 disabled={leaveProject.isPending}
                 className="text-sm font-bold bg-red-600 hover:bg-red-500 text-white px-5 py-2.5 rounded-xl transition-all hover:shadow-lg hover:shadow-red-500/20 disabled:opacity-50"
@@ -257,6 +289,22 @@ export function ProjectDetailsPage() {
           )}
         </div>
       </div>
+
+      <ConfirmModal
+        isOpen={confirmModal.isOpen}
+        title={confirmModal.title}
+        message={confirmModal.message}
+        onConfirm={() => {
+          if (confirmModal.type === 'deleteProject') {
+            deleteProject.mutate(id);
+          } else if (confirmModal.type === 'leaveProject') {
+            leaveProject.mutate(myMembership.id);
+          }
+          setConfirmModal({ isOpen: false, type: null, title: '', message: '' });
+        }}
+        onCancel={() => setConfirmModal({ isOpen: false, type: null, title: '', message: '' })}
+        confirmText={confirmModal.type === 'deleteProject' ? 'Delete Project' : 'Leave Project'}
+      />
     </div>
   );
 }

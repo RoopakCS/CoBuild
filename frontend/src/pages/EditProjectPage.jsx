@@ -5,11 +5,13 @@ import { toast } from 'sonner';
 import { projectsApi } from '../api/projects';
 import { rolesApi } from '../api/roles';
 import { ArrowLeft, Plus, Trash } from '@phosphor-icons/react';
+import { ConfirmModal } from '../components/ConfirmModal';
 
 export function EditProjectPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const [confirmModal, setConfirmModal] = useState({ isOpen: false, type: null, payload: null, title: '', message: '' });
 
   const { data: project, isLoading, error } = useQuery({
     queryKey: ['projects', id],
@@ -208,7 +210,13 @@ export function EditProjectPage() {
               <button 
                 type="button" 
                 onClick={() => {
-                  if(window.confirm('Delete this role?')) deleteRoleMutation.mutate(role.id);
+                  setConfirmModal({
+                    isOpen: true,
+                    type: 'deleteRole',
+                    payload: role.id,
+                    title: 'Delete Role',
+                    message: `Are you sure you want to delete the role "${role.title}"?`
+                  });
                 }}
                 disabled={deleteRoleMutation.isPending}
                 className="p-2 sm:p-3 text-slate-500 hover:text-red-400 hover:bg-red-500/10 rounded-xl transition-colors disabled:opacity-30"
@@ -249,6 +257,20 @@ export function EditProjectPage() {
           </div>
         </div>
       </div>
+
+      <ConfirmModal
+        isOpen={confirmModal.isOpen}
+        title={confirmModal.title}
+        message={confirmModal.message}
+        onConfirm={() => {
+          if (confirmModal.type === 'deleteRole') {
+            deleteRoleMutation.mutate(confirmModal.payload);
+          }
+          setConfirmModal({ isOpen: false, type: null, payload: null, title: '', message: '' });
+        }}
+        onCancel={() => setConfirmModal({ isOpen: false, type: null, payload: null, title: '', message: '' })}
+        confirmText="Delete Role"
+      />
     </div>
   );
 }
