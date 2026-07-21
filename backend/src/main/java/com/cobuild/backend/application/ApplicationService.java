@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class ApplicationService {
         private final ApplicationRepository applicationRepository;
         private final UserRepository userRepository;

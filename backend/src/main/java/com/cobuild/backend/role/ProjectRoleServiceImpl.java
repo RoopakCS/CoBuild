@@ -18,6 +18,7 @@ import com.cobuild.backend.user.User;
 import com.cobuild.backend.exception.ForbiddenException;
 
 @Service
+@Transactional(readOnly = true)
 public class ProjectRoleServiceImpl implements ProjectRoleService {
 
     private final ProjectRoleRepository projectRoleRepository;

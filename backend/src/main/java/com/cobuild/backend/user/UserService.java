@@ -15,12 +15,15 @@ import com.cobuild.backend.membership.Membership;
 import com.cobuild.backend.membership.MembershipStatus;
 import com.cobuild.backend.project.dto.response.ProjectResponse;
 
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class UserService {
 
     private final UserRepository userRepository;
@@ -44,6 +47,7 @@ public class UserService {
     /**
      * Updates the currently authenticated user's profile.
      */
+    @Transactional
     public UserProfileResponse updateProfile(UpdateProfileRequest request) {
 
         User user = getAuthenticatedUser();

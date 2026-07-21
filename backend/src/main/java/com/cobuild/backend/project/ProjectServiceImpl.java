@@ -14,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import com.cobuild.backend.project.dto.response.ProjectRoleResponse;
 import com.cobuild.backend.role.RoleSkill;
 
@@ -24,6 +25,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class ProjectServiceImpl implements ProjectService {
 
     private final ProjectRepository projectRepository;
@@ -31,6 +33,7 @@ public class ProjectServiceImpl implements ProjectService {
     private final ProjectMapper projectMapper;
 
     @Override
+    @Transactional
     public ProjectResponse createProject(CreateProjectRequest request) {
 
         User owner = getCurrentUser();
@@ -84,6 +87,7 @@ public class ProjectServiceImpl implements ProjectService {
                 .map(projectMapper::toResponse);
     }
     @Override
+    @Transactional
     public ProjectResponse updateProject(
             UUID id,
             UpdateProjectRequest request) {
@@ -129,6 +133,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
+    @Transactional
     public void deleteProject(UUID id) {
 
         Project project = projectRepository.findById(id)

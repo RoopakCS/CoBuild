@@ -24,6 +24,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class MembershipServiceImpl implements MembershipService {
 
         private final MembershipRepository membershipRepository;
@@ -32,6 +33,7 @@ public class MembershipServiceImpl implements MembershipService {
         private final ProjectRoleRepository projectRoleRepository;
 
         @Override
+        @Transactional
         public MembershipResponse addMember(AddMemberRequest request) {
 
                 Project project = projectRepository.findById(request.getProjectId())
