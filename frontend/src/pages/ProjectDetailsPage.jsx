@@ -13,6 +13,7 @@ export function ProjectDetailsPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [coverLetter, setCoverLetter] = useState('');
+  const [selectedRoleId, setSelectedRoleId] = useState('');
 
   const { data: user } = useQuery({ queryKey: ['users', 'me'], queryFn: usersApi.getMe });
   
@@ -57,6 +58,15 @@ export function ProjectDetailsPage() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['memberships', 'project', id] })
   });
 
+  const leaveProject = useMutation({
+    mutationFn: membershipsApi.leaveProject,
+    onSuccess: () => {
+      toast.success('You have left the project');
+      queryClient.invalidateQueries({ queryKey: ['memberships', 'project', id] });
+      queryClient.invalidateQueries({ queryKey: ['projects'] });
+    }
+  });
+
   const deleteProject = useMutation({
     mutationFn: projectsApi.delete,
     onSuccess: () => {
@@ -67,7 +77,7 @@ export function ProjectDetailsPage() {
   const handleAccept = async (app) => {
     try {
       await updateAppStatus.mutateAsync({ applicationId: app.id, status: 'ACCEPTED' });
-      await membershipsApi.addMember({ projectId: id, userId: app.applicantId });
+      toast.success('Application accepted!');
       queryClient.invalidateQueries({ queryKey: ['memberships', 'project', id] });
     } catch (e) {
       toast.error('Failed to accept application');
@@ -88,7 +98,12 @@ export function ProjectDetailsPage() {
 
   const isOwner = user?.id === project.ownerId;
   const hasApplied = myApps?.some(a => a.projectId === id && a.status !== 'WITHDRAWN' && a.status !== 'REJECTED');
-  const isMember = members?.some(m => m.userId === user?.id);
+  const myMembership = members?.find(m => m.userId === user?.id && m.status === 'ACTIVE');
+  const isMember = !!myMembership;
+  
+  const openRoles = project.roles?.filter(r => r.openingsCount > r.filledCount) || [];
+  const hasOpenRoles = openRoles.length > 0;
+  const isProjectOpen = project.status === 'OPEN';
 
   return (
     <div className="max-w-5xl mx-auto pb-12">
@@ -146,7 +161,7 @@ export function ProjectDetailsPage() {
               <div className="space-y-4">
                 {apps?.map(app => (
                   <div key={app.id} className="border border-slate-700/80 bg-slate-900/40 p-5 rounded-2xl">
-                    <p className="text-base font-bold text-slate-200">{app.applicantName} <span className={`text-xs font-bold px-2 py-1 rounded ml-2 ${app.status === 'PENDING' ? 'bg-yellow-500/20 text-yellow-400' : app.status === 'ACCEPTED' ? 'bg-green-500/20 text-green-400' : 'bg-slate-700 text-slate-400'}`}>{app.status}</span></p>
+                    <p className="text-base font-bold text-slate-200">{app.applicantName} <span className="text-sm font-normal text-slate-400 ml-1">for {app.roleTitle}</span> <span className={`text-xs font-bold px-2 py-1 rounded ml-2 ${app.status === 'PENDING' ? 'bg-yellow-500/20 text-yellow-400' : app.status === 'ACCEPTED' ? 'bg-green-500/20 text-green-400' : 'bg-slate-700 text-slate-400'}`}>{app.status}</span></p>
                     <p className="text-sm font-medium text-slate-400 mt-3 mb-5 leading-relaxed">{app.message}</p>
                     {app.status === 'PENDING' && (
                       <div className="flex gap-3">
@@ -162,27 +177,62 @@ export function ProjectDetailsPage() {
           ) : isMember ? (
             <div className="flex flex-col items-center justify-center h-full text-slate-400 text-center py-10">
               <span className="text-lg font-bold text-green-400 mb-2">You're in!</span>
-              <p>You are an active member of this project.</p>
+              <p className="mb-6">You are an active member of this project.</p>
+              <button 
+                onClick={() => {
+                  if(window.confirm('Are you sure you want to leave this project?')) {
+                    leaveProject.mutate(myMembership.id);
+                  }
+                }}
+                disabled={leaveProject.isPending}
+                className="text-sm font-bold bg-red-600 hover:bg-red-500 text-white px-5 py-2.5 rounded-xl transition-all hover:shadow-lg hover:shadow-red-500/20 disabled:opacity-50"
+              >
+                {leaveProject.isPending ? 'Leaving...' : 'Leave Project'}
+              </button>
             </div>
           ) : hasApplied ? (
             <div className="flex flex-col items-center justify-center h-full text-slate-400 text-center py-10">
               <span className="text-lg font-bold text-slate-300 mb-2">Application Sent</span>
               <p>You have already applied to this project. We'll let you know when the owner reviews it.</p>
             </div>
+          ) : !isProjectOpen ? (
+            <div className="flex flex-col items-center justify-center h-full text-slate-400 text-center py-10">
+              <span className="text-lg font-bold text-slate-300 mb-2">Not Accepting Applications</span>
+              <p>This project is currently not accepting new members.</p>
+            </div>
+          ) : !hasOpenRoles ? (
+            <div className="flex flex-col items-center justify-center h-full text-slate-400 text-center py-10">
+              <span className="text-lg font-bold text-slate-300 mb-2">No Open Roles</span>
+              <p>There are currently no open roles available for this project.</p>
+            </div>
           ) : (
             <>
               <h2 className="text-2xl font-bold mb-6 text-slate-50 tracking-tight">Join Project</h2>
-              <form onSubmit={e => { e.preventDefault(); applyMutation.mutate({ projectId: id, message: coverLetter }); }} className="flex flex-col h-full">
+              <form onSubmit={e => { e.preventDefault(); applyMutation.mutate({ projectId: id, message: coverLetter, roleId: selectedRoleId }); }} className="flex flex-col h-full">
+                <div className="mb-6">
+                  <label className="block text-sm font-bold text-slate-300 mb-2">Select Role</label>
+                  <select 
+                    required
+                    className="w-full bg-slate-900/50 border border-slate-700 text-slate-100 placeholder-slate-500 p-4 rounded-xl focus:outline-none focus:border-red-500 focus:ring-4 focus:ring-red-500/10 transition-all appearance-none"
+                    value={selectedRoleId}
+                    onChange={e => setSelectedRoleId(e.target.value)}
+                  >
+                    <option value="" disabled>Choose a role...</option>
+                    {openRoles.map(role => (
+                      <option key={role.id} value={role.id}>{role.title} ({role.openingsCount - role.filledCount} open)</option>
+                    ))}
+                  </select>
+                </div>
                 <label className="block text-sm font-bold text-slate-300 mb-2">Cover Letter</label>
                 <textarea 
                   rows={5} 
                   required 
                   placeholder="Why would you be a good fit?" 
-                  className="w-full bg-slate-900/50 border border-slate-700 text-slate-100 placeholder-slate-500 p-4 rounded-xl mb-6 focus:outline-none focus:border-green-500 focus:ring-4 focus:ring-green-500/10 transition-all resize-none" 
+                  className="w-full bg-slate-900/50 border border-slate-700 text-slate-100 placeholder-slate-500 p-4 rounded-xl mb-6 focus:outline-none focus:border-red-500 focus:ring-4 focus:ring-red-500/10 transition-all resize-none" 
                   value={coverLetter} 
                   onChange={e => setCoverLetter(e.target.value)} 
                 />
-                <button type="submit" disabled={applyMutation.isPending} className="mt-auto w-full bg-green-500 hover:bg-green-400 hover:shadow-lg hover:shadow-green-500/20 text-slate-900 font-bold p-4 rounded-xl text-base disabled:opacity-50 disabled:hover:shadow-none transition-all focus:outline-none focus:ring-4 focus:ring-green-500/30">
+                <button type="submit" disabled={applyMutation.isPending || !selectedRoleId} className="mt-auto w-full bg-red-600 hover:bg-red-500 hover:shadow-lg hover:shadow-red-500/20 text-white font-bold p-4 rounded-xl text-base disabled:opacity-50 disabled:hover:shadow-none transition-all focus:outline-none focus:ring-4 focus:ring-red-500/30">
                   {applyMutation.isPending ? 'Sending...' : 'Submit Application'}
                 </button>
               </form>

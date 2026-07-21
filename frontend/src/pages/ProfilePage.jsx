@@ -134,7 +134,7 @@ export function ProfilePage() {
             {applications?.map(app => (
               <div key={app.id} className="bg-slate-900/40 border border-slate-700/80 p-5 rounded-2xl flex flex-col md:flex-row md:justify-between md:items-center gap-4">
                 <div>
-                  <h3 className="font-bold text-lg text-slate-200">{app.projectTitle}</h3>
+                  <h3 className="font-bold text-lg text-slate-200">{app.projectTitle} <span className="text-sm font-normal text-slate-400 ml-1">for {app.roleTitle}</span></h3>
                   <p className="text-sm font-medium text-slate-400 mt-1">Status: <span className={`font-bold ${app.status === 'PENDING' ? 'text-yellow-400' : app.status === 'ACCEPTED' ? 'text-green-400' : 'text-slate-500'}`}>{app.status}</span></p>
                 </div>
                 {app.status !== 'WITHDRAWN' && app.status !== 'ACCEPTED' && app.status !== 'REJECTED' && (

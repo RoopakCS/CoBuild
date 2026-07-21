@@ -17,4 +17,8 @@ export const membershipsApi = {
     const { data } = await apiClient.delete(`/v1/memberships/project/${projectId}/user/${userId}`);
     return data;
   },
+  leaveProject: async (membershipId) => {
+    const { data } = await apiClient.delete(`/v1/memberships/${membershipId}/leave`);
+    return data;
+  }
 };

@@ -59,4 +59,15 @@ public class MembershipController {
         return ResponseEntity.noContent().build();
     }
 
+    @DeleteMapping("/{membershipId}/leave")
+    public ResponseEntity<Void> leaveProject(
+            @PathVariable UUID membershipId,
+            Authentication authentication) {
+
+        membershipService.leaveProject(
+                membershipId,
+                authentication.getName());
+
+        return ResponseEntity.noContent().build();
+    }
 }
