@@ -16,9 +16,17 @@ public interface MembershipRepository
     List<Membership> findByUser(User user);
 
     Optional<Membership> findByUserAndProject(User user,
-                                              Project project);
+            Project project);
 
     boolean existsByUserAndProject(User user,
-                                   Project project);
+            Project project);
+
+    Optional<Membership> findByIdAndStatus(
+            UUID id,
+            MembershipStatus status);
+
+    Optional<Membership> findByProjectIdAndUserId(
+            UUID projectId,
+            UUID userId);
 
 }

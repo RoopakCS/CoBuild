@@ -4,8 +4,10 @@ import com.cobuild.backend.membership.dto.request.AddMemberRequest;
 import com.cobuild.backend.membership.dto.response.MembershipResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -46,9 +48,13 @@ public class MembershipController {
     @DeleteMapping("/project/{projectId}/user/{userId}")
     public ResponseEntity<Void> removeMember(
             @PathVariable UUID projectId,
-            @PathVariable UUID userId) {
+            @PathVariable UUID userId,
+            Authentication authentication) {
 
-        membershipService.removeMember(projectId, userId);
+        membershipService.removeMember(
+                projectId,
+                userId,
+                authentication.getName());
 
         return ResponseEntity.noContent().build();
     }

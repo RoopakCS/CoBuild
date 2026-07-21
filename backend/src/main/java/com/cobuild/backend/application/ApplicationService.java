@@ -174,14 +174,23 @@ public class ApplicationService {
                 }
 
                 if (newStatus == ApplicationStatus.ACCEPTED) {
-                        ProjectRole role = application.getRole();
+                        // ProjectRole role = application.getRole();
+
+                        UUID roleId = application.getRole().getId();
+
+                        // Lock this role until the current transaction completes
+                        ProjectRole role = projectRoleRepository
+                                        .findByIdForUpdate(roleId)
+                                        .orElseThrow(() -> new ResourceNotFoundException(
+                                                        "Role not found"));
 
                         if (role.getFilledCount() >= role.getOpeningsCount()) {
                                 throw new BadRequestException("This role is already full");
                         }
 
                         Membership membership = Membership.builder().project(application.getProject())
-                                        .user(application.getApplicant()).membershipRole(MembershipRole.MEMBER).projectRole(role).build();
+                                        .user(application.getApplicant()).membershipRole(MembershipRole.MEMBER)
+                                        .projectRole(role).build();
 
                         membershipRepository.save(membership);
 

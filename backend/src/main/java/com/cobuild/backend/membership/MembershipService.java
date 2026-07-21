@@ -14,5 +14,7 @@ public interface MembershipService {
 
     List<MembershipResponse> getUserMemberships(UUID userId);
 
-    void removeMember(UUID projectId, UUID userId);
+    void removeMember(UUID projectId, UUID userId, String ownerEmail);
+
+    void leaveProject(UUID membershipId, String userEmail);
 }
