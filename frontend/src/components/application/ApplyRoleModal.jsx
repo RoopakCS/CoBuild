@@ -1,0 +1,143 @@
+import { useState } from 'react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
+import { WarningCircle } from '@phosphor-icons/react';
+import { Modal } from '../common/Modal';
+import { Textarea, FormField } from '../common/Input';
+import { Badge } from '../common/Badge';
+import { applicationsApi } from '../../api/applications';
+
+/**
+ * Modal for applying to a specific role on a project.
+ * Shows role summary (read-only) and a pitch message textarea.
+ *
+ * @param {{ isOpen: boolean, onClose: () => void, role: object|null, projectId: string }} props
+ */
+export function ApplyRoleModal({ isOpen, onClose, role, projectId }) {
+  const queryClient = useQueryClient();
+  const [message, setMessage] = useState('');
+  const [inlineError, setInlineError] = useState('');
+
+  const applyMutation = useMutation({
+    mutationFn: (payload) => applicationsApi.apply(payload),
+    onSuccess: () => {
+      toast.success('Application submitted!');
+      queryClient.invalidateQueries({ queryKey: ['applications', 'me'] });
+      queryClient.invalidateQueries({ queryKey: ['applications', 'project', projectId] });
+      queryClient.invalidateQueries({ queryKey: ['projects', projectId] });
+      setMessage('');
+      setInlineError('');
+      onClose();
+    },
+    onError: (err) => {
+      const status = err.response?.status;
+      const serverMessage = err.response?.data?.message || err.response?.data?.error || '';
+
+      if (status === 400 || status === 409) {
+        // Race condition: role filled between page load and submit
+        setInlineError(
+          serverMessage || 'This role is now full. Please choose a different role.'
+        );
+      } else {
+        toast.error(serverMessage || 'Failed to submit application');
+      }
+    },
+  });
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setInlineError('');
+
+    applyMutation.mutate({
+      projectId,
+      roleId: role?.id,
+      message: message.trim(),
+    });
+  };
+
+  const handleClose = () => {
+    setMessage('');
+    setInlineError('');
+    onClose();
+  };
+
+  if (!role) return null;
+
+  const isFull = role.isFull || role.full || (role.openingsCount - role.filledCount) <= 0;
+
+  return (
+    <Modal isOpen={isOpen} onClose={handleClose} title="Apply for Role" maxWidth="max-w-md">
+      {/* Role Summary */}
+      <div className="bg-slate-800/60 border border-slate-700/40 rounded-xl p-4 mb-6">
+        <div className="flex items-start justify-between mb-2">
+          <h4 className="font-bold text-base text-slate-100">{role.title}</h4>
+          {isFull ? (
+            <Badge variant="danger" size="sm">Full</Badge>
+          ) : (
+            <Badge variant="success" size="sm">
+              {role.openingsCount - role.filledCount} open
+            </Badge>
+          )}
+        </div>
+        {role.description && (
+          <p className="text-sm text-slate-400 leading-relaxed mb-3">{role.description}</p>
+        )}
+        {role.skills && role.skills.length > 0 && (
+          <div className="flex flex-wrap gap-1.5">
+            {role.skills.map((skill) => (
+              <span
+                key={skill}
+                className="text-xs font-medium bg-slate-900 border border-slate-700/50 text-slate-300 px-2 py-0.5 rounded-md"
+              >
+                {skill}
+              </span>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Inline Error */}
+      {inlineError && (
+        <div className="flex items-start gap-2 bg-red-500/10 border border-red-500/20 text-red-400 text-sm font-medium p-3 rounded-xl mb-4">
+          <WarningCircle size={18} weight="fill" className="shrink-0 mt-0.5" />
+          <span>{inlineError}</span>
+        </div>
+      )}
+
+      {/* Form */}
+      <form onSubmit={handleSubmit}>
+        <FormField label="Your Pitch" htmlFor="apply-message">
+          <Textarea
+            id="apply-message"
+            rows={5}
+            placeholder="Why would you be a great fit for this role?"
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            maxLength={1000}
+          />
+          <p className="text-xs text-slate-500 mt-1.5 text-right">
+            {message.length}/1000
+          </p>
+        </FormField>
+
+        <div className="flex justify-end gap-3 mt-6">
+          <button
+            type="button"
+            onClick={handleClose}
+            disabled={applyMutation.isPending}
+            className="px-4 py-2.5 rounded-xl text-sm font-bold text-slate-300 hover:text-slate-100 hover:bg-slate-800 transition-colors disabled:opacity-50"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            disabled={applyMutation.isPending || isFull}
+            className="bg-green-500 hover:bg-green-400 text-slate-900 font-bold px-6 py-2.5 rounded-xl transition-all hover:shadow-lg hover:shadow-green-500/20 disabled:opacity-50 text-sm"
+          >
+            {applyMutation.isPending ? 'Submitting...' : 'Submit Application'}
+          </button>
+        </div>
+      </form>
+    </Modal>
+  );
+}

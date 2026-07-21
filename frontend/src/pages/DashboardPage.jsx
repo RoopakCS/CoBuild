@@ -1,24 +1,22 @@
 import { useQuery } from '@tanstack/react-query';
-import { Link } from 'react-router-dom';
-import { CaretRight, FolderOpen } from '@phosphor-icons/react';
+import { Link, useSearchParams } from 'react-router-dom';
+import { CaretRight, CaretLeft, FolderOpen } from '@phosphor-icons/react';
 import { projectsApi } from '../api/projects';
 import { usersApi } from '../api/users';
 import { membershipsApi } from '../api/memberships';
 import { applicationsApi } from '../api/applications';
-import { useState, useEffect } from 'react';
+import { useState, useCallback } from 'react';
+import { ProjectFilterBar } from '../components/project/ProjectFilterBar';
 
 export function DashboardPage() {
-  const [search, setSearch] = useState('');
-  const [domain, setDomain] = useState('');
-  const [level, setLevel] = useState('');
-  const [debouncedSearch, setDebouncedSearch] = useState('');
-
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedSearch(search);
-    }, 500);
-    return () => clearTimeout(handler);
-  }, [search]);
+  const [searchParams] = useSearchParams();
+  const [filterParams, setFilterParams] = useState(() => {
+    const params = {};
+    for (const [key, value] of searchParams.entries()) {
+      params[key] = value;
+    }
+    return params;
+  });
 
   const { data: user } = useQuery({ queryKey: ['users', 'me'], queryFn: usersApi.getMe });
 
@@ -40,6 +38,7 @@ export function DashboardPage() {
     enabled: !!user?.id,
   });
 
+  // Build "Your Active Projects" map
   const activeProjectsMap = new Map();
   if (myProjects) {
     myProjects.forEach(p => activeProjectsMap.set(p.id, { ...p, myRole: 'Owner' }));
@@ -59,11 +58,17 @@ export function DashboardPage() {
     });
   }
   const activeProjects = Array.from(activeProjectsMap.values());
-  
-  const queryParams = { page: 0, size: 20 };
-  if (debouncedSearch) queryParams.search = debouncedSearch;
-  if (domain) queryParams.domain = domain;
-  if (level) queryParams.level = level;
+
+  // Pagination state — derived from URL params
+  const currentPage = parseInt(searchParams.get('page') || '0', 10);
+
+  // Build query params for the project list endpoint
+  const queryParams = { page: currentPage, size: 20 };
+  if (filterParams.search) queryParams.search = filterParams.search;
+  if (filterParams.domain) queryParams.domain = filterParams.domain;
+  if (filterParams.experienceLevel) queryParams.experienceLevel = filterParams.experienceLevel;
+  if (filterParams.status) queryParams.status = filterParams.status;
+  if (filterParams.skills) queryParams.skills = filterParams.skills.split(',').filter(Boolean);
 
   const { data: pageData, isLoading, error, refetch } = useQuery({
     queryKey: ['projects', queryParams],
@@ -71,6 +76,11 @@ export function DashboardPage() {
   });
 
   const projects = pageData?.content || [];
+  const totalPages = pageData?.totalPages || 1;
+
+  const handleFilterChange = useCallback((params) => {
+    setFilterParams(params);
+  }, []);
 
   return (
     <div className="max-w-5xl mx-auto pb-12">
@@ -129,31 +139,13 @@ export function DashboardPage() {
       )}
 
       <div>
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-          <div className="flex items-center gap-4 flex-1">
-            <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-50 whitespace-nowrap">Discover Projects</h2>
-            <div className="h-px flex-1 bg-slate-700/50 hidden sm:block"></div>
-          </div>
-          <div className="flex flex-col sm:flex-row gap-3">
-            <input 
-              type="text" 
-              placeholder="Search projects..." 
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="bg-slate-900/50 border border-slate-700 text-slate-100 placeholder-slate-500 px-4 py-2 rounded-xl text-sm focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20"
-            />
-            <select 
-              value={level}
-              onChange={(e) => setLevel(e.target.value)}
-              className="bg-slate-900/50 border border-slate-700 text-slate-100 placeholder-slate-500 px-4 py-2 rounded-xl text-sm focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 appearance-none"
-            >
-              <option value="">Any Level</option>
-              <option value="BEGINNER">Beginner</option>
-              <option value="INTERMEDIATE">Intermediate</option>
-              <option value="ADVANCED">Advanced</option>
-            </select>
-          </div>
+        <div className="flex items-center gap-4 mb-6">
+          <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-50 whitespace-nowrap">Discover Projects</h2>
+          <div className="h-px flex-1 bg-slate-700/50 hidden sm:block"></div>
         </div>
+
+        {/* ── Filter Bar (M3) ── */}
+        <ProjectFilterBar onFilterChange={handleFilterChange} />
 
         {isLoading ? (
           <div className="flex flex-col gap-4">
@@ -173,47 +165,80 @@ export function DashboardPage() {
             <p className="mt-2 text-sm sm:text-base text-slate-400 font-medium">Try adjusting your search filters.</p>
           </div>
         ) : (
-          <div className="flex flex-col gap-4">
-            {projects.map((project) => (
-              <Link 
-                to={`/projects/${project.id}`} 
-                key={project.id}
-                className="group flex flex-col sm:flex-row sm:items-center justify-between rounded-2xl border border-slate-700/50 bg-slate-800/40 p-5 sm:p-6 backdrop-blur-sm transition-all hover:border-green-500/30 hover:bg-slate-800/60 hover:shadow-lg hover:shadow-green-500/10"
-              >
-                <div className="flex-1 min-w-0 pr-4">
-                  <div className="mb-2 flex items-center gap-3">
-                    <h3 className="font-bold text-xl text-slate-50 tracking-tight truncate">{project.title}</h3>
-                    <span className="shrink-0 inline-flex rounded-full bg-green-500/10 px-2.5 py-0.5 text-xs font-bold text-green-400 border border-green-500/20">
-                      {project.status || 'ACTIVE'}
-                    </span>
-                  </div>
-                  <p className="text-sm font-medium text-slate-400 line-clamp-2 mb-3">{project.description}</p>
-                  <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mb-4 text-xs font-medium text-slate-400">
-                    <div className="flex items-center gap-1.5"><span className="text-slate-500 font-bold uppercase tracking-wider">Owner:</span><span className="text-slate-300 font-semibold">{project.ownerName || 'Unknown'}</span></div>
-                    {project.domain && <div className="flex items-center gap-1.5 px-2 py-0.5 rounded bg-slate-800 border border-slate-700/50">{project.domain}</div>}
-                    {project.commitment && <div className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-slate-600"></span>{project.commitment}</div>}
-                    {project.experienceLevel && <div className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-slate-600"></span>{project.experienceLevel}</div>}
-                    {project.teamSize && <div className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-slate-600"></span>Team: {project.teamSize}</div>}
-                  </div>
-                  {project.skills && project.skills.length > 0 && (
-                    <div className="flex flex-wrap gap-2">
-                      {project.skills.slice(0, 5).map((skill, idx) => (
-                        <span key={idx} className="text-xs font-medium bg-slate-900 border border-slate-700 text-slate-300 px-2.5 py-1 rounded-md">
-                          {skill}
-                        </span>
-                      ))}
-                      {project.skills.length > 5 && <span className="text-xs font-medium text-slate-500 py-1 px-1">+{project.skills.length - 5} more</span>}
+          <>
+            <div className="flex flex-col gap-4">
+              {projects.map((project) => (
+                <Link 
+                  to={`/projects/${project.id}`} 
+                  key={project.id}
+                  className="group flex flex-col sm:flex-row sm:items-center justify-between rounded-2xl border border-slate-700/50 bg-slate-800/40 p-5 sm:p-6 backdrop-blur-sm transition-all hover:border-green-500/30 hover:bg-slate-800/60 hover:shadow-lg hover:shadow-green-500/10"
+                >
+                  <div className="flex-1 min-w-0 pr-4">
+                    <div className="mb-2 flex items-center gap-3">
+                      <h3 className="font-bold text-xl text-slate-50 tracking-tight truncate">{project.title}</h3>
+                      <span className="shrink-0 inline-flex rounded-full bg-green-500/10 px-2.5 py-0.5 text-xs font-bold text-green-400 border border-green-500/20">
+                        {project.status || 'ACTIVE'}
+                      </span>
                     </div>
-                  )}
-                </div>
-                <div className="mt-4 sm:mt-0 flex items-center justify-between sm:justify-center gap-3 shrink-0 sm:border-l sm:border-slate-700/50 sm:pl-6 sm:h-full">
-                  <div className="flex items-center text-green-400 text-sm font-bold gap-1 transition-transform group-hover:translate-x-1">
-                    View <CaretRight weight="bold" />
+                    <p className="text-sm font-medium text-slate-400 line-clamp-2 mb-3">{project.description}</p>
+                    <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mb-4 text-xs font-medium text-slate-400">
+                      <div className="flex items-center gap-1.5"><span className="text-slate-500 font-bold uppercase tracking-wider">Owner:</span><span className="text-slate-300 font-semibold">{project.ownerName || 'Unknown'}</span></div>
+                      {project.domain && <div className="flex items-center gap-1.5 px-2 py-0.5 rounded bg-slate-800 border border-slate-700/50">{project.domain}</div>}
+                      {project.commitment && <div className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-slate-600"></span>{project.commitment}</div>}
+                      {project.experienceLevel && <div className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-slate-600"></span>{project.experienceLevel}</div>}
+                      {project.teamSize && <div className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-slate-600"></span>Team: {project.teamSize}</div>}
+                    </div>
+                    {project.skills && project.skills.length > 0 && (
+                      <div className="flex flex-wrap gap-2">
+                        {project.skills.slice(0, 5).map((skill, idx) => (
+                          <span key={idx} className="text-xs font-medium bg-slate-900 border border-slate-700 text-slate-300 px-2.5 py-1 rounded-md">
+                            {skill}
+                          </span>
+                        ))}
+                        {project.skills.length > 5 && <span className="text-xs font-medium text-slate-500 py-1 px-1">+{project.skills.length - 5} more</span>}
+                      </div>
+                    )}
                   </div>
-                </div>
-              </Link>
-            ))}
-          </div>
+                  <div className="mt-4 sm:mt-0 flex items-center justify-between sm:justify-center gap-3 shrink-0 sm:border-l sm:border-slate-700/50 sm:pl-6 sm:h-full">
+                    <div className="flex items-center text-green-400 text-sm font-bold gap-1 transition-transform group-hover:translate-x-1">
+                      View <CaretRight weight="bold" />
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="flex items-center justify-center gap-4 mt-8">
+                <Link
+                  to={`?${new URLSearchParams({ ...filterParams, page: Math.max(0, currentPage - 1) }).toString()}`}
+                  className={`flex items-center gap-1.5 text-sm font-bold px-4 py-2 rounded-xl transition-all border ${
+                    currentPage === 0
+                      ? 'border-slate-700/30 text-slate-600 pointer-events-none'
+                      : 'border-slate-700 text-slate-300 hover:bg-slate-800 hover:text-slate-100'
+                  }`}
+                >
+                  <CaretLeft size={16} weight="bold" />
+                  Previous
+                </Link>
+                <span className="text-sm font-medium text-slate-400">
+                  Page {currentPage + 1} of {totalPages}
+                </span>
+                <Link
+                  to={`?${new URLSearchParams({ ...filterParams, page: Math.min(totalPages - 1, currentPage + 1) }).toString()}`}
+                  className={`flex items-center gap-1.5 text-sm font-bold px-4 py-2 rounded-xl transition-all border ${
+                    currentPage >= totalPages - 1
+                      ? 'border-slate-700/30 text-slate-600 pointer-events-none'
+                      : 'border-slate-700 text-slate-300 hover:bg-slate-800 hover:text-slate-100'
+                  }`}
+                >
+                  Next
+                  <CaretRight size={16} weight="bold" />
+                </Link>
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>

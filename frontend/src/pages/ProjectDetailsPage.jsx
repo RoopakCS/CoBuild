@@ -7,14 +7,16 @@ import { membershipsApi } from '../api/memberships';
 import { useState } from 'react';
 import { ArrowLeft } from '@phosphor-icons/react';
 import { toast } from 'sonner';
-import { ConfirmModal } from '../components/ConfirmModal';
+import { ConfirmDialog } from '../components/common/ConfirmDialog';
+import { RoleList } from '../components/project/RoleList';
+import { ApplyRoleModal } from '../components/application/ApplyRoleModal';
+import { TeamMemberList } from '../components/team/TeamMemberList';
 
 export function ProjectDetailsPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const [coverLetter, setCoverLetter] = useState('');
-  const [selectedRoleId, setSelectedRoleId] = useState('');
+  const [applyModal, setApplyModal] = useState({ isOpen: false, role: null });
   const [confirmModal, setConfirmModal] = useState({ isOpen: false, type: null, title: '', message: '' });
 
   const { data: user } = useQuery({ queryKey: ['users', 'me'], queryFn: usersApi.getMe });
@@ -41,39 +43,13 @@ export function ProjectDetailsPage() {
     enabled: !!user,
   });
 
-  const applyMutation = useMutation({
-    mutationFn: (payload) => applicationsApi.apply(payload),
-    onSuccess: () => {
-      toast.success('Applied successfully!');
-      setCoverLetter('');
-      queryClient.invalidateQueries({ queryKey: ['applications', 'me'] });
-      queryClient.invalidateQueries({ queryKey: ['applications', 'project', id] });
-      queryClient.invalidateQueries({ queryKey: ['projects', id] });
-    }
-  });
-
   const updateAppStatus = useMutation({
     mutationFn: applicationsApi.updateStatus,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['applications', 'project', id] })
-  });
-
-  const removeMember = useMutation({
-    mutationFn: membershipsApi.removeMember,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['memberships', 'project', id] });
+      queryClient.invalidateQueries({ queryKey: ['applications', 'project', id] });
       queryClient.invalidateQueries({ queryKey: ['projects', id] });
-    }
-  });
-
-  const leaveProject = useMutation({
-    mutationFn: membershipsApi.leaveProject,
-    onSuccess: () => {
-      toast.success('You have left the project');
       queryClient.invalidateQueries({ queryKey: ['memberships', 'project', id] });
-      queryClient.invalidateQueries({ queryKey: ['memberships', 'user', user?.id] });
-      queryClient.invalidateQueries({ queryKey: ['projects', id] });
-      queryClient.invalidateQueries({ queryKey: ['projects'] });
-    }
+    },
   });
 
   const deleteProject = useMutation({
@@ -87,9 +63,8 @@ export function ProjectDetailsPage() {
     try {
       await updateAppStatus.mutateAsync({ applicationId: app.id, status: 'ACCEPTED' });
       toast.success('Application accepted!');
-      queryClient.invalidateQueries({ queryKey: ['memberships', 'project', id] });
     } catch (e) {
-      toast.error('Failed to accept application');
+      toast.error(e.response?.data?.message || 'Failed to accept application');
     }
   };
 
@@ -97,6 +72,7 @@ export function ProjectDetailsPage() {
     <div className="max-w-5xl mx-auto pb-12 animate-pulse">
       <div className="h-6 w-32 bg-slate-800/50 rounded mb-8"></div>
       <div className="rounded-2xl sm:rounded-3xl border border-slate-700/50 bg-slate-800/40 p-5 sm:p-8 lg:p-12 mb-6 sm:mb-10 h-64 sm:h-80"></div>
+      <div className="rounded-2xl sm:rounded-3xl border border-slate-700/50 bg-slate-800/30 p-5 sm:p-8 mb-6 sm:mb-10 h-48"></div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-10">
         <div className="rounded-2xl sm:rounded-3xl border border-slate-700/50 bg-slate-800/30 p-5 sm:p-8 h-48 sm:h-64"></div>
         <div className="rounded-2xl sm:rounded-3xl border border-slate-700/50 bg-slate-800/30 p-5 sm:p-8 h-48 sm:h-64"></div>
@@ -107,12 +83,11 @@ export function ProjectDetailsPage() {
 
   const isOwner = user?.id === project.ownerId;
   const hasApplied = myApps?.some(a => a.projectId === id && a.status !== 'WITHDRAWN' && a.status !== 'REJECTED');
-  const myMembership = members?.find(m => m.userId === user?.id && m.status === 'ACTIVE');
-  const isMember = !!myMembership;
-  
-  const openRoles = project.roles?.filter(r => r.openingsCount > r.filledCount) || [];
-  const hasOpenRoles = openRoles.length > 0;
+  const isMember = members?.some(m => m.userId === user?.id && m.status === 'ACTIVE');
   const isProjectOpen = project.status === 'OPEN';
+
+  // Determine if user can apply: not owner, not member, not already applied, project is open
+  const canApply = !isOwner && !isMember && !hasApplied && isProjectOpen;
 
   return (
     <div className="max-w-5xl mx-auto pb-12">
@@ -122,6 +97,7 @@ export function ProjectDetailsPage() {
         </button>
       </div>
 
+      {/* ── Project Header ── */}
       <div className="rounded-2xl sm:rounded-3xl border border-slate-700/50 bg-slate-800/40 p-5 sm:p-8 lg:p-12 shadow-2xl backdrop-blur-sm mb-6 sm:mb-10 relative overflow-hidden">
         {/* Subtle glow effect */}
         <div className="absolute top-0 right-0 w-96 h-96 bg-green-500/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none"></div>
@@ -168,28 +144,51 @@ export function ProjectDetailsPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-10">
-        {/* Members */}
-        <div className="rounded-2xl sm:rounded-3xl border border-slate-700/50 bg-slate-800/30 p-5 sm:p-8 shadow-xl backdrop-blur-sm">
-          <h2 className="text-2xl font-bold mb-6 text-slate-50 tracking-tight">Team Members</h2>
-          <div className="space-y-4">
-            {members?.map(m => (
-              <div key={m.id} className="flex items-center justify-between border-b border-slate-700/50 pb-4 last:border-0 last:pb-0">
-                <span className="text-base font-semibold text-slate-200">{m.userName} <span className="text-sm font-normal text-slate-500 ml-2">({m.role})</span></span>
-                {isOwner && m.userId !== project.ownerId && (
-                  <button 
-                    onClick={() => removeMember.mutate({ projectId: id, userId: m.userId })} 
-                    disabled={removeMember.isPending && removeMember.variables?.userId === m.userId}
-                    className="text-sm font-bold text-red-400 hover:text-red-300 bg-red-500/10 px-3 py-1.5 rounded-lg transition-colors disabled:opacity-50">
-                    {removeMember.isPending && removeMember.variables?.userId === m.userId ? 'Removing...' : 'Remove'}
-                  </button>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
+      {/* ── Roles Section (M1) ── */}
+      <div className="mb-6 sm:mb-10">
+        <RoleList
+          roles={project.roles || []}
+          isOwner={isOwner}
+          projectId={id}
+          onApplyClick={(role) => setApplyModal({ isOpen: true, role })}
+          canApply={canApply}
+        />
+      </div>
 
-        {/* Apply or Manage Applications */}
+      {/* ── Status banner for non-owners who can't apply ── */}
+      {!isOwner && !canApply && (
+        <div className="mb-6 sm:mb-10">
+          {isMember ? (
+            <div className="rounded-2xl border border-green-500/20 bg-green-500/5 p-5 text-center">
+              <span className="text-lg font-bold text-green-400">You're on the team!</span>
+              <p className="text-sm text-slate-400 mt-1">You are an active member of this project.</p>
+            </div>
+          ) : hasApplied ? (
+            <div className="rounded-2xl border border-yellow-500/20 bg-yellow-500/5 p-5 text-center">
+              <span className="text-lg font-bold text-yellow-400">Application Sent</span>
+              <p className="text-sm text-slate-400 mt-1">You have already applied. We'll let you know when the owner reviews it.</p>
+            </div>
+          ) : !isProjectOpen ? (
+            <div className="rounded-2xl border border-slate-700/50 bg-slate-800/30 p-5 text-center">
+              <span className="text-lg font-bold text-slate-300">Not Accepting Applications</span>
+              <p className="text-sm text-slate-400 mt-1">This project is currently not accepting new members.</p>
+            </div>
+          ) : null}
+        </div>
+      )}
+
+      {/* ── Team & Applications Grid ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-10">
+        {/* Team Members (M2) */}
+        <TeamMemberList
+          members={members || []}
+          isOwner={isOwner}
+          currentUserId={user?.id}
+          projectId={id}
+          ownerId={project.ownerId}
+        />
+
+        {/* Applications (owner only) */}
         <div className="rounded-2xl sm:rounded-3xl border border-slate-700/50 bg-slate-800/30 p-5 sm:p-8 shadow-xl backdrop-blur-sm">
           {isOwner ? (
             <>
@@ -220,90 +219,37 @@ export function ProjectDetailsPage() {
                 {apps?.length === 0 && <p className="text-base font-medium text-slate-500 text-center py-6">No applications yet.</p>}
               </div>
             </>
-          ) : isMember ? (
-            <div className="flex flex-col items-center justify-center h-full text-slate-400 text-center py-10">
-              <span className="text-lg font-bold text-green-400 mb-2">You're in!</span>
-              <p className="mb-6">You are an active member of this project.</p>
-              <button 
-                onClick={() => {
-                  setConfirmModal({
-                    isOpen: true,
-                    type: 'leaveProject',
-                    title: 'Leave Project',
-                    message: 'Are you sure you want to leave this project? You will need to apply again if you wish to return.'
-                  });
-                }}
-                disabled={leaveProject.isPending}
-                className="text-sm font-bold bg-red-600 hover:bg-red-500 text-white px-5 py-2.5 rounded-xl transition-all hover:shadow-lg hover:shadow-red-500/20 disabled:opacity-50"
-              >
-                {leaveProject.isPending ? 'Leaving...' : 'Leave Project'}
-              </button>
-            </div>
-          ) : hasApplied ? (
-            <div className="flex flex-col items-center justify-center h-full text-slate-400 text-center py-10">
-              <span className="text-lg font-bold text-slate-300 mb-2">Application Sent</span>
-              <p>You have already applied to this project. We'll let you know when the owner reviews it.</p>
-            </div>
-          ) : !isProjectOpen ? (
-            <div className="flex flex-col items-center justify-center h-full text-slate-400 text-center py-10">
-              <span className="text-lg font-bold text-slate-300 mb-2">Not Accepting Applications</span>
-              <p>This project is currently not accepting new members.</p>
-            </div>
-          ) : !hasOpenRoles ? (
-            <div className="flex flex-col items-center justify-center h-full text-slate-400 text-center py-10">
-              <span className="text-lg font-bold text-slate-300 mb-2">No Open Roles</span>
-              <p>There are currently no open roles available for this project.</p>
-            </div>
           ) : (
-            <>
-              <h2 className="text-2xl font-bold mb-6 text-slate-50 tracking-tight">Join Project</h2>
-              <form onSubmit={e => { e.preventDefault(); applyMutation.mutate({ projectId: id, message: coverLetter, roleId: selectedRoleId }); }} className="flex flex-col h-full">
-                <div className="mb-6">
-                  <label className="block text-sm font-bold text-slate-300 mb-2">Select Role</label>
-                  <select 
-                    required
-                    className="w-full bg-slate-900/50 border border-slate-700 text-slate-100 placeholder-slate-500 p-4 rounded-xl focus:outline-none focus:border-green-500 focus:ring-4 focus:ring-green-500/10 transition-all appearance-none"
-                    value={selectedRoleId}
-                    onChange={e => setSelectedRoleId(e.target.value)}
-                  >
-                    <option value="" disabled>Choose a role...</option>
-                    {openRoles.map(role => (
-                      <option key={role.id} value={role.id}>{role.title} ({role.openingsCount - role.filledCount} open)</option>
-                    ))}
-                  </select>
-                </div>
-                <label className="block text-sm font-bold text-slate-300 mb-2">Cover Letter</label>
-                <textarea 
-                  rows={5} 
-                  required 
-                  placeholder="Why would you be a good fit?" 
-                  className="w-full bg-slate-900/50 border border-slate-700 text-slate-100 placeholder-slate-500 p-4 rounded-xl mb-6 focus:outline-none focus:border-green-500 focus:ring-4 focus:ring-green-500/10 transition-all resize-none"
-                  value={coverLetter} 
-                  onChange={e => setCoverLetter(e.target.value)} 
-                />
-                <button type="submit" disabled={applyMutation.isPending || !selectedRoleId} className="mt-auto w-full bg-green-500 hover:bg-green-400 hover:shadow-lg hover:shadow-green-500/20 text-slate-900 font-bold p-4 rounded-xl text-base disabled:opacity-50 disabled:hover:shadow-none transition-all focus:outline-none focus:ring-4 focus:ring-green-500/30">
-                  {applyMutation.isPending ? 'Applying...' : 'Submit Application'}
-                </button>
-              </form>
-            </>
+            <div className="flex flex-col items-center justify-center h-full text-slate-400 text-center py-10">
+              <span className="text-lg font-bold text-slate-300 mb-2">Project Activity</span>
+              <p className="text-sm">Application details are visible to the project owner.</p>
+            </div>
           )}
         </div>
       </div>
 
-      <ConfirmModal
+      {/* ── Apply Role Modal (M2) ── */}
+      <ApplyRoleModal
+        isOpen={applyModal.isOpen}
+        onClose={() => setApplyModal({ isOpen: false, role: null })}
+        role={applyModal.role}
+        projectId={id}
+      />
+
+      {/* ── Delete Project Confirm ── */}
+      <ConfirmDialog
         isOpen={confirmModal.isOpen}
         title={confirmModal.title}
         message={confirmModal.message}
         onConfirm={() => {
           if (confirmModal.type === 'deleteProject') {
             deleteProject.mutate(id);
-          } else if (confirmModal.type === 'leaveProject') {
-            leaveProject.mutate(myMembership.id);
           }
           setConfirmModal({ isOpen: false, type: null, title: '', message: '' });
         }}
         onCancel={() => setConfirmModal({ isOpen: false, type: null, title: '', message: '' })}
-        confirmText={confirmModal.type === 'deleteProject' ? 'Delete Project' : 'Leave Project'}
+        confirmText="Delete Project"
+        isPending={deleteProject.isPending}
       />
     </div>
   );

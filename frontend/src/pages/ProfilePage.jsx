@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { usersApi } from '../api/users';
 import { applicationsApi } from '../api/applications';
 import { skillsApi } from '../api/skills';
+import { ProfileTabs } from '../components/profile/ProfileTabs';
 
 export function ProfilePage() {
   const queryClient = useQueryClient();
@@ -174,6 +175,12 @@ export function ProfilePage() {
           </div>
         )}
       </div>
+
+      {/* ── Profile Tabs — Created / Collaborated / Completed (M3) ── */}
+      <ProfileTabs
+        createdProjects={user?.createdProjects || []}
+        collaboratedProjects={user?.collaboratedProjects || []}
+      />
     </div>
   );
 }
