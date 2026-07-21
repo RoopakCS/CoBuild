@@ -79,6 +79,7 @@ public class UserService {
 
     /**
      * Gets the authenticated user from Spring Security.
+     * Re-fetches from DB so the entity is managed by the current Hibernate session.
      */
     private User getAuthenticatedUser() {
 
@@ -95,13 +96,15 @@ public class UserService {
             throw new RuntimeException("Invalid authentication principal");
         }
 
-        User user = userPrincipal.getUser();
+        User principalUser = userPrincipal.getUser();
 
-        if (user == null) {
+        if (principalUser == null || principalUser.getId() == null) {
             throw new RuntimeException("Authenticated user not found");
         }
 
-        return user;
+        // Re-fetch from DB so the entity is attached to the current session
+        return userRepository.findById(principalUser.getId())
+                .orElseThrow(() -> new RuntimeException("Authenticated user not found in database"));
     }
 
     /**

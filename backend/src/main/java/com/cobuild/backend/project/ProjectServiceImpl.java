@@ -173,7 +173,8 @@ public class ProjectServiceImpl implements ProjectService {
             throw new ForbiddenException("Unauthorized");
         }
 
-        return userPrincipal.getUser();
+        return userRepository.findById(userPrincipal.getUser().getId())
+                .orElseThrow(() -> new ForbiddenException("Unauthorized"));
     }
 
 //    private ProjectResponse mapToResponse(Project project) {
