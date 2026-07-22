@@ -41,7 +41,7 @@ public class ProjectRoleController {
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
-    @PutMapping("/{roleId}")
+    @PatchMapping("/{roleId}")
     public ResponseEntity<ProjectRoleResponse> updateRole(
             @PathVariable UUID projectId,
             @PathVariable UUID roleId,

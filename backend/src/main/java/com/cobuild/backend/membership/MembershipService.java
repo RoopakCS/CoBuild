@@ -17,4 +17,6 @@ public interface MembershipService {
     void removeMember(UUID projectId, UUID userId, String ownerEmail);
 
     void leaveProject(UUID membershipId, String userEmail);
+
+    void transferOwnership(UUID projectId, UUID newOwnerUserId, String currentOwnerEmail);
 }

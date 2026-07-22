@@ -15,6 +15,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import com.cobuild.backend.security.user.UserPrincipal;
 import com.cobuild.backend.user.User;
+import com.cobuild.backend.exception.BadRequestException;
 import com.cobuild.backend.exception.ForbiddenException;
 
 @Service
@@ -118,11 +119,16 @@ public class ProjectRoleServiceImpl implements ProjectRoleService {
         }
 
         if (role.getFilledCount() > 0) {
-            throw new IllegalStateException(
+            throw new BadRequestException(
                     "Cannot delete a role with active members. Remove members first.");
         }
-        // Note: pending applications on this role should also be checked/blocked —
-        // coordinate with M2 on whether that check lives here or in ApplicationService.
+
+        // Check for pending applications on this role
+        if (role.getApplications() != null && role.getApplications().stream()
+                .anyMatch(app -> app.getStatus() == com.cobuild.backend.application.ApplicationStatus.PENDING)) {
+            throw new BadRequestException(
+                    "Cannot delete a role with pending applications. Reject or withdraw them first.");
+        }
 
         roleSkillRepository.deleteAll(role.getSkills());
         projectRoleRepository.delete(role);
@@ -145,7 +151,7 @@ public class ProjectRoleServiceImpl implements ProjectRoleService {
     public boolean incrementFilledCount(UUID roleId) {
         ProjectRole role = getRoleOrThrow(roleId);
         if (role.getFilledCount() >= role.getOpeningsCount()) {
-            throw new IllegalStateException("Role is already full: " + roleId);
+            throw new BadRequestException("Role is already full: " + roleId);
         }
         role.setFilledCount(role.getFilledCount() + 1);
         projectRoleRepository.save(role);

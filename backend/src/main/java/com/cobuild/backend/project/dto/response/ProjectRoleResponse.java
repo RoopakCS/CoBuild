@@ -20,5 +20,7 @@ public class ProjectRoleResponse {
 
     private int filledCount;
 
+    private boolean isFull;
+
     private List<String> skills;
 }

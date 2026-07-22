@@ -110,6 +110,25 @@ public class GlobalExceptionHandler {
     }
 
     // ===============================
+    // Conflict (409)
+    // ===============================
+    @ExceptionHandler(ConflictException.class)
+    public ResponseEntity<ApiError> handleConflict(
+            ConflictException ex,
+            HttpServletRequest request) {
+
+        ApiError error = ApiError.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.CONFLICT.value())
+                .error(HttpStatus.CONFLICT.getReasonPhrase())
+                .message(ex.getMessage())
+                .path(request.getRequestURI())
+                .build();
+
+        return new ResponseEntity<>(error, HttpStatus.CONFLICT);
+    }
+
+    // ===============================
     // Validation Errors
     // ===============================
     @ExceptionHandler(MethodArgumentNotValidException.class)

@@ -8,6 +8,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -25,5 +27,11 @@ public class UpdateProfileRequest {
     private String linkedinUrl;
 
     private ExperienceLevel experienceLevel;
+
+    /**
+     * If provided (non-null), replaces the user's entire skill set.
+     * Pass an empty list to clear all skills; pass null to leave skills untouched.
+     */
+    private List<String> skills;
 
 }

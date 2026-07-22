@@ -12,7 +12,7 @@ export const rolesApi = {
   },
 
   update: async ({ projectId, roleId, ...payload }) => {
-    const { data } = await apiClient.put(`/projects/${projectId}/roles/${roleId}`, payload);
+    const { data } = await apiClient.patch(`/projects/${projectId}/roles/${roleId}`, payload);
     return data;
   },
 

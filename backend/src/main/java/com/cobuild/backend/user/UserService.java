@@ -61,6 +61,10 @@ public class UserService {
             user.setExperienceLevel(request.getExperienceLevel());
         }
 
+        if (request.getSkills() != null) {
+            user.setSkills(request.getSkills());
+        }
+
         User updatedUser = userRepository.save(user);
 
         return mapToProfileResponse(updatedUser);

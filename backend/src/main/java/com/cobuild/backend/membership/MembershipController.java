@@ -70,4 +70,18 @@ public class MembershipController {
 
         return ResponseEntity.noContent().build();
     }
+
+    @PatchMapping("/project/{projectId}/transfer-ownership/{newOwnerUserId}")
+    public ResponseEntity<Void> transferOwnership(
+            @PathVariable UUID projectId,
+            @PathVariable UUID newOwnerUserId,
+            Authentication authentication) {
+
+        membershipService.transferOwnership(
+                projectId,
+                newOwnerUserId,
+                authentication.getName());
+
+        return ResponseEntity.noContent().build();
+    }
 }

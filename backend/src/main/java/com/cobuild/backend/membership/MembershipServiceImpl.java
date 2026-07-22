@@ -1,6 +1,7 @@
 package com.cobuild.backend.membership;
 
 import com.cobuild.backend.exception.BadRequestException;
+import com.cobuild.backend.exception.ConflictException;
 import com.cobuild.backend.exception.DuplicateResourceException;
 import com.cobuild.backend.exception.ForbiddenException;
 import com.cobuild.backend.exception.ResourceNotFoundException;
@@ -224,8 +225,8 @@ public class MembershipServiceImpl implements MembershipService {
                 // Owner should not leave using normal member flow
                 if (membership.getMembershipRole() == MembershipRole.OWNER) {
 
-                        throw new BadRequestException(
-                                        "Project owner cannot leave the project");
+                        throw new ConflictException(
+                                        "Project owner cannot leave the project. Transfer ownership first.");
                 }
 
                 // Lock ProjectRole before changing filledCount
@@ -249,5 +250,66 @@ public class MembershipServiceImpl implements MembershipService {
                 membershipRepository.save(membership);
 
                 projectRoleRepository.save(role);
+        }
+
+        @Override
+        @Transactional
+        public void transferOwnership(
+                        UUID projectId,
+                        UUID newOwnerUserId,
+                        String currentOwnerEmail) {
+
+                User currentOwner = userRepository.findByEmail(currentOwnerEmail)
+                                .orElseThrow(() -> new ResourceNotFoundException(
+                                                "Current owner not found"));
+
+                Project project = projectRepository.findById(projectId)
+                                .orElseThrow(() -> new ResourceNotFoundException(
+                                                "Project not found"));
+
+                // Verify the requester is actually the current owner
+                if (!project.getOwner().getId().equals(currentOwner.getId())) {
+                        throw new ForbiddenException(
+                                        "Only the project owner can transfer ownership");
+                }
+
+                // Cannot transfer to yourself
+                if (currentOwner.getId().equals(newOwnerUserId)) {
+                        throw new BadRequestException(
+                                        "Cannot transfer ownership to yourself");
+                }
+
+                // The new owner must be an active member of the project
+                Membership newOwnerMembership = membershipRepository
+                                .findByProjectIdAndUserId(projectId, newOwnerUserId)
+                                .orElseThrow(() -> new BadRequestException(
+                                                "Target user is not an active member of this project"));
+
+                if (newOwnerMembership.getStatus() != MembershipStatus.ACTIVE) {
+                        throw new BadRequestException(
+                                        "Target user is not an active member of this project");
+                }
+
+                // Swap the membership roles
+                // Find the current owner's membership (if they have one — owner may not always have a Membership row)
+                Membership currentOwnerMembership = membershipRepository
+                                .findByProjectIdAndUserId(projectId, currentOwner.getId())
+                                .orElse(null);
+
+                if (currentOwnerMembership != null) {
+                        currentOwnerMembership.setMembershipRole(MembershipRole.MEMBER);
+                        membershipRepository.save(currentOwnerMembership);
+                }
+
+                newOwnerMembership.setMembershipRole(MembershipRole.OWNER);
+                membershipRepository.save(newOwnerMembership);
+
+                // Transfer project ownership
+                User newOwner = userRepository.findById(newOwnerUserId)
+                                .orElseThrow(() -> new ResourceNotFoundException(
+                                                "New owner user not found"));
+
+                project.setOwner(newOwner);
+                projectRepository.save(project);
         }
 }

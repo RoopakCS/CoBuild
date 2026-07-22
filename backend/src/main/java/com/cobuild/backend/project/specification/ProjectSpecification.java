@@ -1,4 +1,4 @@
-package com.cobuild.backend.project;
+package com.cobuild.backend.project.specification;
 
 import com.cobuild.backend.project.ExperienceLevel;
 import com.cobuild.backend.project.Project;

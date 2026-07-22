@@ -29,6 +29,7 @@ public class ProjectMapper {
                             .description(role.getDescription())
                             .openingsCount(role.getOpeningsCount())
                             .filledCount(role.getFilledCount())
+                            .isFull(role.getFilledCount() >= role.getOpeningsCount())
                             .skills(
                                     role.getSkills()
                                             .stream()

@@ -18,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.cobuild.backend.project.dto.response.ProjectRoleResponse;
 import com.cobuild.backend.role.RoleSkill;
 
-import com.cobuild.backend.project.ProjectSpecification;
+import com.cobuild.backend.project.specification.ProjectSpecification;
 
 import java.util.List;
 import java.util.UUID;
