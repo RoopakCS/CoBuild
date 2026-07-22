@@ -82,7 +82,7 @@ export function ProjectDetailsPage() {
   if (error || !project) return <div className="text-red-400 bg-red-500/10 p-8 text-center rounded-2xl border border-red-500/20">Failed to load project</div>;
 
   const isOwner = user?.id === project.ownerId;
-  const hasApplied = myApps?.some(a => a.projectId === id && a.status !== 'WITHDRAWN' && a.status !== 'REJECTED');
+  const hasApplied = myApps?.some(a => a.projectId === id && a.status === 'PENDING');
   const isMember = members?.some(m => m.userId === user?.id && m.status === 'ACTIVE');
   const isProjectOpen = project.status === 'OPEN';
 
