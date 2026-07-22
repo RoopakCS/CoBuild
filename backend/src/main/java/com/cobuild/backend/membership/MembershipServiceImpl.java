@@ -73,6 +73,7 @@ public class MembershipServiceImpl implements MembershipService {
 
                 return membershipRepository.findByProject(project)
                                 .stream()
+                                .filter(m -> m.getStatus() == MembershipStatus.ACTIVE)
                                 .map(this::mapToResponse)
                                 .toList();
         }
@@ -85,6 +86,7 @@ public class MembershipServiceImpl implements MembershipService {
 
                 return membershipRepository.findByUser(user)
                                 .stream()
+                                .filter(m -> m.getStatus() == MembershipStatus.ACTIVE)
                                 .map(this::mapToResponse)
                                 .toList();
         }

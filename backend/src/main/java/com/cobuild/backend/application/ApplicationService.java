@@ -197,9 +197,18 @@ public class ApplicationService {
                                 throw new BadRequestException("This role is already full");
                         }
 
-                        Membership membership = Membership.builder().project(application.getProject())
-                                        .user(application.getApplicant()).membershipRole(MembershipRole.MEMBER)
-                                        .projectRole(role).build();
+                        Membership membership = membershipRepository
+                                        .findByProjectIdAndUserId(application.getProject().getId(), application.getApplicant().getId())
+                                        .orElse(null);
+
+                        if (membership == null) {
+                                membership = Membership.builder().project(application.getProject())
+                                                .user(application.getApplicant()).membershipRole(MembershipRole.MEMBER)
+                                                .projectRole(role).build();
+                        } else {
+                                membership.setStatus(com.cobuild.backend.membership.MembershipStatus.ACTIVE);
+                                membership.setProjectRole(role);
+                        }
 
                         membershipRepository.save(membership);
 
