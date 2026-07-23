@@ -30,9 +30,9 @@ export function ConfirmDialog({
   if (!isOpen) return null;
 
   return (
-    <Modal isOpen={isOpen} onClose={onCancel} maxWidth="max-w-sm">
-      <h3 className="text-xl font-bold text-slate-50 mb-3">{title}</h3>
-      <p className="text-slate-300 text-sm sm:text-base mb-8 leading-relaxed">
+    <Modal isOpen={isOpen} onClose={onCancel} maxWidth="max-w-md">
+      <h3 className="text-xl font-bold text-slate-100 font-display mb-3">{title}</h3>
+      <p className="text-slate-400 text-sm sm:text-base mb-6 leading-relaxed">
         {message}
       </p>
       {requireMessage && (
@@ -42,24 +42,24 @@ export function ConfirmDialog({
           placeholder={messagePlaceholder}
           disabled={isPending}
           rows={3}
-          className="w-full bg-slate-900/50 border border-slate-700/50 rounded-xl px-4 py-3 text-sm text-slate-200 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all mb-6 resize-none"
+          className="w-full bg-slate-950/70 border border-slate-800 rounded-2xl px-4 py-3 text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500/50 transition-all duration-200 mb-6 resize-none shadow-inner"
         />
       )}
-      <div className="flex justify-end gap-3">
+      <div className="flex items-center justify-end gap-3 pt-2">
         <button
           onClick={onCancel}
           disabled={isPending}
-          className="px-4 py-2 rounded-xl text-sm font-bold text-slate-300 hover:text-slate-100 hover:bg-slate-800 transition-colors disabled:opacity-50"
+          className="px-4 py-2.5 rounded-xl text-sm font-semibold text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 transition-all duration-200 disabled:opacity-50"
         >
           {cancelText}
         </button>
         <button
           onClick={() => onConfirm(messageText)}
           disabled={isPending || (requireMessage && !messageText.trim())}
-          className={`px-4 py-2 rounded-xl text-sm font-bold transition-all disabled:opacity-50 ${
+          className={`px-5 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 shadow-md active:scale-95 disabled:opacity-50 disabled:pointer-events-none ${
             isDangerous
-              ? 'bg-red-500/10 text-red-400 hover:bg-red-500/20'
-              : 'bg-green-500 text-slate-900 hover:bg-green-400 hover:shadow-lg hover:shadow-green-500/20'
+              ? 'bg-red-500/10 text-red-400 border border-red-500/30 hover:bg-red-500/20 hover:border-red-500/50 shadow-red-500/10'
+              : 'bg-blue-600 hover:bg-blue-500 text-white shadow-blue-600/20'
           }`}
         >
           {isPending ? 'Processing...' : confirmText}

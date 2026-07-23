@@ -205,7 +205,7 @@ export function RoleFormModal({ isOpen, onClose, projectId, existingRole }) {
           <button
             type="submit"
             disabled={isPending}
-            className="bg-green-500 hover:bg-green-400 text-slate-900 font-bold px-6 py-2.5 rounded-xl transition-all hover:shadow-lg hover:shadow-green-500/20 disabled:opacity-50 text-sm"
+            className="bg-blue-600 hover:bg-blue-500 text-white font-bold px-6 py-2.5 rounded-xl transition-all shadow-md shadow-blue-600/20 disabled:opacity-50 text-sm"
           >
             {isPending ? 'Saving...' : isEdit ? 'Save Changes' : 'Create Role'}
           </button>

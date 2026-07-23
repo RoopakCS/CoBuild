@@ -56,8 +56,8 @@ export function UserProfilePage() {
           <div className="col-span-1 md:col-span-2">
             <p className="text-[10px] sm:text-xs text-slate-500 font-bold uppercase tracking-widest mb-1 sm:mb-2">Links</p>
             <div className="flex gap-6 mt-2">
-              {user.githubUrl ? <a href={user.githubUrl} target="_blank" rel="noreferrer" className="text-sm sm:text-base font-bold text-green-400 hover:text-green-300 transition-colors">GitHub ↗</a> : <span className="text-slate-600 text-sm">No GitHub</span>}
-              {user.linkedinUrl ? <a href={user.linkedinUrl} target="_blank" rel="noreferrer" className="text-sm sm:text-base font-bold text-green-400 hover:text-green-300 transition-colors">LinkedIn ↗</a> : <span className="text-slate-600 text-sm">No LinkedIn</span>}
+              {user.githubUrl ? <a href={user.githubUrl} target="_blank" rel="noreferrer" className="text-sm sm:text-base font-bold text-blue-500 hover:text-blue-400 transition-colors">GitHub ↗</a> : <span className="text-slate-600 text-sm">No GitHub</span>}
+              {user.linkedinUrl ? <a href={user.linkedinUrl} target="_blank" rel="noreferrer" className="text-sm sm:text-base font-bold text-blue-500 hover:text-blue-400 transition-colors">LinkedIn ↗</a> : <span className="text-slate-600 text-sm">No LinkedIn</span>}
             </div>
           </div>
         </div>
@@ -76,7 +76,7 @@ export function UserProfilePage() {
           {memberships?.map(mem => (
             <div key={mem.id} className="border border-slate-700/80 bg-slate-900/40 p-6 rounded-2xl">
               <h3 className="font-bold text-lg text-slate-200 mb-2">{mem.projectTitle}</h3>
-              <p className="text-sm font-medium text-slate-400">Role: <span className="font-bold text-green-400">{mem.role}</span></p>
+              <p className="text-sm font-medium text-slate-400">Role: <span className="font-bold text-blue-500">{mem.role}</span></p>
             </div>
           ))}
         </div>

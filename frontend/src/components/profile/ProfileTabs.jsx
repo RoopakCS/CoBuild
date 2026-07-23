@@ -35,14 +35,14 @@ export function ProfileTabs({ createdProjects = [], collaboratedProjects = [] })
   return (
     <div className="rounded-2xl sm:rounded-3xl border border-slate-700/50 bg-slate-800/40 p-5 sm:p-8 md:p-10 shadow-2xl backdrop-blur-sm">
       {/* Tab Switcher */}
-      <div className="flex gap-1 bg-slate-900/50 p-1 rounded-xl border border-slate-700/40 mb-6 sm:mb-8 overflow-x-auto">
+      <div className="flex gap-1 bg-slate-900/60 p-1.5 rounded-2xl border border-slate-800/80 mb-6 sm:mb-8 overflow-x-auto">
         {TAB_CONFIG.map((tab) => (
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
-            className={`flex-1 min-w-0 text-sm font-bold py-2.5 px-3 rounded-lg transition-all whitespace-nowrap ${
+            className={`flex-1 min-w-0 text-sm font-bold py-2.5 px-4 rounded-xl transition-all whitespace-nowrap ${
               activeTab === tab.key
-                ? 'bg-slate-800 text-green-400 shadow-sm border border-slate-700/50'
+                ? 'bg-slate-800 text-blue-500 border border-blue-600/60 shadow-none'
                 : 'text-slate-400 hover:text-slate-200'
             }`}
           >
@@ -79,7 +79,7 @@ export function ProfileTabs({ createdProjects = [], collaboratedProjects = [] })
             <Link
               to={`/projects/${project.id}`}
               key={project.id}
-              className="group flex items-center justify-between rounded-xl border border-slate-700/50 bg-slate-900/30 p-4 sm:p-5 transition-all hover:border-green-500/30 hover:bg-slate-900/50 hover:shadow-lg hover:shadow-green-500/5"
+              className="group flex items-center justify-between rounded-xl border border-slate-700/50 bg-slate-900/30 p-4 sm:p-5 transition-all hover:border-blue-500/30 hover:bg-slate-900/50 hover:shadow-lg hover:shadow-blue-500/5"
             >
               <div className="flex-1 min-w-0 pr-4">
                 <div className="flex items-center gap-3 mb-1.5">
@@ -109,7 +109,7 @@ export function ProfileTabs({ createdProjects = [], collaboratedProjects = [] })
                   {project.teamSize && <span>Team: {project.teamSize}</span>}
                 </div>
               </div>
-              <div className="flex items-center text-green-400 text-sm font-bold gap-1 transition-transform group-hover:translate-x-1 shrink-0">
+              <div className="flex items-center text-blue-500 text-sm font-bold gap-1 transition-transform group-hover:translate-x-1 shrink-0">
                 <CaretRight weight="bold" />
               </div>
             </Link>

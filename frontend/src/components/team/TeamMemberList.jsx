@@ -122,7 +122,7 @@ export function TeamMemberList({ members = [], isOwner, currentUserId, projectId
   return (
     <div className="rounded-2xl sm:rounded-3xl border border-slate-700/50 bg-slate-800/30 p-5 sm:p-8 shadow-xl backdrop-blur-sm">
       <div className="flex items-center gap-3 mb-6">
-        <Users size={24} weight="duotone" className="text-green-400" />
+        <Users size={24} weight="duotone" className="text-blue-500" />
         <h2 className="text-2xl font-bold text-slate-50 tracking-tight">Team Members</h2>
         <Badge variant="neutral" size="sm">{members.length}</Badge>
       </div>
@@ -157,19 +157,19 @@ export function TeamMemberList({ members = [], isOwner, currentUserId, projectId
             return (
               <div
                 key={m.id}
-                className="flex items-center justify-between border border-slate-700/40 bg-slate-900/30 rounded-xl px-4 py-3 transition-colors hover:bg-slate-900/50"
+                className="flex items-center justify-between border border-slate-800/80 bg-slate-900/50 rounded-2xl px-4.5 py-3.5 backdrop-blur-xl transition-all duration-300 hover:border-slate-700 hover:bg-slate-900/80 hover:shadow-lg shadow-slate-950/40"
               >
-                <div className="flex items-center gap-3 min-w-0">
-                  {/* Avatar placeholder */}
-                  <div className="w-9 h-9 rounded-full bg-slate-700/50 border border-slate-600/50 flex items-center justify-center text-sm font-bold text-slate-300 shrink-0">
+                <div className="flex items-center gap-3.5 min-w-0">
+                  {/* Avatar placeholder with gradient */}
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600/20 via-blue-500/10 to-slate-800 border border-blue-500/30 flex items-center justify-center text-sm font-extrabold text-blue-500 shrink-0 shadow-md">
                     {(m.userName || '?')[0].toUpperCase()}
                   </div>
 
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className="font-bold text-base text-slate-200 truncate">
+                      <span className="font-bold text-base text-slate-100 truncate font-display">
                         {m.userName}
-                        {isSelf && <span className="text-slate-500 font-normal ml-1">(you)</span>}
+                        {isSelf && <span className="text-blue-500 font-normal text-xs ml-1 bg-blue-600/15 px-1.5 py-0.5 rounded-md border border-blue-500/30">(you)</span>}
                       </span>
                       {isOwnerMember && (
                         <Badge variant="warning" size="sm">
@@ -178,23 +178,9 @@ export function TeamMemberList({ members = [], isOwner, currentUserId, projectId
                         </Badge>
                       )}
                     </div>
-                    <div className="flex items-center gap-2 mt-0.5">
-                      <span className="text-xs font-medium text-slate-400">{m.role}</span>
-                      {m.joinedAt && (
-                        <>
-                          <span className="text-slate-700">·</span>
-                          <span className="text-xs text-slate-500">
-                            Joined {formatDate(m.joinedAt)}
-                          </span>
-                        </>
-                      )}
-                    </div>
-                    {m.statusMessage && m.status === 'LEAVE_PENDING' && (
-                      <div className="mt-2 text-sm text-yellow-400/80 bg-yellow-500/5 p-2.5 rounded-lg border border-yellow-500/10 line-clamp-2">
-                        <span className="font-semibold text-yellow-500/80 mr-1">Reason:</span>
-                        {m.statusMessage}
-                      </div>
-                    )}
+                    <p className="text-xs text-slate-400 truncate">
+                      {m.roleTitle || 'Contributor'}
+                    </p>
                   </div>
                 </div>
 
@@ -208,9 +194,9 @@ export function TeamMemberList({ members = [], isOwner, currentUserId, projectId
                         }
                         disabled={isPending}
                         title="Approve Leave"
-                        className="flex items-center justify-center text-green-400 hover:text-green-300 bg-green-500/10 hover:bg-green-500/15 w-8 h-8 rounded-lg transition-colors disabled:opacity-50"
+                        className="flex items-center justify-center text-blue-500 hover:text-blue-400 bg-blue-600/15 hover:bg-blue-600/25 border border-blue-500/30 w-9 h-9 rounded-xl transition-all duration-200 disabled:opacity-50 active:scale-95 shadow-sm"
                       >
-                        <CheckCircle size={18} weight="bold" />
+                        <CheckCircle size={19} weight="bold" />
                       </button>
                       <button
                         onClick={() =>
@@ -218,9 +204,9 @@ export function TeamMemberList({ members = [], isOwner, currentUserId, projectId
                         }
                         disabled={isPending}
                         title="Reject Leave"
-                        className="flex items-center justify-center text-red-400 hover:text-red-300 bg-red-500/10 hover:bg-red-500/15 w-8 h-8 rounded-lg transition-colors disabled:opacity-50"
+                        className="flex items-center justify-center text-red-400 hover:text-red-300 bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 w-9 h-9 rounded-xl transition-all duration-200 disabled:opacity-50 active:scale-95 shadow-sm"
                       >
-                        <XCircle size={18} weight="bold" />
+                        <XCircle size={19} weight="bold" />
                       </button>
                     </>
                   )}
@@ -231,14 +217,14 @@ export function TeamMemberList({ members = [], isOwner, currentUserId, projectId
                         setConfirmModal({ isOpen: true, type: 'remove', member: m })
                       }
                       disabled={isPending}
-                      className="flex items-center gap-1.5 text-xs font-bold text-red-400 hover:text-red-300 bg-red-500/10 hover:bg-red-500/15 px-3 py-1.5 rounded-lg transition-colors disabled:opacity-50"
+                      className="flex items-center gap-1.5 text-xs font-bold text-red-400 hover:text-red-300 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 px-3.5 py-2 rounded-xl transition-all duration-200 disabled:opacity-50 active:scale-95"
                     >
                       <UserMinus size={14} weight="bold" />
                       Remove
                     </button>
                   )}
                   {isSelf && !isOwner && m.status === 'LEAVE_PENDING' && (
-                    <div className="flex items-center gap-1.5 text-xs font-bold text-yellow-400 bg-yellow-500/10 px-3 py-1.5 rounded-lg border border-yellow-500/20">
+                    <div className="flex items-center gap-1.5 text-xs font-bold text-amber-400 bg-amber-500/10 px-3.5 py-2 rounded-xl border border-amber-500/20">
                       <WarningCircle size={14} weight="bold" />
                       Leave Pending
                     </div>
@@ -249,7 +235,7 @@ export function TeamMemberList({ members = [], isOwner, currentUserId, projectId
                         setConfirmModal({ isOpen: true, type: 'leave', member: m })
                       }
                       disabled={isPending}
-                      className="flex items-center gap-1.5 text-xs font-bold text-red-400 hover:text-red-300 bg-red-500/10 hover:bg-red-500/15 px-3 py-1.5 rounded-lg transition-colors disabled:opacity-50"
+                      className="flex items-center gap-1.5 text-xs font-bold text-red-400 hover:text-red-300 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 px-3.5 py-2 rounded-xl transition-all duration-200 disabled:opacity-50 active:scale-95"
                     >
                       <SignOut size={14} weight="bold" />
                       Request Leave

@@ -34,11 +34,11 @@ export function Modal({ isOpen, onClose, title, children, maxWidth = 'max-w-lg' 
   return (
     <div
       ref={overlayRef}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-md px-4 animate-fade-in"
       onClick={(e) => { if (e.target === overlayRef.current) onClose(); }}
     >
       <div
-        className={`bg-slate-900 border border-slate-700/50 rounded-2xl p-6 sm:p-8 w-full ${maxWidth} shadow-2xl transform transition-all animate-in fade-in zoom-in-95 duration-200`}
+        className={`bg-slate-900/90 border border-slate-800/90 rounded-3xl p-6 sm:p-8 w-full ${maxWidth} shadow-2xl shadow-slate-950/80 transform transition-all animate-scale-in backdrop-blur-xl`}
         role="dialog"
         aria-modal="true"
       >

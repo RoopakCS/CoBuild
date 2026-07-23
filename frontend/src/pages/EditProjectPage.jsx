@@ -90,38 +90,38 @@ export function EditProjectPage() {
   if (error || !project) return <div className="text-center py-10">Error loading project</div>;
 
   return (
-    <div className="max-w-3xl mx-auto pb-12">
+    <div className="max-w-3xl mx-auto pb-16 animate-fade-in">
       <button 
         onClick={() => navigate(`/projects/${id}`)}
-        className="flex items-center gap-2 text-slate-400 hover:text-slate-200 transition-colors mb-6 font-medium text-sm"
+        className="flex items-center gap-2 text-slate-400 hover:text-blue-500 transition-all mb-6 font-semibold text-sm group"
       >
-        <ArrowLeft weight="bold" /> Back to Project
+        <ArrowLeft weight="bold" className="group-hover:-translate-x-1 transition-transform" /> Back to Project
       </button>
 
-      <div className="mb-6 sm:mb-10">
-        <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tighter text-slate-50">Edit Project</h1>
-        <p className="mt-2 sm:mt-3 text-base sm:text-lg text-slate-400 font-medium">Update your project details and manage roles.</p>
+      <div className="mb-8 sm:mb-10">
+        <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-slate-100 font-display pb-2 leading-tight">Edit Project</h1>
+        <p className="mt-2 text-base sm:text-lg text-slate-400 font-medium leading-relaxed">Update your project details and manage open roles.</p>
       </div>
       
-      <div className="bg-slate-800/40 backdrop-blur-md rounded-2xl sm:rounded-3xl border border-slate-700/50 p-5 sm:p-8 shadow-2xl shadow-slate-900/50 mb-8">
-        <h2 className="text-2xl font-bold mb-6 text-slate-50">Project Details</h2>
+      <div className="bg-slate-900/40 backdrop-blur-xl rounded-3xl border border-slate-800/80 p-6 sm:p-10 shadow-2xl shadow-slate-950/70 mb-8">
+        <h2 className="text-xl sm:text-2xl font-bold mb-6 text-slate-100 font-display">Project Details</h2>
         <form onSubmit={e => { e.preventDefault(); updateProjectMutation.mutate(formData); }} className="space-y-8">
           <div>
-            <label className="block text-sm font-bold text-slate-300 mb-2">Title</label>
+            <label className="block text-xs font-extrabold text-slate-300 uppercase tracking-wider mb-2">Title</label>
             <input 
               required
-              className="w-full rounded-xl bg-slate-900/50 border border-slate-700 px-4 py-3 text-slate-50 placeholder-slate-500 focus:border-green-500 focus:outline-none focus:ring-4 focus:ring-green-500/10 transition-all"
+              className="w-full rounded-2xl bg-slate-950/70 border border-slate-800 px-4.5 py-3.5 text-slate-100 placeholder:text-slate-600 focus:border-blue-500/50 focus:outline-none focus:ring-4 focus:ring-blue-500/10 transition-all text-sm font-medium"
               value={formData.title} 
               onChange={e => setFormData({ ...formData, title: e.target.value })} 
             />
           </div>
 
           <div>
-            <label className="block text-sm font-bold text-slate-300 mb-2">Description</label>
+            <label className="block text-xs font-extrabold text-slate-300 uppercase tracking-wider mb-2">Description</label>
             <textarea 
               required
               rows={5}
-              className="w-full rounded-xl bg-slate-900/50 border border-slate-700 px-4 py-3 text-slate-50 placeholder-slate-500 focus:border-green-500 focus:outline-none focus:ring-4 focus:ring-green-500/10 transition-all resize-none"
+              className="w-full rounded-2xl bg-slate-950/70 border border-slate-800 px-4.5 py-3.5 text-slate-100 placeholder:text-slate-600 focus:border-blue-500/50 focus:outline-none focus:ring-4 focus:ring-blue-500/10 transition-all text-sm font-medium resize-none"
               value={formData.description} 
               onChange={e => setFormData({ ...formData, description: e.target.value })} 
             />
@@ -129,70 +129,70 @@ export function EditProjectPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-bold text-slate-300 mb-2">Domain</label>
+              <label className="block text-xs font-extrabold text-slate-300 uppercase tracking-wider mb-2">Domain</label>
               <input 
                 required
-                className="w-full rounded-xl bg-slate-900/50 border border-slate-700 px-4 py-3 text-slate-50 placeholder-slate-500 focus:border-green-500 focus:outline-none focus:ring-4 focus:ring-green-500/10 transition-all"
+                className="w-full rounded-2xl bg-slate-950/70 border border-slate-800 px-4.5 py-3.5 text-slate-100 placeholder:text-slate-600 focus:border-blue-500/50 focus:outline-none focus:ring-4 focus:ring-blue-500/10 transition-all text-sm font-medium"
                 value={formData.domain} 
                 onChange={e => setFormData({ ...formData, domain: e.target.value })} 
               />
             </div>
             
             <div>
-              <label className="block text-sm font-bold text-slate-300 mb-2">Status</label>
+              <label className="block text-xs font-extrabold text-slate-300 uppercase tracking-wider mb-2">Status</label>
               <select 
-                className="w-full rounded-xl bg-slate-900/50 border border-slate-700 px-4 py-3 text-slate-50 focus:border-green-500 focus:outline-none focus:ring-4 focus:ring-green-500/10 transition-all appearance-none"
+                className="w-full rounded-2xl bg-slate-950/70 border border-slate-800 px-4.5 py-3.5 text-slate-100 focus:border-blue-500/50 focus:outline-none focus:ring-4 focus:ring-blue-500/10 transition-all text-sm font-medium"
                 value={formData.status} 
                 onChange={e => setFormData({ ...formData, status: e.target.value })}
               >
-                <option value="OPEN">Open (Accepting Members)</option>
-                <option value="CLOSED">Closed (Not Accepting)</option>
+                <option value="OPEN" className="bg-slate-900 text-slate-100">Open (Accepting Members)</option>
+                <option value="CLOSED" className="bg-slate-900 text-slate-100">Closed (Not Accepting)</option>
               </select>
             </div>
             
             <div>
-              <label className="block text-sm font-bold text-slate-300 mb-2">Experience Level</label>
+              <label className="block text-xs font-extrabold text-slate-300 uppercase tracking-wider mb-2">Experience Level</label>
               <select 
-                className="w-full rounded-xl bg-slate-900/50 border border-slate-700 px-4 py-3 text-slate-50 focus:border-green-500 focus:outline-none focus:ring-4 focus:ring-green-500/10 transition-all appearance-none"
+                className="w-full rounded-2xl bg-slate-950/70 border border-slate-800 px-4.5 py-3.5 text-slate-100 focus:border-blue-500/50 focus:outline-none focus:ring-4 focus:ring-blue-500/10 transition-all text-sm font-medium"
                 value={formData.experienceLevel} 
                 onChange={e => setFormData({ ...formData, experienceLevel: e.target.value })}
               >
-                <option value="BEGINNER">Beginner Friendly</option>
-                <option value="INTERMEDIATE">Intermediate</option>
-                <option value="ADVANCED">Advanced</option>
+                <option value="BEGINNER" className="bg-slate-900 text-slate-100">Beginner Friendly</option>
+                <option value="INTERMEDIATE" className="bg-slate-900 text-slate-100">Intermediate</option>
+                <option value="ADVANCED" className="bg-slate-900 text-slate-100">Advanced</option>
               </select>
             </div>
             
             <div>
-              <label className="block text-sm font-bold text-slate-300 mb-2">Commitment</label>
+              <label className="block text-xs font-extrabold text-slate-300 uppercase tracking-wider mb-2">Commitment</label>
               <select 
-                className="w-full rounded-xl bg-slate-900/50 border border-slate-700 px-4 py-3 text-slate-50 focus:border-green-500 focus:outline-none focus:ring-4 focus:ring-green-500/10 transition-all appearance-none"
+                className="w-full rounded-2xl bg-slate-950/70 border border-slate-800 px-4.5 py-3.5 text-slate-100 focus:border-blue-500/50 focus:outline-none focus:ring-4 focus:ring-blue-500/10 transition-all text-sm font-medium"
                 value={formData.commitment} 
                 onChange={e => setFormData({ ...formData, commitment: e.target.value })}
               >
-                <option value="PART_TIME">Part Time</option>
-                <option value="FULL_TIME">Full Time</option>
-                <option value="CASUAL">Casual / Hobby</option>
+                <option value="PART_TIME" className="bg-slate-900 text-slate-100">Part Time</option>
+                <option value="FULL_TIME" className="bg-slate-900 text-slate-100">Full Time</option>
+                <option value="CASUAL" className="bg-slate-900 text-slate-100">Casual / Hobby</option>
               </select>
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-bold text-slate-300 mb-2">Repository URL (Optional)</label>
+            <label className="block text-xs font-extrabold text-slate-300 uppercase tracking-wider mb-2">Repository URL <span className="text-slate-500 font-normal lowercase">(optional)</span></label>
             <input 
               type="url"
-              className="w-full rounded-xl bg-slate-900/50 border border-slate-700 px-4 py-3 text-slate-50 placeholder-slate-500 focus:border-green-500 focus:outline-none focus:ring-4 focus:ring-green-500/10 transition-all"
+              className="w-full rounded-2xl bg-slate-950/70 border border-slate-800 px-4.5 py-3.5 text-slate-100 placeholder:text-slate-600 focus:border-blue-500/50 focus:outline-none focus:ring-4 focus:ring-blue-500/10 transition-all text-sm font-medium"
               value={formData.repositoryUrl} 
               onChange={e => setFormData({ ...formData, repositoryUrl: e.target.value })} 
               placeholder="https://github.com/..."
             />
           </div>
 
-          <div className="pt-4 border-t border-slate-700/50">
+          <div className="pt-4 border-t border-slate-800/80">
             <button 
               type="submit" 
               disabled={updateProjectMutation.isPending}
-              className="w-full sm:w-auto bg-green-500 hover:bg-green-400 text-slate-900 font-bold py-3 px-8 rounded-xl transition-all hover:shadow-lg hover:shadow-green-500/20 disabled:opacity-50"
+              className="w-full sm:w-auto bg-blue-600 hover:bg-blue-500 text-white font-bold py-3.5 px-8 rounded-xl transition-all duration-200 shadow-md shadow-blue-600/20 active:scale-95 disabled:opacity-50 text-sm"
             >
               {updateProjectMutation.isPending ? 'Saving...' : 'Save Changes'}
             </button>
@@ -200,15 +200,15 @@ export function EditProjectPage() {
         </form>
       </div>
 
-      <div className="bg-slate-800/40 backdrop-blur-md rounded-2xl sm:rounded-3xl border border-slate-700/50 p-5 sm:p-8 shadow-2xl shadow-slate-900/50">
-        <h2 className="text-2xl font-bold mb-6 text-slate-50">Manage Roles</h2>
+      <div className="bg-slate-900/40 backdrop-blur-xl rounded-3xl border border-slate-800/80 p-6 sm:p-10 shadow-2xl shadow-slate-950/70">
+        <h2 className="text-xl sm:text-2xl font-bold mb-6 text-slate-100 font-display">Manage Roles</h2>
         
-        <div className="space-y-4 mb-8">
+        <div className="space-y-3 mb-8">
           {roles.map((role) => (
-            <div key={role.id} className="flex flex-col sm:flex-row gap-4 items-start sm:items-center bg-slate-900/30 p-4 rounded-xl border border-slate-700/50">
+            <div key={role.id} className="flex flex-col sm:flex-row gap-4 items-start sm:items-center bg-slate-950/50 p-4.5 rounded-2xl border border-slate-800/80 transition-all hover:border-slate-700">
               <div className="flex-1">
-                <p className="font-bold text-slate-200">{role.title}</p>
-                <p className="text-sm text-slate-400">Openings: {role.openingsCount} (Filled: {role.filledCount})</p>
+                <p className="font-bold text-slate-100 font-display">{role.title}</p>
+                <p className="text-xs font-semibold text-slate-400 mt-0.5">Openings: {role.openingsCount} · Filled: {role.filledCount}</p>
               </div>
               <button 
                 type="button" 
@@ -222,20 +222,20 @@ export function EditProjectPage() {
                   });
                 }}
                 disabled={deleteRoleMutation.isPending}
-                className="p-2 sm:p-3 text-slate-500 hover:text-red-400 hover:bg-red-500/10 rounded-xl transition-colors disabled:opacity-30"
+                className="p-2.5 text-slate-500 hover:text-red-400 hover:bg-red-500/10 rounded-xl transition-all duration-200 border border-transparent hover:border-red-500/20 active:scale-95 disabled:opacity-30"
               >
-                <Trash size={20} weight="bold" />
+                <Trash size={18} weight="bold" />
               </button>
             </div>
           ))}
-          {roles.length === 0 && <p className="text-slate-500">No roles added yet.</p>}
+          {roles.length === 0 && <p className="text-slate-500 text-sm">No roles added yet.</p>}
         </div>
 
-        <div className="pt-6 border-t border-slate-700/50">
-          <h3 className="text-lg font-bold text-slate-200 mb-4">Add New Role</h3>
-          <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+        <div className="pt-6 border-t border-slate-800/80">
+          <h3 className="text-sm font-extrabold uppercase tracking-wider text-slate-300 mb-4">Add New Role</h3>
+          <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
             <input 
-              className="flex-1 rounded-xl bg-slate-900/50 border border-slate-700 px-4 py-3 text-slate-50 placeholder-slate-500 focus:border-green-500 focus:outline-none focus:ring-4 focus:ring-green-500/10 transition-all"
+              className="flex-1 w-full rounded-2xl bg-slate-950/70 border border-slate-800 px-4.5 py-3 text-sm text-slate-100 placeholder:text-slate-600 focus:border-blue-500/50 focus:outline-none focus:ring-4 focus:ring-blue-500/10 transition-all"
               placeholder="Role Title (e.g. Frontend Dev)"
               value={newRole.title}
               onChange={e => setNewRole({ ...newRole, title: e.target.value })}
@@ -244,7 +244,7 @@ export function EditProjectPage() {
               <input 
                 type="number" 
                 min="1" 
-                className="w-24 rounded-xl bg-slate-900/50 border border-slate-700 px-4 py-3 text-slate-50 focus:border-green-500 focus:outline-none focus:ring-4 focus:ring-green-500/10 transition-all text-center"
+                className="w-24 rounded-2xl bg-slate-950/70 border border-slate-800 px-4 py-3 text-sm text-slate-100 focus:border-blue-500/50 focus:outline-none focus:ring-4 focus:ring-blue-500/10 transition-all text-center font-bold"
                 value={newRole.openingsCount}
                 onChange={e => setNewRole({ ...newRole, openingsCount: parseInt(e.target.value) || 1 })}
               />
@@ -252,9 +252,9 @@ export function EditProjectPage() {
                 type="button" 
                 onClick={() => addRoleMutation.mutate(newRole)}
                 disabled={addRoleMutation.isPending || !newRole.title.trim()}
-                className="flex items-center justify-center gap-2 bg-green-500 hover:bg-green-400 text-slate-900 p-3 rounded-xl transition-all disabled:opacity-50 flex-1 sm:flex-none"
+                className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 text-white font-bold p-3 px-5 rounded-2xl transition-all duration-200 shadow-md shadow-blue-600/20 active:scale-95 disabled:opacity-50 flex-1 sm:flex-none"
               >
-                <Plus weight="bold" /> <span className="sm:hidden">Add</span>
+                <Plus weight="bold" /> <span>Add Role</span>
               </button>
             </div>
           </div>

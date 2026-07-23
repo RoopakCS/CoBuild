@@ -1,7 +1,7 @@
 import { forwardRef } from 'react';
 
 const baseClasses =
-  'w-full bg-slate-900/50 border border-slate-700 text-slate-100 placeholder-slate-500 rounded-xl focus:outline-none focus:border-green-500 focus:ring-4 focus:ring-green-500/10 transition-all';
+  'w-full bg-slate-900/50 border border-slate-700 text-slate-100 placeholder-slate-500 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all';
 
 /**
  * Styled text input with consistent theming.

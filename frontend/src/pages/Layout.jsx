@@ -32,32 +32,35 @@ export function Layout() {
   ];
 
   return (
-    <div className="flex flex-col min-h-screen bg-slate-900 text-slate-50 font-sans selection:bg-green-500/30 selection:text-green-200">
+    <div className="flex flex-col min-h-screen bg-slate-950 text-slate-50 font-sans selection:bg-blue-500/30 selection:text-blue-200">
       {/* Floating Glossy Top Navbar Container */}
-      <div className="sticky top-4 sm:top-6 z-40 mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8 mb-6 sm:mb-8">
-        <header className="flex items-center justify-between rounded-2xl border border-slate-700/30 bg-slate-800/40 px-4 sm:px-6 py-3 shadow-sm shadow-slate-900/10 backdrop-blur-xl">
+      <div className="sticky top-3 sm:top-5 z-40 mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8 mb-4 sm:mb-6">
+        <header className="flex items-center justify-between rounded-2xl border border-slate-800/80 bg-slate-900/60 px-4 sm:px-6 py-3 shadow-lg backdrop-blur-xl transition-all duration-300">
           
           {/* Left: Logo */}
           <div className="flex w-1/4 items-center">
             <Link to="/" className="flex items-center">
-              <span className="text-xl font-bold tracking-tighter text-slate-50">CoBuild</span>
+              <span className="text-2xl font-extrabold tracking-tight text-slate-100 font-display">
+                CoBuild
+              </span>
             </Link>
           </div>
 
         {/* Middle: Centered Nav Links (Desktop) */}
-        <nav className="hidden md:flex flex-1 items-center justify-center gap-8">
+        <nav className="hidden md:flex flex-1 items-center justify-center gap-2 bg-slate-950/60 p-1.5 rounded-xl border border-slate-800/80">
           {navItems.map((item) => {
             const isActive = location.pathname === item.path;
             return (
               <Link
                 key={item.name}
                 to={item.path}
-                className={`flex items-center text-sm font-medium transition-all ${
+                className={`flex items-center gap-2 px-4 py-1.5 rounded-lg text-sm font-bold transition-all duration-200 ${
                   isActive
-                    ? 'text-green-400 drop-shadow-[0_0_8px_rgba(25,245,140,0.4)]'
-                    : 'text-slate-400 hover:text-slate-200'
+                    ? 'bg-slate-800 text-blue-500 border border-blue-600/60 shadow-none'
+                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/40'
                 }`}
               >
+                {item.icon}
                 {item.name}
               </Link>
             );
@@ -65,38 +68,44 @@ export function Layout() {
         </nav>
 
         {/* Right: Actions */}
-        <div className="flex w-auto md:w-1/4 items-center justify-end gap-5">
-          <div className="hidden md:flex items-center gap-4 text-slate-400">
+        <div className="flex w-auto md:w-1/4 items-center justify-end gap-3">
+          <div className="hidden md:flex items-center gap-2 text-slate-400">
             <button 
               onClick={() => setTheme(t => t === 'dark' ? 'light' : 'dark')}
-              className="hover:text-slate-200 transition-colors" 
+              className="p-2 rounded-lg hover:text-blue-500 hover:bg-slate-800/60 transition-all duration-200 hover:scale-105 active:scale-95" 
               title="Toggle Theme"
             >
-              {theme === 'dark' ? <Sun size={20} weight="bold" /> : <Moon size={20} weight="bold" />}
+              {theme === 'dark' ? <Sun size={19} weight="bold" /> : <Moon size={19} weight="bold" />}
             </button>
 
-            <button className="hover:text-slate-200 transition-colors" title="Notifications">
-              <Bell size={20} weight="bold" />
+            <button className="p-2 rounded-lg hover:text-blue-500 hover:bg-slate-800/60 transition-all duration-200 hover:scale-105" title="Notifications">
+              <Bell size={19} weight="bold" />
             </button>
-            <Link to="/projects/new" className="hover:text-slate-200 transition-colors" title="Create Project">
-              <Plus size={20} weight="bold" />
+            
+            <Link 
+              to="/projects/new" 
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold transition-all duration-300 shadow-none active:scale-95"
+              title="Create Project"
+            >
+              <Plus size={16} weight="bold" />
+              <span>Create</span>
             </Link>
           </div>
 
-          <div className="hidden md:flex items-center gap-4 border-l border-slate-700/50 pl-4">
+          <div className="hidden md:flex items-center gap-3 border-l border-slate-800 pl-3">
             <Link
               to="/profile"
-              className="flex h-8 w-8 items-center justify-center rounded-full bg-green-500/20 text-green-400 hover:bg-green-500/30 transition-colors border border-green-500/30"
+              className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-800 text-blue-500 hover:bg-slate-700 transition-all duration-300 border border-blue-600/40 hover:scale-105 shadow-none"
               title="Profile"
             >
-              <UserCircle size={20} weight="fill" />
+              <UserCircle size={22} weight="fill" />
             </Link>
           </div>
 
           {/* Mobile Menu Toggle */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden flex h-9 w-9 items-center justify-center rounded-lg border border-slate-700/50 bg-slate-800/50 text-slate-200 focus:outline-none backdrop-blur-md"
+            className="md:hidden flex h-9 w-9 items-center justify-center rounded-xl border border-slate-700/50 bg-slate-800/60 text-slate-200 focus:outline-none backdrop-blur-md hover:border-blue-500/40 transition-colors"
             aria-label="Toggle menu"
           >
             {mobileMenuOpen ? <X size={20} weight="bold" /> : <List size={20} weight="bold" />}
@@ -118,10 +127,10 @@ export function Layout() {
                 <Link
                   key={item.name}
                   to={item.path}
-                  className={`flex items-center gap-4 rounded-xl px-4 py-3 text-sm font-medium transition-all ${
+                  className={`flex items-center gap-4 rounded-xl px-4 py-3 text-sm font-bold transition-all ${
                     location.pathname === item.path
-                      ? 'bg-slate-700/50 text-green-400 shadow-sm border border-slate-600/50'
-                      : 'text-slate-400 hover:bg-slate-700/30 hover:text-slate-100'
+                      ? 'bg-slate-800 text-blue-500 border border-blue-600/60 shadow-none'
+                      : 'text-slate-400 hover:bg-slate-800/40 hover:text-slate-100'
                   }`}
                 >
                   {item.icon}
@@ -130,10 +139,10 @@ export function Layout() {
               ))}
               <Link
                 to="/profile"
-                className={`flex items-center gap-4 rounded-xl px-4 py-3 text-sm font-medium transition-all ${
+                className={`flex items-center gap-4 rounded-xl px-4 py-3 text-sm font-bold transition-all ${
                   location.pathname === '/profile'
-                    ? 'bg-slate-700/50 text-green-400 shadow-sm border border-slate-600/50'
-                    : 'text-slate-400 hover:bg-slate-700/30 hover:text-slate-100'
+                    ? 'bg-slate-800 text-blue-500 border border-blue-600/60 shadow-none'
+                    : 'text-slate-400 hover:bg-slate-800/40 hover:text-slate-100'
                 }`}
               >
                 <UserCircle size={20} weight="duotone" />
@@ -141,17 +150,17 @@ export function Layout() {
               </Link>
               <button
                 onClick={() => setTheme(t => t === 'dark' ? 'light' : 'dark')}
-                className="flex w-full items-center gap-4 rounded-xl px-4 py-3 text-sm font-medium text-slate-400 transition-all hover:bg-slate-700/30 hover:text-slate-100"
+                className="flex w-full items-center gap-4 rounded-xl px-4 py-3 text-sm font-medium text-slate-400 transition-all hover:bg-slate-800/40 hover:text-slate-100"
               >
                 {theme === 'dark' ? <Sun size={20} weight="duotone" /> : <Moon size={20} weight="duotone" />}
                 {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
               </button>
             </nav>
 
-            <div className="space-y-3 pt-4 border-t border-slate-700/50">
+            <div className="space-y-3 pt-4 border-t border-slate-800">
               <Link
                 to="/projects/new"
-                className="flex w-full items-center justify-center gap-2 rounded-xl bg-green-500 px-4 py-3 text-sm font-bold text-slate-950 transition-all hover:bg-green-400 shadow-[0_0_15px_rgba(25,245,140,0.3)]"
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white px-4 py-3 text-sm font-bold transition-all shadow-md shadow-blue-600/20 active:scale-95"
               >
                 <Plus weight="bold" size={20} />
                 Create Project

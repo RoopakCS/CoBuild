@@ -88,14 +88,14 @@ export function ProjectFilterBar({ onFilterChange }) {
     setSkillInput('');
   };
 
-  const hasActiveFilters = debouncedSearch || domain || status || experienceLevel || skills.length;
+  const hasActiveFilters = Boolean(debouncedSearch || domain || status || experienceLevel || skills.length);
 
   const toggleChip = (current, value, setter) => {
     setter(current === value ? '' : value);
   };
 
   return (
-    <div className="space-y-4 mb-6">
+    <div className="space-y-4 mb-8">
       {/* Search + toggle */}
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1">
@@ -106,15 +106,15 @@ export function ProjectFilterBar({ onFilterChange }) {
           />
           <input
             type="text"
-            placeholder="Search projects..."
+            placeholder="Search projects by title, description, domain or skills..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full bg-slate-900/50 border border-slate-700 text-slate-100 placeholder-slate-500 pl-11 pr-4 py-2.5 rounded-xl text-sm focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-all"
+            className="w-full bg-slate-950/70 border border-slate-800 text-slate-100 placeholder:text-slate-600 pl-11 pr-10 py-3.5 rounded-2xl text-sm focus:outline-none focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/10 transition-all duration-200 font-medium shadow-inner"
           />
           {search && (
             <button
               onClick={() => setSearch('')}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300"
+              className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300"
             >
               <X size={16} weight="bold" />
             </button>
@@ -123,16 +123,16 @@ export function ProjectFilterBar({ onFilterChange }) {
 
         <button
           onClick={() => setShowFilters(!showFilters)}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold border transition-all ${
+          className={`flex items-center justify-center gap-2 px-5 py-3.5 rounded-2xl text-sm font-bold border transition-all duration-200 active:scale-95 ${
             showFilters || hasActiveFilters
-              ? 'bg-green-500/10 border-green-500/30 text-green-400'
-              : 'bg-slate-900/50 border-slate-700 text-slate-300 hover:text-slate-100 hover:bg-slate-800'
+              ? 'bg-slate-800 border-blue-600/60 text-blue-500 shadow-none font-bold'
+              : 'bg-slate-950/70 border-slate-800 text-slate-300 hover:text-slate-100 hover:bg-slate-900'
           }`}
         >
           <Funnel size={16} weight="bold" />
           Filters
           {hasActiveFilters && (
-            <span className="bg-green-500 text-slate-900 text-xs font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center">
+            <span className="bg-blue-600 text-white text-xs font-black px-2 py-0.5 rounded-full min-w-[20px] text-center shadow-none">
               {[debouncedSearch, domain, status, experienceLevel].filter(Boolean).length + (skills.length ? 1 : 0)}
             </span>
           )}
@@ -141,7 +141,7 @@ export function ProjectFilterBar({ onFilterChange }) {
         {hasActiveFilters && (
           <button
             onClick={clearAll}
-            className="text-xs font-bold text-slate-400 hover:text-slate-200 px-3 py-2 rounded-lg hover:bg-slate-800 transition-colors self-center"
+            className="text-xs font-bold text-slate-400 hover:text-slate-200 px-4 py-3 rounded-2xl hover:bg-slate-900/60 transition-colors self-center border border-transparent hover:border-slate-800"
           >
             Clear all
           </button>
@@ -150,21 +150,21 @@ export function ProjectFilterBar({ onFilterChange }) {
 
       {/* Expanded filter panel */}
       {showFilters && (
-        <div className="bg-slate-800/40 border border-slate-700/50 rounded-2xl p-4 sm:p-5 space-y-5 backdrop-blur-sm">
+        <div className="bg-slate-900/50 border border-slate-800/80 rounded-3xl p-5 sm:p-6 space-y-6 backdrop-blur-xl shadow-none animate-fade-in">
           {/* Domain chips */}
           <div>
-            <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">
-              Domain
+            <p className="text-[11px] font-extrabold text-slate-500 uppercase tracking-widest mb-2.5">
+              Domain Filter
             </p>
             <div className="flex flex-wrap gap-2">
               {DOMAINS.map((d) => (
                 <button
                   key={d}
                   onClick={() => toggleChip(domain, d, setDomain)}
-                  className={`text-xs font-semibold px-3 py-1.5 rounded-lg border transition-all ${
+                  className={`text-xs font-semibold px-3.5 py-1.5 rounded-xl border transition-all duration-200 active:scale-95 ${
                     domain === d
-                      ? 'bg-green-500/15 border-green-500/30 text-green-400'
-                      : 'bg-slate-900/50 border-slate-700 text-slate-400 hover:text-slate-200 hover:bg-slate-800'
+                      ? 'bg-slate-800 border-blue-600/60 text-blue-500 shadow-none font-bold'
+                      : 'bg-slate-950/70 border-slate-800 text-slate-400 hover:text-slate-200 hover:bg-slate-900'
                   }`}
                 >
                   {d}
@@ -175,18 +175,18 @@ export function ProjectFilterBar({ onFilterChange }) {
 
           {/* Status chips */}
           <div>
-            <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">
-              Status
+            <p className="text-[11px] font-extrabold text-slate-500 uppercase tracking-widest mb-2.5">
+              Status Filter
             </p>
             <div className="flex flex-wrap gap-2">
               {STATUSES.map((s) => (
                 <button
                   key={s}
                   onClick={() => toggleChip(status, s, setStatus)}
-                  className={`text-xs font-semibold px-3 py-1.5 rounded-lg border transition-all ${
+                  className={`text-xs font-semibold px-3.5 py-1.5 rounded-xl border transition-all duration-200 active:scale-95 ${
                     status === s
-                      ? 'bg-green-500/15 border-green-500/30 text-green-400'
-                      : 'bg-slate-900/50 border-slate-700 text-slate-400 hover:text-slate-200 hover:bg-slate-800'
+                      ? 'bg-slate-800 border-blue-600/60 text-blue-500 shadow-none font-bold'
+                      : 'bg-slate-950/70 border-slate-800 text-slate-400 hover:text-slate-200 hover:bg-slate-900'
                   }`}
                 >
                   {s.replace('_', ' ')}
@@ -197,7 +197,7 @@ export function ProjectFilterBar({ onFilterChange }) {
 
           {/* Experience level chips */}
           <div>
-            <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">
+            <p className="text-[11px] font-extrabold text-slate-500 uppercase tracking-widest mb-2.5">
               Experience Level
             </p>
             <div className="flex flex-wrap gap-2">
@@ -205,10 +205,10 @@ export function ProjectFilterBar({ onFilterChange }) {
                 <button
                   key={l.value}
                   onClick={() => toggleChip(experienceLevel, l.value, setExperienceLevel)}
-                  className={`text-xs font-semibold px-3 py-1.5 rounded-lg border transition-all ${
+                  className={`text-xs font-semibold px-3.5 py-1.5 rounded-xl border transition-all duration-200 active:scale-95 ${
                     experienceLevel === l.value
-                      ? 'bg-green-500/15 border-green-500/30 text-green-400'
-                      : 'bg-slate-900/50 border-slate-700 text-slate-400 hover:text-slate-200 hover:bg-slate-800'
+                      ? 'bg-slate-800 border-blue-600/60 text-blue-500 shadow-none font-bold'
+                      : 'bg-slate-950/70 border-slate-800 text-slate-400 hover:text-slate-200 hover:bg-slate-900'
                   }`}
                 >
                   {l.label}
@@ -219,13 +219,13 @@ export function ProjectFilterBar({ onFilterChange }) {
 
           {/* Skill tags */}
           <div>
-            <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">
-              Skills
+            <p className="text-[11px] font-extrabold text-slate-500 uppercase tracking-widest mb-2.5">
+              Filter by Required Skills
             </p>
-            <div className="flex gap-2 mb-2">
+            <div className="flex gap-2 mb-3">
               <input
                 type="text"
-                placeholder="Type a skill, press Enter"
+                placeholder="Type a skill (e.g. React) and press Enter..."
                 value={skillInput}
                 onChange={(e) => setSkillInput(e.target.value)}
                 onKeyDown={(e) => {
@@ -234,14 +234,14 @@ export function ProjectFilterBar({ onFilterChange }) {
                     addSkill();
                   }
                 }}
-                className="flex-1 bg-slate-900/50 border border-slate-700 text-slate-100 placeholder-slate-500 px-3 py-2 rounded-lg text-sm focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-all"
+                className="flex-1 bg-slate-950/70 border border-slate-800 text-slate-100 placeholder:text-slate-600 px-4 py-2.5 rounded-xl text-xs focus:outline-none focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/10 transition-all"
               />
               <button
                 onClick={addSkill}
                 disabled={!skillInput.trim()}
-                className="text-xs font-bold bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-2 rounded-lg transition-colors border border-slate-700 disabled:opacity-40"
+                className="text-xs font-bold bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 px-4 py-2.5 rounded-xl transition-all border border-blue-500/30 disabled:opacity-40"
               >
-                Add
+                Add Tag
               </button>
             </div>
             {skills.length > 0 && (
@@ -251,7 +251,7 @@ export function ProjectFilterBar({ onFilterChange }) {
                     {s}
                     <button
                       onClick={() => removeSkill(s)}
-                      className="text-blue-400/60 hover:text-blue-300 ml-0.5"
+                      className="text-blue-400/60 hover:text-blue-300 ml-1"
                     >
                       <X size={10} weight="bold" />
                     </button>
