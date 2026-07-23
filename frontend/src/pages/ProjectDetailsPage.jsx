@@ -198,7 +198,7 @@ export function ProjectDetailsPage() {
             <>
               <h2 className="text-2xl font-bold mb-6 text-slate-50 tracking-tight">Applications</h2>
               <div className="space-y-4">
-                {apps?.map(app => (
+                {apps?.filter(app => app.status !== 'REJECTED' && app.status !== 'WITHDRAWN').map(app => (
                   <div key={app.id} className="border border-slate-700/80 bg-slate-900/40 p-5 rounded-2xl">
                     <p className="text-base font-bold text-slate-200">{app.applicantName} <span className="text-sm font-normal text-slate-400 ml-1">for {app.roleTitle}</span> <span className={`text-xs font-bold px-2 py-1 rounded ml-2 ${app.status === 'PENDING' ? 'bg-yellow-500/20 text-yellow-400' : app.status === 'ACCEPTED' ? 'bg-green-500/20 text-green-400' : 'bg-slate-700 text-slate-400'}`}>{app.status}</span></p>
                     <p className="text-sm font-medium text-slate-400 mt-3 mb-5 leading-relaxed">{app.message}</p>
@@ -220,7 +220,7 @@ export function ProjectDetailsPage() {
                     )}
                   </div>
                 ))}
-                {apps?.length === 0 && <p className="text-base font-medium text-slate-500 text-center py-6">No applications yet.</p>}
+                {apps?.filter(app => app.status !== 'REJECTED' && app.status !== 'WITHDRAWN').length === 0 && <p className="text-base font-medium text-slate-500 text-center py-6">No applications yet.</p>}
               </div>
             </>
           ) : (

@@ -21,12 +21,22 @@ export function TeamMemberList({ members = [], isOwner, currentUserId, projectId
     await Promise.all([
       queryClient.invalidateQueries({ queryKey: ['memberships', 'project', projectId] }),
       queryClient.invalidateQueries({ queryKey: ['projects', projectId] }),
+<<<<<<< HEAD
       queryClient.invalidateQueries({ queryKey: ['projects'] })
+=======
+      queryClient.invalidateQueries({ queryKey: ['projects'] }),
+      queryClient.invalidateQueries({ queryKey: ['applications', 'project', projectId] }),
+      queryClient.invalidateQueries({ queryKey: ['applications', 'me'] })
+>>>>>>> 4c5bfd7ddfb623297037f562aa49f7fa12cfdcb9
     ]);
   };
 
   const removeMutation = useMutation({
+<<<<<<< HEAD
     mutationFn: ({ userId }) => membershipsApi.removeMember({ projectId, userId }),
+=======
+    mutationFn: ({ userId, message }) => membershipsApi.removeMember({ projectId, userId, message }),
+>>>>>>> 4c5bfd7ddfb623297037f562aa49f7fa12cfdcb9
     onSuccess: async () => {
       toast.success('Member removed');
       await invalidateAll();
@@ -39,7 +49,11 @@ export function TeamMemberList({ members = [], isOwner, currentUserId, projectId
   });
 
   const leaveMutation = useMutation({
+<<<<<<< HEAD
     mutationFn: ({ membershipId }) => membershipsApi.leaveProject(membershipId),
+=======
+    mutationFn: ({ membershipId, message }) => membershipsApi.leaveProject({ membershipId, message }),
+>>>>>>> 4c5bfd7ddfb623297037f562aa49f7fa12cfdcb9
     onSuccess: async () => {
       toast.success('Leave request submitted');
       await Promise.all([

@@ -1,5 +1,7 @@
 package com.cobuild.backend.membership;
 
+import com.cobuild.backend.application.ApplicationRepository;
+import com.cobuild.backend.application.ApplicationStatus;
 import com.cobuild.backend.exception.BadRequestException;
 import com.cobuild.backend.exception.ConflictException;
 import com.cobuild.backend.exception.DuplicateResourceException;
@@ -32,6 +34,7 @@ public class MembershipServiceImpl implements MembershipService {
         private final ProjectRepository projectRepository;
         private final UserRepository userRepository;
         private final ProjectRoleRepository projectRoleRepository;
+        private final ApplicationRepository applicationRepository;
 
         @Override
         @Transactional
@@ -156,8 +159,14 @@ public class MembershipServiceImpl implements MembershipService {
                 }
 
                 membershipRepository.save(membership);
-
                 projectRoleRepository.save(role);
+
+                // Update application status so it no longer shows ACCEPTED
+                applicationRepository.findByProjectIdAndApplicantId(projectId, userId)
+                                .ifPresent(app -> {
+                                        app.setStatus(ApplicationStatus.REJECTED);
+                                        applicationRepository.save(app);
+                                });
         }
 
         private User getCurrentUser() {
@@ -279,6 +288,39 @@ public class MembershipServiceImpl implements MembershipService {
 
                 membershipRepository.save(membership);
                 projectRoleRepository.save(role);
+
+                // Update application status so it no longer shows ACCEPTED
+                applicationRepository.findByProjectIdAndApplicantId(membership.getProject().getId(), membership.getUser().getId())
+                                .ifPresent(app -> {
+                                        app.setStatus(ApplicationStatus.WITHDRAWN);
+                                        applicationRepository.save(app);
+                                });
+        }
+
+        @Override
+        @Transactional
+        public void rejectLeave(UUID membershipId, String message) {
+                // Find LEAVE_PENDING membership
+                Membership membership = membershipRepository
+                                .findByIdAndStatus(
+                                                membershipId,
+                                                MembershipStatus.LEAVE_PENDING)
+                                .orElseThrow(() -> new ResourceNotFoundException(
+                                                "Pending leave request not found"));
+
+                // Verify current user is owner
+                User currentUser = getCurrentUser();
+                if (!membership.getProject().getOwner().getId().equals(currentUser.getId())) {
+                        throw new ForbiddenException("Only the project owner can reject leave requests");
+                }
+
+                // Mark membership as ACTIVE
+                membership.setStatus(MembershipStatus.ACTIVE);
+                if (message != null) {
+                        membership.setStatusMessage(message);
+                }
+
+                membershipRepository.save(membership);
         }
 
         @Override
