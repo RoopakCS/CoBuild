@@ -20,9 +20,9 @@ export function RoleList({ roles = [], isOwner, projectId, onApplyClick, canAppl
 
   const deleteMutation = useMutation({
     mutationFn: ({ roleId }) => rolesApi.delete({ projectId, roleId }),
-    onSuccess: () => {
+    onSuccess: async () => {
       toast.success('Role deleted');
-      queryClient.invalidateQueries({ queryKey: ['projects', projectId] });
+      await queryClient.invalidateQueries({ queryKey: ['projects', projectId] });
       setDeleteConfirm({ isOpen: false, role: null });
     },
     onError: (err) => {

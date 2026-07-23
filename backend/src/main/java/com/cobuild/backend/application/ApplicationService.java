@@ -83,13 +83,16 @@ public class ApplicationService {
                                         }
                                 });
 
-                ProjectApplication application = ProjectApplication.builder()
-                                .project(project)
-                                .role(role)
-                                .applicant(applicant)
-                                .message(request.message())
-                                .status(ApplicationStatus.PENDING)
-                                .build();
+                ProjectApplication application = applicationRepository
+                                .findByProjectIdAndApplicantId(projectId, applicantId)
+                                .orElseGet(() -> ProjectApplication.builder()
+                                                .project(project)
+                                                .applicant(applicant)
+                                                .build());
+
+                application.setRole(role);
+                application.setMessage(request.message());
+                application.setStatus(ApplicationStatus.PENDING);
 
                 ProjectApplication savedApplication = applicationRepository.save(application);
 
@@ -111,7 +114,7 @@ public class ApplicationService {
                                 application.getUpdatedAt());
         }
 
-        @Transactional(readOnly = true)
+        @Transactional
         public List<ApplicationResponse> getProjectApplications(UUID projectId, String userEmail) {
                 Project project = projectRepository
                                 .findById(projectId)
@@ -127,6 +130,18 @@ public class ApplicationService {
                 }
 
                 return applicationRepository.findByProjectId(projectId).stream()
+                                .peek(app -> {
+                                        membershipRepository.findByProjectIdAndUserId(projectId, app.getApplicant().getId())
+                                                        .ifPresent(m -> {
+                                                                if (m.getStatus() == com.cobuild.backend.membership.MembershipStatus.REMOVED && app.getStatus() == ApplicationStatus.ACCEPTED) {
+                                                                        app.setStatus(ApplicationStatus.REJECTED);
+                                                                        applicationRepository.save(app);
+                                                                } else if (m.getStatus() == com.cobuild.backend.membership.MembershipStatus.LEFT && app.getStatus() == ApplicationStatus.ACCEPTED) {
+                                                                        app.setStatus(ApplicationStatus.WITHDRAWN);
+                                                                        applicationRepository.save(app);
+                                                                }
+                                                        });
+                                })
                                 .map(this::mapToResponse)
                                 .toList();
         }

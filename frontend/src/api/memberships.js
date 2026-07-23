@@ -13,12 +13,24 @@ export const membershipsApi = {
     const { data } = await apiClient.get(`/v1/memberships/user/${userId}`);
     return data;
   },
-  removeMember: async ({ projectId, userId }) => {
-    const { data } = await apiClient.delete(`/v1/memberships/project/${projectId}/user/${userId}`);
+  removeMember: async ({ projectId, userId, message }) => {
+    const { data } = await apiClient.delete(`/v1/memberships/project/${projectId}/user/${userId}`, {
+      data: { message }
+    });
     return data;
   },
-  leaveProject: async (membershipId) => {
-    const { data } = await apiClient.delete(`/v1/memberships/${membershipId}/leave`);
+  leaveProject: async ({ membershipId, message }) => {
+    const { data } = await apiClient.delete(`/v1/memberships/${membershipId}/leave`, {
+      data: { message }
+    });
+    return data;
+  },
+  approveLeave: async ({ membershipId, message }) => {
+    const { data } = await apiClient.post(`/v1/memberships/${membershipId}/approve-leave`, { message });
+    return data;
+  },
+  rejectLeave: async ({ membershipId, message }) => {
+    const { data } = await apiClient.post(`/v1/memberships/${membershipId}/reject-leave`, { message });
     return data;
   }
 };

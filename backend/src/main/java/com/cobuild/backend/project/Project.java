@@ -10,6 +10,7 @@ import com.cobuild.backend.application.ProjectApplication;
 import com.cobuild.backend.user.User;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.BatchSize;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -75,12 +76,15 @@ public class Project {
     }
 
     @OneToMany(mappedBy = "project", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @BatchSize(size = 20)
     private List<ProjectRole> roles;
 
     @OneToMany(mappedBy = "project", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @BatchSize(size = 20)
     private List<Membership> memberships;
 
     @OneToMany(mappedBy = "project", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @BatchSize(size = 20)
     private List<ProjectApplication> applications;
 
 }

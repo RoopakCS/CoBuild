@@ -12,5 +12,7 @@ public interface ApplicationRepository extends JpaRepository<ProjectApplication,
 
     boolean existsByProjectIdAndApplicantIdAndStatusIn(UUID projectId, UUID applicantId, List<ApplicationStatus> statuses);
 
+    java.util.Optional<ProjectApplication> findByProjectIdAndApplicantId(UUID projectId, UUID applicantId);
+
     List<ProjectApplication> findByRoleIdAndStatus(UUID roleId, ApplicationStatus status);
 }

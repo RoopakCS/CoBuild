@@ -1,5 +1,7 @@
 package com.cobuild.backend.membership;
 
+import com.cobuild.backend.application.ApplicationRepository;
+import com.cobuild.backend.application.ApplicationStatus;
 import com.cobuild.backend.exception.BadRequestException;
 import com.cobuild.backend.exception.ConflictException;
 import com.cobuild.backend.exception.DuplicateResourceException;
@@ -32,6 +34,7 @@ public class MembershipServiceImpl implements MembershipService {
         private final ProjectRepository projectRepository;
         private final UserRepository userRepository;
         private final ProjectRoleRepository projectRoleRepository;
+        private final ApplicationRepository applicationRepository;
 
         @Override
         @Transactional
@@ -71,9 +74,10 @@ public class MembershipServiceImpl implements MembershipService {
                 Project project = projectRepository.findById(projectId)
                                 .orElseThrow(() -> new ResourceNotFoundException("Project not found"));
 
-                return membershipRepository.findByProject(project)
+                return membershipRepository.findByProjectAndStatusIn(
+                                project, 
+                                List.of(MembershipStatus.ACTIVE, MembershipStatus.LEAVE_PENDING))
                                 .stream()
-                                .filter(m -> m.getStatus() == MembershipStatus.ACTIVE)
                                 .map(this::mapToResponse)
                                 .toList();
         }
@@ -84,9 +88,10 @@ public class MembershipServiceImpl implements MembershipService {
                 User user = userRepository.findById(userId)
                                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-                return membershipRepository.findByUser(user)
+                return membershipRepository.findByUserAndStatusIn(
+                                user, 
+                                List.of(MembershipStatus.ACTIVE, MembershipStatus.LEAVE_PENDING))
                                 .stream()
-                                .filter(m -> m.getStatus() == MembershipStatus.ACTIVE)
                                 .map(this::mapToResponse)
                                 .toList();
         }
@@ -96,9 +101,8 @@ public class MembershipServiceImpl implements MembershipService {
         public void removeMember(
                         UUID projectId,
                         UUID userId,
-                        String ownerEmail) {
-
-                // Find membership
+                        String ownerEmail,
+                        String message) {
                 Membership membership = membershipRepository
                                 .findByProjectIdAndUserId(projectId, userId)
                                 .orElseThrow(() -> new ResourceNotFoundException(
@@ -143,9 +147,10 @@ public class MembershipServiceImpl implements MembershipService {
                                                 "Project role not found"));
 
                 // Mark membership as removed
-                membership.setStatus(
-                                MembershipStatus.REMOVED);
+                membership.setStatus(MembershipStatus.REMOVED);
+                membership.setStatusMessage(message);
 
+                // Free one opening
                 // Free one opening
                 if (role.getFilledCount() > 0) {
 
@@ -154,8 +159,14 @@ public class MembershipServiceImpl implements MembershipService {
                 }
 
                 membershipRepository.save(membership);
-
                 projectRoleRepository.save(role);
+
+                // Update application status so it no longer shows ACCEPTED
+                applicationRepository.findByProjectIdAndApplicantId(projectId, userId)
+                                .ifPresent(app -> {
+                                        app.setStatus(ApplicationStatus.REJECTED);
+                                        applicationRepository.save(app);
+                                });
         }
 
         private User getCurrentUser() {
@@ -194,6 +205,7 @@ public class MembershipServiceImpl implements MembershipService {
                                 .projectTitle(project != null ? project.getTitle() : null)
                                 .role(membership.getMembershipRole())
                                 .status(membership.getStatus())
+                                .statusMessage(membership.getStatusMessage())
                                 .joinedAt(membership.getJoinedAt())
                                 .build();
         }
@@ -201,7 +213,8 @@ public class MembershipServiceImpl implements MembershipService {
         @Transactional
         public void leaveProject(
                         UUID membershipId,
-                        String userEmail) {
+                        String userEmail,
+                        String message) {
 
                 // Find ACTIVE membership
                 Membership membership = membershipRepository
@@ -231,6 +244,30 @@ public class MembershipServiceImpl implements MembershipService {
                                         "Project owner cannot leave the project. Transfer ownership first.");
                 }
 
+                // Mark membership as LEAVE_PENDING
+                membership.setStatus(MembershipStatus.LEAVE_PENDING);
+                membership.setStatusMessage(message);
+
+                membershipRepository.save(membership);
+        }
+
+        @Override
+        @Transactional
+        public void approveLeave(UUID membershipId, String message) {
+                // Find LEAVE_PENDING membership
+                Membership membership = membershipRepository
+                                .findByIdAndStatus(
+                                                membershipId,
+                                                MembershipStatus.LEAVE_PENDING)
+                                .orElseThrow(() -> new ResourceNotFoundException(
+                                                "Pending leave request not found"));
+
+                // Verify current user is owner
+                User currentUser = getCurrentUser();
+                if (!membership.getProject().getOwner().getId().equals(currentUser.getId())) {
+                        throw new ForbiddenException("Only the project owner can approve leave requests");
+                }
+
                 // Lock ProjectRole before changing filledCount
                 ProjectRole role = projectRoleRepository
                                 .findByIdForUpdate(
@@ -239,19 +276,51 @@ public class MembershipServiceImpl implements MembershipService {
                                                 "Project role not found"));
 
                 // Mark membership as LEFT
-                membership.setStatus(
-                                MembershipStatus.LEFT);
+                membership.setStatus(MembershipStatus.LEFT);
+                if (message != null) {
+                        membership.setStatusMessage(message);
+                }
 
                 // Decrement occupied position
                 if (role.getFilledCount() > 0) {
-
-                        role.setFilledCount(
-                                        role.getFilledCount() - 1);
+                        role.setFilledCount(role.getFilledCount() - 1);
                 }
 
                 membershipRepository.save(membership);
-
                 projectRoleRepository.save(role);
+
+                // Update application status so it no longer shows ACCEPTED
+                applicationRepository.findByProjectIdAndApplicantId(membership.getProject().getId(), membership.getUser().getId())
+                                .ifPresent(app -> {
+                                        app.setStatus(ApplicationStatus.WITHDRAWN);
+                                        applicationRepository.save(app);
+                                });
+        }
+
+        @Override
+        @Transactional
+        public void rejectLeave(UUID membershipId, String message) {
+                // Find LEAVE_PENDING membership
+                Membership membership = membershipRepository
+                                .findByIdAndStatus(
+                                                membershipId,
+                                                MembershipStatus.LEAVE_PENDING)
+                                .orElseThrow(() -> new ResourceNotFoundException(
+                                                "Pending leave request not found"));
+
+                // Verify current user is owner
+                User currentUser = getCurrentUser();
+                if (!membership.getProject().getOwner().getId().equals(currentUser.getId())) {
+                        throw new ForbiddenException("Only the project owner can reject leave requests");
+                }
+
+                // Mark membership as ACTIVE
+                membership.setStatus(MembershipStatus.ACTIVE);
+                if (message != null) {
+                        membership.setStatusMessage(message);
+                }
+
+                membershipRepository.save(membership);
         }
 
         @Override
