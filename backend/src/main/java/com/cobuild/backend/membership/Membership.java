@@ -43,6 +43,9 @@ public class Membership {
     @Builder.Default
     private MembershipStatus status = MembershipStatus.ACTIVE;
 
+    @Column(name = "status_message", columnDefinition = "TEXT")
+    private String statusMessage;
+
     @Column(nullable = false, updatable = false)
     private LocalDateTime joinedAt;
 

@@ -138,7 +138,7 @@ public class UserService {
                 .toList();
 
         List<ProjectResponse> collaboratedProjects = membershipRepository
-                .findByUserAndStatus(user, MembershipStatus.ACTIVE)
+                .findByUserAndStatusIn(user, List.of(MembershipStatus.ACTIVE, MembershipStatus.LEAVE_PENDING))
                 .stream()
                 .map(Membership::getProject)
                 .map(projectMapper::toResponse)

@@ -83,13 +83,16 @@ public class ApplicationService {
                                         }
                                 });
 
-                ProjectApplication application = ProjectApplication.builder()
-                                .project(project)
-                                .role(role)
-                                .applicant(applicant)
-                                .message(request.message())
-                                .status(ApplicationStatus.PENDING)
-                                .build();
+                ProjectApplication application = applicationRepository
+                                .findByProjectIdAndApplicantId(projectId, applicantId)
+                                .orElseGet(() -> ProjectApplication.builder()
+                                                .project(project)
+                                                .applicant(applicant)
+                                                .build());
+
+                application.setRole(role);
+                application.setMessage(request.message());
+                application.setStatus(ApplicationStatus.PENDING);
 
                 ProjectApplication savedApplication = applicationRepository.save(application);
 

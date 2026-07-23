@@ -14,9 +14,13 @@ public interface MembershipService {
 
     List<MembershipResponse> getUserMemberships(UUID userId);
 
-    void removeMember(UUID projectId, UUID userId, String ownerEmail);
+    void removeMember(UUID projectId, UUID userId, String ownerEmail, String message);
 
-    void leaveProject(UUID membershipId, String userEmail);
+    void leaveProject(UUID membershipId, String userEmail, String message);
+
+    void approveLeave(UUID membershipId, String message);
+
+    void rejectLeave(UUID membershipId, String message);
 
     void transferOwnership(UUID projectId, UUID newOwnerUserId, String currentOwnerEmail);
 }

@@ -1,6 +1,7 @@
 package com.cobuild.backend.membership;
 
 import com.cobuild.backend.membership.dto.request.AddMemberRequest;
+import com.cobuild.backend.membership.dto.request.MembershipActionRequest;
 import com.cobuild.backend.membership.dto.response.MembershipResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -49,12 +50,14 @@ public class MembershipController {
     public ResponseEntity<Void> removeMember(
             @PathVariable UUID projectId,
             @PathVariable UUID userId,
+            @RequestBody(required = false) MembershipActionRequest actionRequest,
             Authentication authentication) {
 
         membershipService.removeMember(
                 projectId,
                 userId,
-                authentication.getName());
+                authentication.getName(),
+                actionRequest != null ? actionRequest.getMessage() : null);
 
         return ResponseEntity.noContent().build();
     }
@@ -62,12 +65,32 @@ public class MembershipController {
     @DeleteMapping("/{membershipId}/leave")
     public ResponseEntity<Void> leaveProject(
             @PathVariable UUID membershipId,
+            @RequestBody(required = false) MembershipActionRequest actionRequest,
             Authentication authentication) {
 
         membershipService.leaveProject(
                 membershipId,
-                authentication.getName());
+                authentication.getName(),
+                actionRequest != null ? actionRequest.getMessage() : null);
 
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{membershipId}/approve-leave")
+    public ResponseEntity<Void> approveLeave(
+            @PathVariable UUID membershipId,
+            @RequestBody(required = false) MembershipActionRequest actionRequest) {
+
+        membershipService.approveLeave(membershipId, actionRequest != null ? actionRequest.getMessage() : null);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{membershipId}/reject-leave")
+    public ResponseEntity<Void> rejectLeave(
+            @PathVariable UUID membershipId,
+            @RequestBody(required = false) MembershipActionRequest actionRequest) {
+
+        membershipService.rejectLeave(membershipId, actionRequest != null ? actionRequest.getMessage() : null);
         return ResponseEntity.noContent().build();
     }
 

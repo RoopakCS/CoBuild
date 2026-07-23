@@ -50,8 +50,11 @@ export function EditProjectPage() {
 
   const updateProjectMutation = useMutation({
     mutationFn: (payload) => projectsApi.update({ id, ...payload }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['projects'] });
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['projects'] }),
+        queryClient.invalidateQueries({ queryKey: ['projects', id] }),
+      ]);
       toast.success('Project updated successfully!');
       navigate(`/projects/${id}`);
     },
@@ -62,8 +65,8 @@ export function EditProjectPage() {
 
   const addRoleMutation = useMutation({
     mutationFn: (payload) => rolesApi.create({ projectId: id, ...payload }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['projects', id] });
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['projects', id] });
       setNewRole({ title: '', openingsCount: 1 });
       toast.success('Role added successfully!');
     },
@@ -74,8 +77,8 @@ export function EditProjectPage() {
 
   const deleteRoleMutation = useMutation({
     mutationFn: (roleId) => rolesApi.delete({ projectId: id, roleId }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['projects', id] });
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['projects', id] });
       toast.success('Role deleted successfully!');
     },
     onError: (err) => {

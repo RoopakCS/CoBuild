@@ -26,6 +26,8 @@ public class MembershipResponse {
 
     private MembershipStatus status;
 
+    private String statusMessage;
+
     private LocalDateTime joinedAt;
 
 }

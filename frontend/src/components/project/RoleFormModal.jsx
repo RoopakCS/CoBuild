@@ -45,9 +45,9 @@ export function RoleFormModal({ isOpen, onClose, projectId, existingRole }) {
 
   const createMutation = useMutation({
     mutationFn: (payload) => rolesApi.create({ projectId, ...payload }),
-    onSuccess: () => {
+    onSuccess: async () => {
       toast.success('Role created!');
-      queryClient.invalidateQueries({ queryKey: ['projects', projectId] });
+      await queryClient.invalidateQueries({ queryKey: ['projects', projectId] });
       onClose();
     },
     onError: (err) => {
@@ -58,9 +58,9 @@ export function RoleFormModal({ isOpen, onClose, projectId, existingRole }) {
   const updateMutation = useMutation({
     mutationFn: (payload) =>
       rolesApi.update({ projectId, roleId: existingRole?.id, ...payload }),
-    onSuccess: () => {
+    onSuccess: async () => {
       toast.success('Role updated!');
-      queryClient.invalidateQueries({ queryKey: ['projects', projectId] });
+      await queryClient.invalidateQueries({ queryKey: ['projects', projectId] });
       onClose();
     },
     onError: (err) => {

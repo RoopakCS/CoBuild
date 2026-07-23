@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { Modal } from './Modal';
 
 /**
@@ -15,7 +16,17 @@ export function ConfirmDialog({
   cancelText = 'Cancel',
   isDangerous = true,
   isPending = false,
+  requireMessage = false,
+  messagePlaceholder = 'Enter your reason here...',
 }) {
+  const [messageText, setMessageText] = useState('');
+
+  // Reset text when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      setMessageText('');
+    }
+  }, [isOpen]);
   if (!isOpen) return null;
 
   return (
@@ -24,6 +35,16 @@ export function ConfirmDialog({
       <p className="text-slate-300 text-sm sm:text-base mb-8 leading-relaxed">
         {message}
       </p>
+      {requireMessage && (
+        <textarea
+          value={messageText}
+          onChange={(e) => setMessageText(e.target.value)}
+          placeholder={messagePlaceholder}
+          disabled={isPending}
+          rows={3}
+          className="w-full bg-slate-900/50 border border-slate-700/50 rounded-xl px-4 py-3 text-sm text-slate-200 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all mb-6 resize-none"
+        />
+      )}
       <div className="flex justify-end gap-3">
         <button
           onClick={onCancel}
@@ -33,8 +54,8 @@ export function ConfirmDialog({
           {cancelText}
         </button>
         <button
-          onClick={onConfirm}
-          disabled={isPending}
+          onClick={() => onConfirm(messageText)}
+          disabled={isPending || (requireMessage && !messageText.trim())}
           className={`px-4 py-2 rounded-xl text-sm font-bold transition-all disabled:opacity-50 ${
             isDangerous
               ? 'bg-red-500/10 text-red-400 hover:bg-red-500/20'

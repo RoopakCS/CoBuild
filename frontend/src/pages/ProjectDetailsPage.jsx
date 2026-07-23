@@ -45,16 +45,20 @@ export function ProjectDetailsPage() {
 
   const updateAppStatus = useMutation({
     mutationFn: applicationsApi.updateStatus,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['applications', 'project', id] });
-      queryClient.invalidateQueries({ queryKey: ['projects', id] });
-      queryClient.invalidateQueries({ queryKey: ['memberships', 'project', id] });
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['applications', 'project', id] }),
+        queryClient.invalidateQueries({ queryKey: ['projects', id] }),
+        queryClient.invalidateQueries({ queryKey: ['memberships', 'project', id] }),
+        queryClient.invalidateQueries({ queryKey: ['applications', 'me'] }),
+      ]);
     },
   });
 
   const deleteProject = useMutation({
     mutationFn: projectsApi.delete,
-    onSuccess: () => {
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['projects'] });
       navigate('/my-projects');
     }
   });

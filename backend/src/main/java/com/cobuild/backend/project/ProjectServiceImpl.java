@@ -58,7 +58,7 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public ProjectResponse getProjectById(UUID id) {
 
-        Project project = projectRepository.findById(id)
+        Project project = projectRepository.findWithDetailsById(id)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Project not found"));
 
