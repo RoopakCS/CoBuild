@@ -219,11 +219,22 @@ export function DashboardPage() {
                     </div>
                     {project.skills && project.skills.length > 0 && (
                       <div className="flex flex-wrap gap-2">
-                        {project.skills.slice(0, 5).map((skill, idx) => (
-                          <span key={idx} className="text-xs font-medium bg-slate-950/80 border border-slate-800 text-slate-300 px-2.5 py-1 rounded-lg">
-                            {skill}
-                          </span>
-                        ))}
+                        {project.skills.slice(0, 5).map((skill, idx) => {
+                          const activeSkills = filterParams.skills ? filterParams.skills.split(',').filter(Boolean) : [];
+                          const isMatched = activeSkills.some(s => s.toLowerCase() === skill.toLowerCase());
+                          return (
+                            <span
+                              key={idx}
+                              className={`text-xs font-semibold px-2.5 py-1 rounded-lg transition-colors border ${
+                                isMatched
+                                  ? 'bg-blue-600/20 border-blue-500/50 text-blue-400 font-bold shadow-sm'
+                                  : 'bg-slate-950/80 border-slate-800 text-slate-300'
+                              }`}
+                            >
+                              {skill}
+                            </span>
+                          );
+                        })}
                         {project.skills.length > 5 && <span className="text-xs font-medium text-slate-500 py-1 px-1">+{project.skills.length - 5} more</span>}
                       </div>
                     )}

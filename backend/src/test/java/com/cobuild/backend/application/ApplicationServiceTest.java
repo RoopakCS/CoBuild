@@ -263,6 +263,52 @@ class ApplicationServiceTest {
             assertThatThrownBy(() -> service.updateStatus(pendingApp.getId(), ApplicationStatus.ACCEPTED, applicant.getEmail()))
                     .isInstanceOf(ForbiddenException.class);
         }
+
+        @Test
+        @DisplayName("accept auto-rejects pending applications for filled role only, not other roles on project")
+        void accept_autoRejectsOnlyForSpecificRole() {
+            role.setOpeningsCount(1);
+            role.setFilledCount(0);
+
+            ProjectRole otherRole = new ProjectRole();
+            otherRole.setId(UUID.randomUUID());
+            otherRole.setProject(project);
+            otherRole.setTitle("Frontend Dev");
+            otherRole.setOpeningsCount(2);
+
+            ProjectApplication otherRoleApp = ProjectApplication.builder()
+                    .id(UUID.randomUUID())
+                    .project(project)
+                    .role(otherRole)
+                    .applicant(User.builder().id(UUID.randomUUID()).name("Frontend Applicant").email("fe@test.com").build())
+                    .message("Frontend Dev pitch")
+                    .status(ApplicationStatus.PENDING)
+                    .build();
+
+            ProjectApplication roleSameApp = ProjectApplication.builder()
+                    .id(UUID.randomUUID())
+                    .project(project)
+                    .role(role)
+                    .applicant(User.builder().id(UUID.randomUUID()).name("Backend Applicant").email("be@test.com").build())
+                    .message("Backend Dev pitch")
+                    .status(ApplicationStatus.PENDING)
+                    .build();
+
+            when(applicationRepository.findById(pendingApp.getId())).thenReturn(Optional.of(pendingApp));
+            when(userRepository.findByEmail(owner.getEmail())).thenReturn(Optional.of(owner));
+            when(projectRoleRepository.findByIdForUpdate(role.getId())).thenReturn(Optional.of(role));
+            when(membershipRepository.save(any(Membership.class))).thenAnswer(inv -> inv.getArgument(0));
+            when(applicationRepository.save(any(ProjectApplication.class))).thenAnswer(inv -> inv.getArgument(0));
+            when(projectRoleRepository.save(any(ProjectRole.class))).thenAnswer(inv -> inv.getArgument(0));
+            when(applicationRepository.findByRoleIdAndStatus(role.getId(), ApplicationStatus.PENDING))
+                    .thenReturn(List.of(roleSameApp));
+            when(applicationRepository.saveAll(any())).thenReturn(List.of(roleSameApp));
+
+            service.updateStatus(pendingApp.getId(), ApplicationStatus.ACCEPTED, owner.getEmail());
+
+            assertThat(roleSameApp.getStatus()).isEqualTo(ApplicationStatus.REJECTED);
+            assertThat(otherRoleApp.getStatus()).isEqualTo(ApplicationStatus.PENDING); // untouched
+        }
     }
 
     // ============================================================

@@ -121,4 +121,17 @@ class ProjectSpecificationTest {
         );
         assertThat(spec).isNotNull();
     }
+
+    @Test
+    @DisplayName("withFilters creates non-null composed specification for combined domain, skills, level, and status")
+    void withFilters_combinedFacetAndSkillsList() {
+        Specification<Project> spec = ProjectSpecification.withFilters(
+                "AI",
+                "Web Development",
+                ExperienceLevel.INTERMEDIATE,
+                ProjectStatus.OPEN,
+                List.of("React", "Tailwind")
+        );
+        assertThat(spec).isNotNull();
+    }
 }
