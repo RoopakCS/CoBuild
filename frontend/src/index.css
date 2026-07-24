@@ -18,6 +18,10 @@
   --my-blue-500: #2563EB;  /* Solid Royal Blue (#2563EB - 1st image) */
   --my-blue-400: #3B82F6;  /* Vivid Royal Blue (#3B82F6 - 1st image) */
   --my-blue-300: #60A5FA;
+
+  /* Semantic UI Tokens for Contrast Compliance */
+  --my-brand-text: #60A5FA; /* Accessible blue on dark backgrounds */
+  --my-brand-border: #3B82F6;
 }
 
 :root[data-theme="light"] {
@@ -37,6 +41,10 @@
   --my-blue-500: #2563EB;
   --my-blue-400: #3B82F6;
   --my-blue-300: #60A5FA;
+
+  /* Semantic UI Tokens for Contrast Compliance */
+  --my-brand-text: #2563EB; /* Accessible blue on light backgrounds */
+  --my-brand-border: #1D4ED8;
 }
 
 @theme {
@@ -58,6 +66,9 @@
   --color-blue-500: var(--my-blue-500);
   --color-blue-400: var(--my-blue-400);
   --color-blue-300: var(--my-blue-300);
+
+  --color-brand-text: var(--my-brand-text);
+  --color-brand-border: var(--my-brand-border);
 
   --color-sky-400: #3B82F6;
   --color-sky-300: #60A5FA;

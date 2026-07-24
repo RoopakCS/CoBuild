@@ -47,17 +47,17 @@ export function Layout() {
           </div>
 
         {/* Middle: Centered Nav Links (Desktop) */}
-        <nav className="hidden md:flex flex-1 items-center justify-center gap-2 bg-slate-950/60 p-1.5 rounded-xl border border-slate-800/80">
+        <nav className="hidden md:flex flex-1 items-center justify-center gap-2">
           {navItems.map((item) => {
             const isActive = location.pathname === item.path;
             return (
               <Link
                 key={item.name}
                 to={item.path}
-                className={`flex items-center gap-2 px-4 py-1.5 rounded-lg text-sm font-bold transition-all duration-200 ${
+                className={`flex items-center gap-2 px-4 py-1.5 rounded-lg text-sm font-bold transition-all duration-200 border ${
                   isActive
-                    ? 'bg-slate-800 text-blue-500 border border-blue-600/60 shadow-none'
-                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/40'
+                    ? 'bg-slate-800 text-brand-text border-brand-border/60 shadow-none'
+                    : 'border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-800/40'
                 }`}
               >
                 {item.icon}
@@ -72,19 +72,19 @@ export function Layout() {
           <div className="hidden md:flex items-center gap-2 text-slate-400">
             <button 
               onClick={() => setTheme(t => t === 'dark' ? 'light' : 'dark')}
-              className="p-2 rounded-lg hover:text-blue-500 hover:bg-slate-800/60 transition-all duration-200 hover:scale-105 active:scale-95" 
+              className="flex h-9 w-9 items-center justify-center rounded-xl border border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-800/40 transition-all duration-200 hover:scale-105 active:scale-95" 
               title="Toggle Theme"
             >
               {theme === 'dark' ? <Sun size={19} weight="bold" /> : <Moon size={19} weight="bold" />}
             </button>
 
-            <button className="p-2 rounded-lg hover:text-blue-500 hover:bg-slate-800/60 transition-all duration-200 hover:scale-105" title="Notifications">
+            <button className="flex h-9 w-9 items-center justify-center rounded-xl border border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-800/40 transition-all duration-200 hover:scale-105 active:scale-95" title="Notifications">
               <Bell size={19} weight="bold" />
             </button>
             
             <Link 
               to="/projects/new" 
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold transition-all duration-300 shadow-none active:scale-95"
+              className="flex h-9 items-center gap-1.5 px-3.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold transition-all duration-300 shadow-none active:scale-95"
               title="Create Project"
             >
               <Plus size={16} weight="bold" />
@@ -95,17 +95,21 @@ export function Layout() {
           <div className="hidden md:flex items-center gap-3 border-l border-slate-800 pl-3">
             <Link
               to="/profile"
-              className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-800 text-blue-500 hover:bg-slate-700 transition-all duration-300 border border-blue-600/40 hover:scale-105 shadow-none"
+              className={`flex h-9 w-9 items-center justify-center rounded-xl transition-all duration-300 border hover:scale-105 shadow-none ${
+                location.pathname.startsWith('/profile')
+                  ? 'bg-slate-800 text-brand-text border-brand-border/60'
+                  : 'bg-transparent text-slate-400 border-transparent hover:text-slate-200 hover:bg-slate-800/40'
+              }`}
               title="Profile"
             >
-              <UserCircle size={22} weight="fill" />
+              <UserCircle size={22} weight={location.pathname.startsWith('/profile') ? "fill" : "bold"} />
             </Link>
           </div>
 
           {/* Mobile Menu Toggle */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden flex h-9 w-9 items-center justify-center rounded-xl border border-slate-700/50 bg-slate-800/60 text-slate-200 focus:outline-none backdrop-blur-md hover:border-blue-500/40 transition-colors"
+            className="md:hidden flex h-9 w-9 items-center justify-center rounded-xl border border-slate-700/50 bg-slate-800/60 text-slate-200 focus:outline-none backdrop-blur-md hover:border-brand-border/40 transition-colors"
             aria-label="Toggle menu"
           >
             {mobileMenuOpen ? <X size={20} weight="bold" /> : <List size={20} weight="bold" />}
@@ -127,10 +131,10 @@ export function Layout() {
                 <Link
                   key={item.name}
                   to={item.path}
-                  className={`flex items-center gap-4 rounded-xl px-4 py-3 text-sm font-bold transition-all ${
+                  className={`flex items-center gap-4 rounded-xl px-4 py-3 text-sm font-bold transition-all border ${
                     location.pathname === item.path
-                      ? 'bg-slate-800 text-blue-500 border border-blue-600/60 shadow-none'
-                      : 'text-slate-400 hover:bg-slate-800/40 hover:text-slate-100'
+                      ? 'bg-slate-800 text-brand-text border-brand-border/60 shadow-none'
+                      : 'border-transparent text-slate-400 hover:bg-slate-800/40 hover:text-slate-100'
                   }`}
                 >
                   {item.icon}
@@ -139,10 +143,10 @@ export function Layout() {
               ))}
               <Link
                 to="/profile"
-                className={`flex items-center gap-4 rounded-xl px-4 py-3 text-sm font-bold transition-all ${
-                  location.pathname === '/profile'
-                    ? 'bg-slate-800 text-blue-500 border border-blue-600/60 shadow-none'
-                    : 'text-slate-400 hover:bg-slate-800/40 hover:text-slate-100'
+                className={`flex items-center gap-4 rounded-xl px-4 py-3 text-sm font-bold transition-all border ${
+                  location.pathname.startsWith('/profile')
+                    ? 'bg-slate-800 text-brand-text border-brand-border/60 shadow-none'
+                    : 'border-transparent text-slate-400 hover:bg-slate-800/40 hover:text-slate-100'
                 }`}
               >
                 <UserCircle size={20} weight="duotone" />

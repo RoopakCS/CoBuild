@@ -42,7 +42,7 @@ export function ProfileTabs({ createdProjects = [], collaboratedProjects = [] })
             onClick={() => setActiveTab(tab.key)}
             className={`flex-1 min-w-0 text-sm font-bold py-2.5 px-4 rounded-xl transition-all whitespace-nowrap ${
               activeTab === tab.key
-                ? 'bg-slate-800 text-blue-500 border border-blue-600/60 shadow-none'
+                ? 'bg-slate-800 text-brand-text border border-brand-border/60 shadow-none'
                 : 'text-slate-400 hover:text-slate-200'
             }`}
           >
@@ -79,7 +79,7 @@ export function ProfileTabs({ createdProjects = [], collaboratedProjects = [] })
             <Link
               to={`/projects/${project.id}`}
               key={project.id}
-              className="group flex items-center justify-between rounded-xl border border-slate-700/50 bg-slate-900/30 p-4 sm:p-5 transition-all hover:border-blue-500/30 hover:bg-slate-900/50 hover:shadow-lg hover:shadow-blue-500/5"
+              className="group flex items-center justify-between rounded-xl border border-slate-700/50 bg-slate-900/30 p-4 sm:p-5 transition-all hover:border-brand-border/30 hover:bg-slate-900/50 hover:shadow-lg hover:shadow-brand-border/5"
             >
               <div className="flex-1 min-w-0 pr-4">
                 <div className="flex items-center gap-3 mb-1.5">
@@ -102,14 +102,14 @@ export function ProfileTabs({ createdProjects = [], collaboratedProjects = [] })
                 )}
                 <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500">
                   {project.domain && (
-                    <span className="font-medium px-2 py-0.5 rounded bg-slate-800 border border-slate-700/50">
+                    <span className="font-medium px-2.5 py-0.5 rounded-md bg-slate-800/50 text-slate-300">
                       {project.domain}
                     </span>
                   )}
                   {project.teamSize && <span>Team: {project.teamSize}</span>}
                 </div>
               </div>
-              <div className="flex items-center text-blue-500 text-sm font-bold gap-1 transition-transform group-hover:translate-x-1 shrink-0">
+              <div className="flex items-center text-brand-text text-sm font-bold gap-1 transition-transform group-hover:translate-x-1 shrink-0">
                 <CaretRight weight="bold" />
               </div>
             </Link>

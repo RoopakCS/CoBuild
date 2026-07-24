@@ -297,31 +297,6 @@ public class MembershipServiceImpl implements MembershipService {
                                 });
         }
 
-        @Override
-        @Transactional
-        public void rejectLeave(UUID membershipId, String message) {
-                // Find LEAVE_PENDING membership
-                Membership membership = membershipRepository
-                                .findByIdAndStatus(
-                                                membershipId,
-                                                MembershipStatus.LEAVE_PENDING)
-                                .orElseThrow(() -> new ResourceNotFoundException(
-                                                "Pending leave request not found"));
-
-                // Verify current user is owner
-                User currentUser = getCurrentUser();
-                if (!membership.getProject().getOwner().getId().equals(currentUser.getId())) {
-                        throw new ForbiddenException("Only the project owner can reject leave requests");
-                }
-
-                // Mark membership as ACTIVE
-                membership.setStatus(MembershipStatus.ACTIVE);
-                if (message != null) {
-                        membership.setStatusMessage(message);
-                }
-
-                membershipRepository.save(membership);
-        }
 
         @Override
         @Transactional

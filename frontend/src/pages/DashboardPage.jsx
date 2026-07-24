@@ -115,7 +115,7 @@ export function DashboardPage() {
           <div className="flex items-center justify-between mb-4 sm:mb-6">
             <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-100 font-display flex items-center gap-2">
               <span>Your Active Projects</span>
-              <span className="text-xs px-2.5 py-0.5 rounded-full bg-blue-600/15 text-blue-500 border border-blue-500/30 font-bold">
+              <span className="text-xs px-2.5 py-0.5 rounded-full bg-blue-600/15 text-brand-text border border-brand-border/30 font-bold">
                 {activeProjects.length}
               </span>
             </h2>
@@ -126,20 +126,20 @@ export function DashboardPage() {
               <Link 
                 to={`/projects/${project.id}`} 
                 key={project.id}
-                className="group flex flex-col sm:flex-row sm:items-center justify-between rounded-2xl border border-slate-800/80 bg-slate-900/50 p-5 sm:p-6 backdrop-blur-xl transition-all duration-300 hover:border-blue-500/40 hover:bg-slate-900/80 hover:shadow-md hover:-translate-y-0.5"
+                className="group flex flex-col sm:flex-row sm:items-center justify-between rounded-2xl border border-slate-800/80 bg-slate-900/50 p-5 sm:p-6 backdrop-blur-xl transition-all duration-300 hover:border-brand-border/40 hover:bg-slate-900/80 hover:shadow-md hover:-translate-y-0.5"
               >
                 <div className="flex-1 min-w-0 pr-4">
                   <div className="mb-2 flex items-center gap-3">
-                    <h3 className="font-bold text-xl text-slate-100 tracking-tight truncate group-hover:text-blue-500 transition-colors duration-300 font-display">{project.title}</h3>
-                    <span className="shrink-0 inline-flex rounded-full bg-blue-600/15 px-3 py-0.5 text-xs font-bold text-blue-500 border border-blue-500/30 uppercase tracking-wider">
+                    <h3 className="font-bold text-xl text-slate-100 tracking-tight truncate group-hover:text-brand-text transition-colors duration-300 font-display">{project.title}</h3>
+                    <span className="shrink-0 inline-flex rounded-full bg-blue-600/15 px-3 py-0.5 text-xs font-bold text-brand-text border border-brand-border/30 uppercase tracking-wider">
                       {project.myRole}
                     </span>
                   </div>
                   <p className="text-sm font-medium text-slate-400 line-clamp-2 mb-4 leading-relaxed">{project.description}</p>
                   <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mb-4 text-xs font-medium text-slate-400">
-                    <div className="flex items-center gap-1.5"><span className="text-slate-500 font-bold uppercase tracking-wider">Owner:</span><span className="text-slate-300 font-semibold">{project.ownerName || (project.myRole === 'Owner' ? 'You' : 'Unknown')}</span></div>
-                    {project.domain && <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-slate-950/60 border border-slate-800 text-slate-300">{project.domain}</div>}
-                    {project.commitment && <div className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-blue-500/60"></span>{project.commitment}</div>}
+                    <div className="flex items-center gap-1.5"><span className="text-slate-500 font-semibold">Owner:</span><span className="text-slate-300 font-semibold">{project.ownerName || (project.myRole === 'Owner' ? 'You' : 'Unknown')}</span></div>
+                    {project.domain && <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-slate-800/50 text-slate-300">{project.domain}</div>}
+                    {project.commitment && <div className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-brand-border/60"></span>{project.commitment}</div>}
                     {project.experienceLevel && <div className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-slate-600"></span>{project.experienceLevel}</div>}
                     {project.teamSize && <div className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-slate-600"></span>Team: {project.teamSize}</div>}
                   </div>
@@ -155,7 +155,7 @@ export function DashboardPage() {
                   )}
                 </div>
                 <div className="mt-4 sm:mt-0 flex items-center justify-between sm:justify-center gap-3 shrink-0 sm:border-l sm:border-slate-800/80 sm:pl-6 sm:h-full">
-                  <div className="flex items-center text-blue-500 font-bold text-sm gap-1.5 transition-all duration-300 group-hover:translate-x-1.5">
+                  <div className="flex items-center text-brand-text font-bold text-sm gap-1.5 transition-all duration-300 group-hover:translate-x-1.5">
                     View Project <CaretRight weight="bold" size={16} />
                   </div>
                 </div>
@@ -200,20 +200,20 @@ export function DashboardPage() {
                 <Link 
                   to={`/projects/${project.id}`} 
                   key={project.id}
-                  className="group flex flex-col sm:flex-row sm:items-center justify-between rounded-2xl border border-slate-800/80 bg-slate-900/40 p-5 sm:p-6 backdrop-blur-xl transition-all duration-300 hover:border-blue-500/40 hover:bg-slate-900/70 hover:shadow-md hover:-translate-y-0.5"
+                  className="group flex flex-col sm:flex-row sm:items-center justify-between rounded-2xl border border-slate-800/80 bg-slate-900/40 p-5 sm:p-6 backdrop-blur-xl transition-all duration-300 hover:border-brand-border/40 hover:bg-slate-900/70 hover:shadow-md hover:-translate-y-0.5"
                 >
                   <div className="flex-1 min-w-0 pr-4">
                     <div className="mb-2 flex items-center gap-3">
-                      <h3 className="font-bold text-xl text-slate-100 tracking-tight truncate group-hover:text-blue-500 transition-colors duration-300 font-display">{project.title}</h3>
-                      <span className="shrink-0 inline-flex rounded-full bg-blue-600/15 px-3 py-0.5 text-xs font-bold text-blue-500 border border-blue-500/30">
+                      <h3 className="font-bold text-xl text-slate-100 tracking-tight truncate group-hover:text-brand-text transition-colors duration-300 font-display">{project.title}</h3>
+                      <span className="shrink-0 inline-flex rounded-full bg-blue-600/15 px-3 py-0.5 text-xs font-bold text-brand-text border border-brand-border/30">
                         {project.status || 'ACTIVE'}
                       </span>
                     </div>
                     <p className="text-sm font-medium text-slate-400 line-clamp-2 mb-4 leading-relaxed">{project.description}</p>
                     <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mb-4 text-xs font-medium text-slate-400">
-                      <div className="flex items-center gap-1.5"><span className="text-slate-500 font-bold uppercase tracking-wider">Owner:</span><span className="text-slate-300 font-semibold">{project.ownerName || 'Unknown'}</span></div>
-                      {project.domain && <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-slate-950/60 border border-slate-800 text-slate-300">{project.domain}</div>}
-                      {project.commitment && <div className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-slate-600"></span>{project.commitment}</div>}
+                      <div className="flex items-center gap-1.5"><span className="text-slate-500 font-semibold">Owner:</span><span className="text-slate-300 font-semibold">{project.ownerName || 'Unknown'}</span></div>
+                      {project.domain && <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-slate-800/50 text-slate-300">{project.domain}</div>}
+                      {project.commitment && <div className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-brand-border/60"></span>{project.commitment}</div>}
                       {project.experienceLevel && <div className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-slate-600"></span>{project.experienceLevel}</div>}
                       {project.teamSize && <div className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-slate-600"></span>Team: {project.teamSize}</div>}
                     </div>
@@ -229,7 +229,7 @@ export function DashboardPage() {
                     )}
                   </div>
                   <div className="mt-4 sm:mt-0 flex items-center justify-between sm:justify-center gap-3 shrink-0 sm:border-l sm:border-slate-800/80 sm:pl-6 sm:h-full">
-                    <div className="flex items-center text-blue-500 font-bold text-sm gap-1 transition-all duration-300 group-hover:translate-x-1.5">
+                    <div className="flex items-center text-brand-text font-bold text-sm gap-1 transition-all duration-300 group-hover:translate-x-1.5">
                       Explore <CaretRight weight="bold" size={16} />
                     </div>
                   </div>
