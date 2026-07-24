@@ -87,6 +87,9 @@ public class ProjectRoleServiceImpl implements ProjectRoleService {
             role.setDescription(request.getDescription());
         }
         if (request.getOpeningsCount() != null) {
+            if (request.getOpeningsCount() < 1) {
+                throw new IllegalArgumentException("openingsCount must be at least 1");
+            }
             if (request.getOpeningsCount() < role.getFilledCount()) {
                 throw new IllegalArgumentException(
                         "openingsCount cannot be less than current filledCount (" + role.getFilledCount() + ")");

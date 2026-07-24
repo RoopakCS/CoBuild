@@ -105,14 +105,17 @@ export function RoleList({ roles = [], isOwner, projectId, onApplyClick, canAppl
                 {/* Skills */}
                 {role.skills && role.skills.length > 0 && (
                   <div className="flex flex-wrap gap-1.5 mb-4">
-                    {role.skills.map((skill) => (
-                      <span
-                        key={skill}
-                        className="text-[11px] font-semibold bg-slate-950/70 border border-slate-800 text-slate-300 px-2.5 py-1 rounded-lg"
-                      >
-                        {skill}
-                      </span>
-                    ))}
+                    {role.skills.map((skill, idx) => {
+                      const skillName = typeof skill === 'string' ? skill : (skill.skillName || skill.name || String(skill));
+                      return (
+                        <span
+                          key={skillName || idx}
+                          className="text-[11px] font-semibold bg-slate-950/70 border border-slate-800 text-slate-300 px-2.5 py-1 rounded-lg"
+                        >
+                          {skillName}
+                        </span>
+                      );
+                    })}
                   </div>
                 )}
 

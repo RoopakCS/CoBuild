@@ -74,7 +74,11 @@ export function RoleFormModal({ isOpen, onClose, projectId, existingRole }) {
     const newErrors = {};
     if (!title.trim()) newErrors.title = 'Title is required';
     if (title.length > 255) newErrors.title = 'Title must be at most 255 characters';
-    if (!openingsCount || openingsCount < 1) newErrors.openingsCount = 'Must be at least 1';
+    if (!openingsCount || openingsCount < 1) {
+      newErrors.openingsCount = 'Must be at least 1';
+    } else if (existingRole && openingsCount < (existingRole.filledCount || 0)) {
+      newErrors.openingsCount = `Cannot be less than filled count (${existingRole.filledCount})`;
+    }
     if (description.length > 5000) newErrors.description = 'Must be at most 5000 characters';
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;

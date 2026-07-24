@@ -93,6 +93,7 @@ class ProjectRoleServiceImplTest {
 
             CreateRoleRequest request = new CreateRoleRequest();
             request.setTitle("Frontend Dev");
+            request.setDescription("Build UI components");
             request.setOpeningsCount(3);
 
             when(projectRepository.findById(project.getId())).thenReturn(Optional.of(project));
@@ -106,6 +107,7 @@ class ProjectRoleServiceImplTest {
             ProjectRoleResponse response = service.createRole(project.getId(), request);
 
             assertThat(response.getTitle()).isEqualTo("Frontend Dev");
+            assertThat(response.getDescription()).isEqualTo("Build UI components");
             assertThat(response.getOpeningsCount()).isEqualTo(3);
             assertThat(response.getFilledCount()).isEqualTo(0);
             assertThat(response.isFull()).isFalse();
@@ -312,6 +314,49 @@ class ProjectRoleServiceImplTest {
             assertThatThrownBy(() -> service.updateRole(project.getId(), role.getId(), request))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessageContaining("filledCount");
+        }
+
+        @Test
+        @DisplayName("throws IllegalArgumentException when openingsCount < 1")
+        void updateRole_invalidOpeningsCountZeroOrNegative() {
+            authenticateAs(owner);
+
+            when(projectRoleRepository.findById(role.getId())).thenReturn(Optional.of(role));
+
+            UpdateRoleRequest request = new UpdateRoleRequest();
+            request.setOpeningsCount(0);
+
+            assertThatThrownBy(() -> service.updateRole(project.getId(), role.getId(), request))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("must be at least 1");
+        }
+
+        @Test
+        @DisplayName("updating openingsCount preserves existing applications and memberships")
+        void updateRole_validOpeningsCountUpdatePreservesApplicationsAndMemberships() {
+            authenticateAs(owner);
+
+            ProjectApplication existingApp = new ProjectApplication();
+            existingApp.setId(UUID.randomUUID());
+            existingApp.setStatus(ApplicationStatus.PENDING);
+            existingApp.setRole(role);
+
+            role.setApplications(List.of(existingApp));
+            role.setFilledCount(1);
+            role.setOpeningsCount(2);
+
+            when(projectRoleRepository.findById(role.getId())).thenReturn(Optional.of(role));
+            when(projectRoleRepository.save(any(ProjectRole.class))).thenAnswer(inv -> inv.getArgument(0));
+
+            UpdateRoleRequest request = new UpdateRoleRequest();
+            request.setOpeningsCount(5);
+
+            ProjectRoleResponse response = service.updateRole(project.getId(), role.getId(), request);
+
+            assertThat(response.getOpeningsCount()).isEqualTo(5);
+            assertThat(role.getApplications()).hasSize(1);
+            assertThat(role.getApplications().get(0).getId()).isEqualTo(existingApp.getId());
+            verify(projectRoleRepository).save(role);
         }
     }
 }
