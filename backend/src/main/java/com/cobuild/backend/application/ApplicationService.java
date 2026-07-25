@@ -22,11 +22,13 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
+@Slf4j
 public class ApplicationService {
         private final ApplicationRepository applicationRepository;
         private final UserRepository userRepository;
@@ -42,6 +44,7 @@ public class ApplicationService {
                                 .orElseThrow(() -> new ResourceNotFoundException("Project not found"));
 
                 if (project.getStatus() != ProjectStatus.OPEN) {
+                        log.warn("User {} attempted to apply to project {} but project status is {}", applicantEmail, projectId, project.getStatus());
                         throw new BadRequestException("This project is not accepting applications");
                 }
 
@@ -66,6 +69,7 @@ public class ApplicationService {
                 UUID applicantId = applicant.getId();
 
                 if (project.getOwner().getId().equals(applicantId)) {
+                        log.warn("User {} attempted to apply to their own project {}", applicantEmail, projectId);
                         throw new BadRequestException("You cannot apply to your own project");
                 }
 
@@ -96,6 +100,8 @@ public class ApplicationService {
 
                 ProjectApplication savedApplication = applicationRepository.save(application);
 
+                log.info("User {} successfully applied to project {} for role {}", applicantEmail, projectId, role.getTitle());
+
                 return mapToResponse(savedApplication);
         }
 
@@ -125,7 +131,7 @@ public class ApplicationService {
                                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
                 if (!project.getOwner().getId().equals(user.getId())) {
-
+                        log.warn("User {} attempted to view applications for project {} without authorization", userEmail, projectId);
                         throw new ForbiddenException("You are not authorized to view applications for this project");
                 }
 
@@ -177,7 +183,8 @@ public class ApplicationService {
                                 .getOwner()
                                 .getId()
                                 .equals(user.getId())) {
-
+                        
+                        log.warn("User {} attempted to update application {} but is not the project owner", userEmail, applicationId);
                         throw new ForbiddenException(
                                         "You are not authorized to update this application");
                 }
@@ -263,6 +270,8 @@ public class ApplicationService {
 
                 ProjectApplication savedApplication = applicationRepository.save(application);
 
+                log.info("User {} successfully {} application {} for project {}", userEmail, newStatus, applicationId, application.getProject().getId());
+
                 return mapToResponse(savedApplication);
         }
 
@@ -285,7 +294,8 @@ public class ApplicationService {
                                 .getApplicant()
                                 .getId()
                                 .equals(user.getId())) {
-
+                        
+                        log.warn("User {} attempted to withdraw application {} but is not the applicant", userEmail, applicationId);
                         throw new ForbiddenException(
                                         "You are not authorized to withdraw this application");
                 }
@@ -302,6 +312,8 @@ public class ApplicationService {
                                 ApplicationStatus.WITHDRAWN);
 
                 ProjectApplication savedApplication = applicationRepository.save(application);
+                
+                log.info("User {} successfully withdrew application {}", userEmail, applicationId);
 
                 return mapToResponse(savedApplication);
         }

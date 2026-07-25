@@ -3,6 +3,9 @@ package com.cobuild.backend.application;
 import com.cobuild.backend.application.dto.response.ApplicationResponse;
 import com.cobuild.backend.application.dto.request.CreateApplicationRequest;
 import com.cobuild.backend.application.dto.request.UpdateApplicationStatusRequest;
+import com.cobuild.backend.security.RateLimitingService;
+import com.cobuild.backend.exception.TooManyRequestsException;
+import io.github.bucket4j.Bucket;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
@@ -23,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class ApplicationController {
     private final ApplicationService applicationService;
+    private final RateLimitingService rateLimitingService;
 
     // To create an appplication
     @PostMapping("/projects/{projectId}/applications")
@@ -30,6 +34,12 @@ public class ApplicationController {
             @PathVariable UUID projectId,
             @Valid @RequestBody CreateApplicationRequest request,
             Authentication authentication) {
+            
+        Bucket bucket = rateLimitingService.resolveBucket(authentication.getName());
+        if (!bucket.tryConsume(1)) {
+            throw new TooManyRequestsException("You have exceeded the maximum number of applications allowed per minute.");
+        }
+            
         ApplicationResponse response = applicationService.apply(projectId, authentication.getName(), request);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);

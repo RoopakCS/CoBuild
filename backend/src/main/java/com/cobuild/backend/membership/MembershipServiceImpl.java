@@ -24,10 +24,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
+@Slf4j
 public class MembershipServiceImpl implements MembershipService {
 
         private final MembershipRepository membershipRepository;
@@ -46,6 +48,7 @@ public class MembershipServiceImpl implements MembershipService {
                 User currentUser = getCurrentUser();
 
                 if (!project.getOwner().getId().equals(currentUser.getId())) {
+                        log.warn("User {} attempted to add member to project {} but is not the owner", currentUser.getEmail(), project.getId());
                         throw new ForbiddenException(
                                         "Only the project owner can add members");
                 }
@@ -65,7 +68,11 @@ public class MembershipServiceImpl implements MembershipService {
                                 .status(MembershipStatus.ACTIVE)
                                 .build();
 
-                return mapToResponse(membershipRepository.save(membership));
+                Membership savedMembership = membershipRepository.save(membership);
+                
+                log.info("User {} added user {} to project {} as MEMBER", currentUser.getEmail(), user.getEmail(), project.getId());
+
+                return mapToResponse(savedMembership);
         }
 
         @Override
@@ -114,13 +121,13 @@ public class MembershipServiceImpl implements MembershipService {
                                 .orElseThrow(() -> new ResourceNotFoundException(
                                                 "User not found"));
 
-                // Only project owner can remove members
                 if (!membership
                                 .getProject()
                                 .getOwner()
                                 .getId()
                                 .equals(authenticatedUser.getId())) {
-
+                        
+                        log.warn("User {} attempted to remove user {} from project {} but is not the owner", ownerEmail, userId, projectId);
                         throw new ForbiddenException(
                                         "You are not authorized to remove members from this project");
                 }
@@ -167,6 +174,8 @@ public class MembershipServiceImpl implements MembershipService {
                                         app.setStatus(ApplicationStatus.REJECTED);
                                         applicationRepository.save(app);
                                 });
+                                
+                log.info("User {} successfully removed user {} from project {}", ownerEmail, userId, projectId);
         }
 
         private User getCurrentUser() {
@@ -230,9 +239,8 @@ public class MembershipServiceImpl implements MembershipService {
                                 .orElseThrow(() -> new ResourceNotFoundException(
                                                 "User not found"));
 
-                // Only the member themselves can leave
                 if (!membership.getUser().getId().equals(user.getId())) {
-
+                        log.warn("User {} attempted to leave project {} but is not the member", userEmail, membership.getProject().getId());
                         throw new ForbiddenException(
                                         "You cannot leave this membership");
                 }
@@ -249,6 +257,8 @@ public class MembershipServiceImpl implements MembershipService {
                 membership.setStatusMessage(message);
 
                 membershipRepository.save(membership);
+                
+                log.info("User {} initiated leave process for project {}", userEmail, membership.getProject().getId());
         }
 
         @Override
@@ -262,9 +272,9 @@ public class MembershipServiceImpl implements MembershipService {
                                 .orElseThrow(() -> new ResourceNotFoundException(
                                                 "Pending leave request not found"));
 
-                // Verify current user is owner
                 User currentUser = getCurrentUser();
                 if (!membership.getProject().getOwner().getId().equals(currentUser.getId())) {
+                        log.warn("User {} attempted to approve leave for membership {} but is not the project owner", currentUser.getEmail(), membershipId);
                         throw new ForbiddenException("Only the project owner can approve leave requests");
                 }
 
@@ -295,6 +305,8 @@ public class MembershipServiceImpl implements MembershipService {
                                         app.setStatus(ApplicationStatus.WITHDRAWN);
                                         applicationRepository.save(app);
                                 });
+                                
+                log.info("User {} approved leave request for membership {}", currentUser.getEmail(), membershipId);
         }
 
 
@@ -309,9 +321,9 @@ public class MembershipServiceImpl implements MembershipService {
                                 .orElseThrow(() -> new ResourceNotFoundException(
                                                 "Pending leave request not found"));
 
-                // Verify current user is owner
                 User currentUser = getCurrentUser();
                 if (!membership.getProject().getOwner().getId().equals(currentUser.getId())) {
+                        log.warn("User {} attempted to reject leave for membership {} but is not the project owner", currentUser.getEmail(), membershipId);
                         throw new ForbiddenException("Only the project owner can reject leave requests");
                 }
 
@@ -322,6 +334,8 @@ public class MembershipServiceImpl implements MembershipService {
                 }
 
                 membershipRepository.save(membership);
+                
+                log.info("User {} rejected leave request for membership {}", currentUser.getEmail(), membershipId);
         }
 
         @Override
@@ -341,6 +355,7 @@ public class MembershipServiceImpl implements MembershipService {
 
                 // Verify the requester is actually the current owner
                 if (!project.getOwner().getId().equals(currentOwner.getId())) {
+                        log.warn("User {} attempted to transfer ownership of project {} but is not the owner", currentOwnerEmail, projectId);
                         throw new ForbiddenException(
                                         "Only the project owner can transfer ownership");
                 }
@@ -383,5 +398,7 @@ public class MembershipServiceImpl implements MembershipService {
 
                 project.setOwner(newOwner);
                 projectRepository.save(project);
+                
+                log.info("User {} successfully transferred ownership of project {} to user {}", currentOwnerEmail, projectId, newOwner.getEmail());
         }
 }
