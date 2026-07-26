@@ -5,16 +5,19 @@ import { projectsApi } from '../api/projects';
 import { usersApi } from '../api/users';
 import { membershipsApi } from '../api/memberships';
 import { applicationsApi } from '../api/applications';
-import { ProjectFilterBar } from '../components/project/ProjectFilterBar';
+import { useSearchParams } from 'react-router-dom';
+import { ProjectFilters } from '../components/project/ProjectFilters';
 import { ProjectCard } from '../components/project/ProjectCard';
 
 export function MyProjectsPage() {
   const [activeTab, setActiveTab] = useState('owned');
-  const [filterParams, setFilterParams] = useState({});
+  const [searchParams] = useSearchParams();
 
-  const handleFilterChange = useCallback((params) => {
-    setFilterParams(params);
-  }, []);
+  const search = searchParams.get('search');
+  const domain = searchParams.get('domain');
+  const experienceLevel = searchParams.get('experienceLevel');
+  const status = searchParams.get('status');
+  const skills = searchParams.get('skills');
   
   const { data: user } = useQuery({ queryKey: ['users', 'me'], queryFn: usersApi.getMe });
   
@@ -42,39 +45,37 @@ export function MyProjectsPage() {
 
   const filteredOwnedProjects = useMemo(() => {
     return ownedProjects.filter(p => {
-      if (filterParams.search && !p.title?.toLowerCase().includes(filterParams.search.toLowerCase())) return false;
-      if (filterParams.status && p.status !== filterParams.status) return false;
-      if (filterParams.domain && p.domain !== filterParams.domain) return false;
-      if (filterParams.experienceLevel && p.experienceLevel !== filterParams.experienceLevel) return false;
-      if (filterParams.skills) {
-        const selectedSkills = filterParams.skills.split(',').filter(Boolean);
+      if (search && !p.title?.toLowerCase().includes(search.toLowerCase())) return false;
+      if (status && p.status !== status) return false;
+      if (domain && p.domain !== domain) return false;
+      if (experienceLevel && p.experienceLevel !== experienceLevel) return false;
+      if (skills) {
+        const selectedSkills = skills.split(',').filter(Boolean);
         if (selectedSkills.length > 0 && (!p.skills || !selectedSkills.some(s => p.skills.includes(s)))) return false;
       }
       return true;
     });
-  }, [ownedProjects, filterParams]);
+  }, [ownedProjects, search, status, domain, experienceLevel, skills]);
 
   const filteredMemberships = useMemo(() => {
     return memberships.filter(m => {
-      if (filterParams.search && !m.projectTitle?.toLowerCase().includes(filterParams.search.toLowerCase())) return false;
+      if (search && !m.projectTitle?.toLowerCase().includes(search.toLowerCase())) return false;
       return true;
     });
-  }, [memberships, filterParams]);
+  }, [memberships, search]);
 
   const filteredApplications = useMemo(() => {
     return applications.filter(a => {
-      if (filterParams.search && !a.projectTitle?.toLowerCase().includes(filterParams.search.toLowerCase())) return false;
+      if (search && !a.projectTitle?.toLowerCase().includes(search.toLowerCase())) return false;
       return true;
     });
-  }, [applications, filterParams]);
+  }, [applications, search]);
 
   return (
-    <div className="pb-16 flex flex-col md:flex-row gap-8">
-      {/* Sidebar */}
-      <ProjectFilterBar onFilterChange={handleFilterChange} />
+    <div className="pb-16 flex flex-col gap-8">
       
       {/* Main Content */}
-      <div className="flex-grow">
+      <div className="flex-grow w-full">
       {/* Page Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
         <div>
@@ -107,13 +108,15 @@ export function MyProjectsPage() {
         </div>
       </div>
 
+      <ProjectFilters />
+
       {/* Owned Projects Section */}
       {activeTab === 'owned' && (
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 animate-fade-in">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 animate-fade-in">
           
           {isLoadingOwned ? (
             <>
-              {[1, 2].map(i => (
+              {[1, 2, 3].map(i => (
                 <div key={i} className="skeleton h-64"></div>
               ))}
             </>

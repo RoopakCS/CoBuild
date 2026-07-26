@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { usersApi } from '../api/users';
 import { applicationsApi } from '../api/applications';
 import { skillsApi } from '../api/skills';
-import { SignOut, PencilSimple, Code, Link as LinkIcon, ClipboardText, UserCircle, MapPin, X } from '@phosphor-icons/react';
+import { SignOut, PencilSimple, Code, Link as LinkIcon, ClipboardText, UserCircle, EnvelopeSimple, X } from '@phosphor-icons/react';
 
 export function ProfilePage() {
   const queryClient = useQueryClient();
@@ -66,18 +66,16 @@ export function ProfilePage() {
       {/* Header Section */}
       <section className="mb-6">
         <div className="surface-1 rounded-lg p-6 sm:p-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-          <div className="flex items-center gap-6">
-            <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-md overflow-hidden bg-primary border-2 border-border-subtle flex-shrink-0 flex items-center justify-center">
-               <span className="text-surface font-bold text-[28px] sm:text-[32px] tracking-tight">{user.name ? user.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) : '?'}</span>
+          <div className="flex items-center gap-4 sm:gap-6 min-w-0 w-full md:w-auto">
+            <div className="w-16 h-16 sm:w-24 sm:h-24 rounded-md overflow-hidden bg-primary border-2 border-border-subtle flex-shrink-0 flex items-center justify-center">
+               <span className="text-surface font-bold text-[24px] sm:text-[32px] tracking-tight">{user.name ? user.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) : '?'}</span>
             </div>
-            <div>
-              <h1 className="headline-lg text-primary">{user.name}</h1>
-              <div className="flex gap-4 mt-3">
-                <span className="flex items-center gap-1.5 text-text-muted body-sm">
-                  <MapPin size={16} /> Remote
-                </span>
-                <span className="flex items-center gap-1.5 text-text-muted body-sm">
-                   <LinkIcon size={16} /> {user.email}
+            <div className="min-w-0 flex-1">
+              <h1 className="headline-lg text-primary truncate">{user.name}</h1>
+              <div className="flex mt-2 min-w-0">
+                <span className="flex items-center gap-2 text-text-muted body-sm min-w-0 w-full" title={user.email}>
+                   <EnvelopeSimple size={16} className="shrink-0" /> 
+                   <span className="truncate">{user.email}</span>
                 </span>
               </div>
             </div>

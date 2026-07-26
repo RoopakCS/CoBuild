@@ -1,11 +1,15 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, Navigate } from 'react-router-dom';
 import { authApi } from '../api/auth';
 import { Terminal, EnvelopeSimple, Lock, Eye, EyeSlash, ArrowRight } from '@phosphor-icons/react';
 
 export function AuthPage({ mode }) {
   const navigate = useNavigate();
   const isLogin = mode === 'login';
+  
+  if (localStorage.getItem('token')) {
+    return <Navigate to="/discover" replace />;
+  }
   
   const [formData, setFormData] = useState({ name: '', email: '', password: '' });
   const [error, setError] = useState('');
@@ -23,7 +27,7 @@ export function AuthPage({ mode }) {
         : await authApi.register(formData);
       
       localStorage.setItem('token', data.token);
-      navigate('/');
+      navigate('/discover');
     } catch (err) {
       setError(err.response?.data?.message || err.message || 'Authentication failed');
     } finally {
@@ -41,9 +45,6 @@ export function AuthPage({ mode }) {
         
         {/* Brand Identity */}
         <div className="flex flex-col items-center mb-10 text-center">
-          <div className="w-12 h-12 bg-primary rounded-md flex items-center justify-center mb-4 text-surface">
-            <Terminal size={28} weight="fill" />
-          </div>
           <h1 className="headline-xl text-primary tracking-tight">CoBuild</h1>
           <p className="body-md text-text-muted mt-2">Precision-built for developers.</p>
         </div>

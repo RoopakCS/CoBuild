@@ -1,5 +1,21 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: 'Satoshi';
+  src: url('/Fonts/WEB/fonts/Satoshi-Variable.woff2') format('woff2');
+  font-weight: 300 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Satoshi';
+  src: url('/Fonts/WEB/fonts/Satoshi-VariableItalic.woff2') format('woff2');
+  font-weight: 300 900;
+  font-style: italic;
+  font-display: swap;
+}
+
 :root {
   /* CoBuild MVP Product Design System */
   
@@ -20,7 +36,7 @@
 }
 
 @theme {
-  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-sans: 'Satoshi', system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
 
   /* Map standard tailwind colors to design system tokens */
@@ -235,7 +251,7 @@ button:focus-visible {
   --normal-bg: var(--color-surface);
   --normal-border: var(--color-border-subtle);
   --normal-text: var(--color-primary);
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: var(--font-sans);
   border-radius: 6px;
   border: 1px solid var(--color-border-subtle);
   box-shadow: 0px 4px 12px rgba(0,0,0,0.05);

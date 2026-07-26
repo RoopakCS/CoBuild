@@ -12,7 +12,7 @@ export function Layout() {
   }, [location.pathname]);
 
   const navItems = [
-    { name: 'Discover', path: '/' },
+    { name: 'Discover', path: '/discover' },
     { name: 'My Projects', path: '/my-projects' },
     { name: 'Profile', path: '/profile' },
   ];
