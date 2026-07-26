@@ -1,6 +1,5 @@
 package com.cobuild.backend.project;
 
-import com.cobuild.backend.project.Project;
 import com.cobuild.backend.project.dto.response.ProjectResponse;
 import com.cobuild.backend.project.dto.response.ProjectRoleResponse;
 import com.cobuild.backend.role.RoleSkill;

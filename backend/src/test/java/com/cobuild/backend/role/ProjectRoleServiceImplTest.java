@@ -11,7 +11,6 @@ import com.cobuild.backend.role.dto.request.UpdateRoleRequest;
 import com.cobuild.backend.role.dto.response.ProjectRoleResponse;
 import com.cobuild.backend.security.user.UserPrincipal;
 import com.cobuild.backend.user.User;
-import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
