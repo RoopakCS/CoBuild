@@ -9,4 +9,8 @@ export const authApi = {
     const { data } = await apiClient.post('/auth/register', credentials);
     return data;
   },
+  sendCode: async (email, code) => {
+    const { data } = await apiClient.post('/auth/send-code', { email, code });
+    return data;
+  },
 };

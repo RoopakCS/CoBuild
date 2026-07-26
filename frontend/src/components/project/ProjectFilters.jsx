@@ -8,7 +8,11 @@ const DOMAINS = [
   'IoT', 'Cloud Computing', 'Other',
 ];
 
-const STATUSES = ['OPEN', 'CLOSED', 'IN_PROGRESS'];
+const STATUSES = [
+  { value: 'OPEN', label: 'Open' },
+  { value: 'CLOSED', label: 'Closed' },
+  { value: 'IN_PROGRESS', label: 'In Progress' },
+];
 
 const EXPERIENCE_LEVELS = [
   { value: 'BEGINNER', label: 'Beginner' },
@@ -128,16 +132,16 @@ export function ProjectFilters() {
               <h3 className="label-mono uppercase text-text-muted">Status</h3>
               <div className="space-y-2">
                 {STATUSES.map(s => (
-                  <label key={s} className="flex items-center gap-3 group cursor-pointer w-fit">
+                  <label key={s.value} className="flex items-center gap-3 group cursor-pointer w-fit">
                     <input 
                       type="radio"
                       name="status"
                       className="w-4 h-4 border-border-subtle text-primary focus:ring-primary"
-                      checked={status === s}
-                      onChange={() => setStatus(s)}
+                      checked={status === s.value}
+                      onChange={() => setStatus(s.value)}
                     />
                     <span className="body-md text-primary group-hover:text-primary transition-colors">
-                      {s.replace('_', ' ')}
+                      {s.label}
                     </span>
                   </label>
                 ))}
