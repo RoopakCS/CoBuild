@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { authApi } from '../api/auth';
+import { Terminal, EnvelopeSimple, Lock, Eye, EyeSlash, ArrowRight } from '@phosphor-icons/react';
 
 export function AuthPage({ mode }) {
   const navigate = useNavigate();
@@ -9,6 +10,7 @@ export function AuthPage({ mode }) {
   const [formData, setFormData] = useState({ name: '', email: '', password: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -29,83 +31,116 @@ export function AuthPage({ mode }) {
     }
   };
 
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-950 p-4 sm:p-6 font-sans text-slate-100 relative overflow-hidden selection:bg-blue-500/30 selection:text-blue-200">
-      {/* Background ambient lighting */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-1/4 left-1/3 w-80 h-80 bg-sky-500/5 rounded-full blur-3xl pointer-events-none" />
+  const inputClass = "w-full pl-10 pr-10 py-3 bg-surface border border-border-subtle rounded-md body-md text-primary placeholder:text-text-muted focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary transition-all";
 
-      <div className="w-full max-w-md rounded-3xl border border-slate-800/90 bg-slate-900/60 p-6 sm:p-10 shadow-2xl backdrop-blur-2xl relative z-10 animate-fade-in">
-        <div className="mb-6 sm:mb-8 text-center">
-          <div className="mb-4 flex justify-center">
-            <span className="text-3xl font-extrabold tracking-tight text-slate-100 font-display">CoBuild</span>
+  return (
+    <div className="min-h-screen flex items-center justify-center p-4 bg-surface-dim selection:bg-primary selection:text-surface">
+      
+      {/* Main Content Container */}
+      <main className="relative z-10 w-full max-w-[420px] animate-fade-in">
+        
+        {/* Brand Identity */}
+        <div className="flex flex-col items-center mb-10 text-center">
+          <div className="w-12 h-12 bg-primary rounded-md flex items-center justify-center mb-4 text-surface">
+            <Terminal size={28} weight="fill" />
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-100 font-display">
-            {isLogin ? 'Welcome back' : 'Create account'}
-          </h1>
-          <p className="mt-2 text-xs sm:text-sm text-slate-400 font-medium leading-relaxed">
-            {isLogin ? 'Enter your credentials to access your workspace.' : 'Sign up to start discovering and building together.'}
-          </p>
+          <h1 className="headline-xl text-primary tracking-tight">CoBuild</h1>
+          <p className="body-md text-text-muted mt-2">Precision-built for developers.</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
-          {!isLogin && (
-            <div className="space-y-1.5">
-              <label className="text-[11px] font-extrabold tracking-wider uppercase text-slate-300">Name</label>
-              <input 
-                type="text" 
-                required
-                className="w-full rounded-2xl bg-slate-950/70 border border-slate-800 px-4 py-3.5 text-sm text-slate-100 placeholder:text-slate-600 focus:border-blue-500/50 focus:outline-none focus:ring-4 focus:ring-blue-500/10 transition-all font-medium"
-                value={formData.name} 
-                onChange={e => setFormData({ ...formData, name: e.target.value })} 
-                placeholder="Jane Doe"
-              />
+        {/* Auth Card */}
+        <div className="surface-1 rounded-lg p-8 shadow-sm">
+          <div className="mb-8">
+            <h2 className="headline-lg text-primary">{isLogin ? 'Welcome back' : 'Create account'}</h2>
+            <p className="body-sm text-text-muted mt-1">
+              {isLogin ? 'Build your next team today.' : 'Start discovering and building together.'}
+            </p>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {!isLogin && (
+              <div className="space-y-2">
+                <label className="block label-mono text-text-muted uppercase">Name</label>
+                <div className="relative">
+                  <Terminal className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted" size={18} />
+                  <input 
+                    type="text" 
+                    required
+                    className={inputClass}
+                    value={formData.name} 
+                    onChange={e => setFormData({ ...formData, name: e.target.value })} 
+                    placeholder="Jane Doe"
+                  />
+                </div>
+              </div>
+            )}
+            
+            <div className="space-y-2">
+              <label className="block label-mono text-text-muted uppercase">Email Address</label>
+              <div className="relative">
+                <EnvelopeSimple className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted" size={18} />
+                <input 
+                  type="email" 
+                  required
+                  className={inputClass}
+                  value={formData.email} 
+                  onChange={e => setFormData({ ...formData, email: e.target.value })} 
+                  placeholder="name@company.com"
+                />
+              </div>
             </div>
-          )}
-          <div className="space-y-1.5">
-            <label className="text-[11px] font-extrabold tracking-wider uppercase text-slate-300">Email Address</label>
-            <input 
-              type="email" 
-              required
-              className="w-full rounded-2xl bg-slate-950/70 border border-slate-800 px-4 py-3.5 text-sm text-slate-100 placeholder:text-slate-600 focus:border-blue-500/50 focus:outline-none focus:ring-4 focus:ring-blue-500/10 transition-all font-medium"
-              value={formData.email} 
-              onChange={e => setFormData({ ...formData, email: e.target.value })} 
-              placeholder="jane@example.com"
-            />
-          </div>
-          <div className="space-y-1.5">
-            <label className="text-[11px] font-extrabold tracking-wider uppercase text-slate-300">Password</label>
-            <input 
-              type="password" 
-              required
-              minLength={8}
-              className="w-full rounded-2xl bg-slate-950/70 border border-slate-800 px-4 py-3.5 text-sm text-slate-100 placeholder:text-slate-600 focus:border-blue-500/50 focus:outline-none focus:ring-4 focus:ring-blue-500/10 transition-all font-medium"
-              value={formData.password} 
-              onChange={e => setFormData({ ...formData, password: e.target.value })} 
-              placeholder="••••••••"
-            />
-          </div>
-          
-          {error && <p className="text-xs font-bold text-red-400 bg-red-500/10 p-3 rounded-xl border border-red-500/20">{error}</p>}
+            
+            <div className="space-y-2">
+              <label className="block label-mono text-text-muted uppercase">Password</label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted" size={18} />
+                <input 
+                  type={showPassword ? "text" : "password"}
+                  required
+                  minLength={8}
+                  className={inputClass}
+                  value={formData.password} 
+                  onChange={e => setFormData({ ...formData, password: e.target.value })} 
+                  placeholder="••••••••"
+                />
+                <button 
+                  type="button" 
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-primary transition-colors"
+                >
+                  {showPassword ? <EyeSlash size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
+            </div>
 
-          <button 
-            type="submit" 
-            disabled={loading}
-            className="mt-4 flex w-full items-center justify-center rounded-2xl bg-blue-600 hover:bg-blue-500 text-white px-4 py-3.5 text-sm font-bold transition-all duration-200 shadow-md shadow-blue-600/20 active:scale-95 disabled:opacity-50"
-          >
-            {loading ? 'Processing...' : isLogin ? 'Sign In' : 'Create Account'}
-          </button>
-        </form>
+            {error && (
+              <div className="bg-error-container border border-error/20 p-3 rounded-md">
+                <p className="body-sm font-bold text-error">{error}</p>
+              </div>
+            )}
 
-        <div className="mt-8 text-center border-t border-slate-800/80 pt-6">
+            <button 
+              type="submit" 
+              disabled={loading}
+              className="w-full btn-primary py-3 flex items-center justify-center group disabled:opacity-50"
+            >
+              {loading ? 'Processing...' : (isLogin ? 'Sign In' : 'Create Account')}
+              {!loading && <ArrowRight size={18} weight="bold" className="ml-2 group-hover:translate-x-1 transition-transform" />}
+            </button>
+          </form>
+        </div>
+
+        {/* Secondary Action */}
+        <p className="text-center mt-8 body-sm text-text-muted">
+          {isLogin ? "Don't have an account? " : "Already have an account? "}
           <Link 
             to={isLogin ? '/register' : '/login'}
-            className="text-xs sm:text-sm font-semibold text-slate-400 hover:text-blue-400 transition-colors"
+            className="text-primary font-bold hover:underline"
           >
-            {isLogin ? "Don't have an account? Sign up" : "Already have an account? Sign in"}
+            {isLogin ? 'Register' : 'Sign In'}
           </Link>
-        </div>
-      </div>
+        </p>
+      </main>
     </div>
   );
 }

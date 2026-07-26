@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { usersApi } from '../api/users';
 import { applicationsApi } from '../api/applications';
 import { skillsApi } from '../api/skills';
-import { ProfileTabs } from '../components/profile/ProfileTabs';
+import { SignOut, PencilSimple, Code, Link as LinkIcon, ClipboardText, UserCircle, MapPin, X } from '@phosphor-icons/react';
 
 export function ProfilePage() {
   const queryClient = useQueryClient();
@@ -49,142 +49,265 @@ export function ProfilePage() {
   };
 
   if (userLoading) return (
-    <div className="max-w-4xl space-y-6 sm:space-y-10 mx-auto pb-12 animate-pulse">
-      <div className="mb-6 sm:mb-10">
-        <div className="h-10 sm:h-12 w-48 bg-slate-800/80 rounded-lg mb-4"></div>
-        <div className="h-5 sm:h-6 w-64 bg-slate-800/50 rounded-lg"></div>
+    <div className="pb-16 space-y-6">
+      <div className="h-32 skeleton rounded-lg"></div>
+      <div className="grid grid-cols-12 gap-6">
+        <div className="col-span-12 lg:col-span-8 h-64 skeleton rounded-lg"></div>
+        <div className="col-span-12 lg:col-span-4 h-64 skeleton rounded-lg"></div>
       </div>
-      <div className="rounded-2xl sm:rounded-3xl border border-slate-700/50 bg-slate-800/40 p-5 sm:p-8 md:p-10 h-64"></div>
-      <div className="rounded-2xl sm:rounded-3xl border border-slate-700/50 bg-slate-800/40 p-5 sm:p-8 md:p-10 h-48"></div>
     </div>
   );
 
-  return (
-    <div className="max-w-4xl space-y-8 sm:space-y-10 mx-auto pb-16 animate-fade-in">
-      <div className="mb-8 sm:mb-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-slate-100 font-display pb-2 leading-tight">Your Profile</h1>
-          <p className="mt-2 text-base sm:text-lg text-slate-400 font-medium leading-relaxed">Manage your developer bio, skills, and project applications.</p>
-        </div>
-        <button
-          onClick={handleLogout}
-          className="text-xs sm:text-sm font-bold text-red-400 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 px-4.5 py-2.5 rounded-xl transition-all duration-200 self-start sm:self-auto active:scale-95 shadow-sm"
-        >
-          Sign Out
-        </button>
-      </div>
-      
-      {/* Profile Info */}
-      <div className="rounded-3xl border border-slate-800/80 bg-slate-900/40 p-6 sm:p-8 md:p-10 shadow-2xl backdrop-blur-xl">
-        <div className="flex justify-between items-center mb-6 sm:mb-8">
-          <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-100 font-display">Basic Info</h2>
-          <button 
-            onClick={() => { setIsEditing(!isEditing); setEditForm(user); }}
-            className="text-xs sm:text-sm font-bold text-blue-400 hover:text-blue-300 transition-all duration-200 bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/20 px-4 py-2 rounded-xl active:scale-95"
-          >
-            {isEditing ? 'Cancel' : 'Edit Profile'}
-          </button>
-        </div>
+  const inputClass = "w-full rounded-md bg-surface-dim border border-border-subtle px-4 py-3 body-md text-primary placeholder:text-text-muted focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary transition-all";
 
-        {isEditing ? (
-          <form className="space-y-4 sm:space-y-5" onSubmit={e => { e.preventDefault(); updateProfile.mutate(editForm); }}>
-            <textarea className="w-full bg-slate-950/70 border border-slate-800 text-slate-100 placeholder:text-slate-600 p-4 rounded-2xl text-sm focus:outline-none focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/10 transition-all resize-none" placeholder="Bio" rows={3} value={editForm.bio || ''} onChange={e => setEditForm({...editForm, bio: e.target.value})} />
-            <input className="w-full bg-slate-950/70 border border-slate-800 text-slate-100 placeholder:text-slate-600 p-4 rounded-2xl text-sm focus:outline-none focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/10 transition-all" placeholder="GitHub URL" value={editForm.githubUrl || ''} onChange={e => setEditForm({...editForm, githubUrl: e.target.value})} />
-            <input className="w-full bg-slate-950/70 border border-slate-800 text-slate-100 placeholder:text-slate-600 p-4 rounded-2xl text-sm focus:outline-none focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/10 transition-all" placeholder="LinkedIn URL" value={editForm.linkedinUrl || ''} onChange={e => setEditForm({...editForm, linkedinUrl: e.target.value})} />
-            <select className="w-full bg-slate-950/70 border border-slate-800 text-slate-100 p-4 rounded-2xl text-sm focus:outline-none focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/10 transition-all" value={editForm.experienceLevel || 'BEGINNER'} onChange={e => setEditForm({...editForm, experienceLevel: e.target.value})}>
-              <option value="BEGINNER" className="bg-slate-900 text-slate-100">Beginner</option>
-              <option value="INTERMEDIATE" className="bg-slate-900 text-slate-100">Intermediate</option>
-              <option value="ADVANCED" className="bg-slate-900 text-slate-100">Advanced</option>
-            </select>
-            <div className="pt-2 sm:pt-4 flex justify-end">
-              <button type="submit" disabled={updateProfile.isPending} className="w-full sm:w-auto bg-blue-600 hover:bg-blue-500 text-white font-bold px-6 py-3 rounded-xl transition-all duration-200 shadow-md shadow-blue-600/20 active:scale-95 disabled:opacity-50 text-sm">
-                {updateProfile.isPending ? 'Saving...' : 'Save Changes'}
+  return (
+    <div className="pb-16 animate-fade-in">
+      
+      {/* Header Section */}
+      <section className="mb-6">
+        <div className="surface-1 rounded-lg p-6 sm:p-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+          <div className="flex items-center gap-6">
+            <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-md overflow-hidden bg-primary border-2 border-border-subtle flex-shrink-0 flex items-center justify-center">
+               <span className="text-surface font-bold text-[28px] sm:text-[32px] tracking-tight">{user.name ? user.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) : '?'}</span>
+            </div>
+            <div>
+              <h1 className="headline-lg text-primary">{user.name}</h1>
+              <div className="flex gap-4 mt-3">
+                <span className="flex items-center gap-1.5 text-text-muted body-sm">
+                  <MapPin size={16} /> Remote
+                </span>
+                <span className="flex items-center gap-1.5 text-text-muted body-sm">
+                   <LinkIcon size={16} /> {user.email}
+                </span>
+              </div>
+            </div>
+          </div>
+          <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+            <button 
+              onClick={() => { setIsEditing(!isEditing); setEditForm(user); }}
+              className="btn-secondary px-6 py-2.5 flex items-center justify-center gap-2"
+            >
+              <PencilSimple size={18} /> {isEditing ? 'Cancel Edit' : 'Edit Profile'}
+            </button>
+            <button 
+              onClick={handleLogout}
+              className="px-6 py-2.5 rounded-md button-text transition-all border border-error/20 text-error hover:bg-error/10 flex items-center justify-center gap-2 cursor-pointer"
+            >
+              <SignOut size={18} /> Sign Out
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* Bento Content Grid */}
+      <div className="grid grid-cols-12 gap-6">
+        
+        {/* Left Column */}
+        <div className="col-span-12 lg:col-span-8 space-y-6">
+          
+          {/* About Me / Edit Form */}
+          <div className="surface-1 rounded-lg p-6 sm:p-8">
+            <div className="flex items-center gap-2 mb-4">
+              <UserCircle size={24} className="text-primary" />
+              <h2 className="headline-lg-mobile text-primary tracking-tight">About Me</h2>
+            </div>
+            
+            {isEditing ? (
+              <form className="space-y-4" onSubmit={e => { e.preventDefault(); updateProfile.mutate(editForm); }}>
+                <div>
+                  <textarea 
+                    className={`${inputClass} resize-none`} 
+                    placeholder="Bio" rows={4} 
+                    maxLength={300}
+                    value={editForm.bio || ''} 
+                    onChange={e => setEditForm({...editForm, bio: e.target.value})} 
+                  />
+                  <p className="label-mono text-text-muted mt-1 text-right">{(editForm.bio || '').length} / 300</p>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <input 
+                    className={inputClass} 
+                    placeholder="GitHub URL" 
+                    value={editForm.githubUrl || ''} 
+                    onChange={e => setEditForm({...editForm, githubUrl: e.target.value})} 
+                  />
+                  <input 
+                    className={inputClass} 
+                    placeholder="LinkedIn URL" 
+                    value={editForm.linkedinUrl || ''} 
+                    onChange={e => setEditForm({...editForm, linkedinUrl: e.target.value})} 
+                  />
+                </div>
+                <div>
+                  <select className={inputClass} value={editForm.experienceLevel || 'BEGINNER'} onChange={e => setEditForm({...editForm, experienceLevel: e.target.value})}>
+                    <option value="BEGINNER">Beginner</option>
+                    <option value="INTERMEDIATE">Intermediate</option>
+                    <option value="ADVANCED">Advanced</option>
+                  </select>
+                </div>
+                <div className="pt-2 flex justify-end">
+                  <button type="submit" disabled={updateProfile.isPending} className="btn-primary px-8 py-2.5 w-full sm:w-auto">
+                    {updateProfile.isPending ? 'Saving...' : 'Save Changes'}
+                  </button>
+                </div>
+              </form>
+            ) : (
+              <>
+                <p className="text-text-muted leading-relaxed mb-6 body-md">
+                  {user.bio || 'No bio provided. Click Edit Profile to add one.'}
+                </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="bg-surface p-4 rounded-md border border-border-subtle">
+                    <p className="label-mono text-text-muted mb-1">EXPERIENCE LEVEL</p>
+                    <p className="body-md font-bold text-primary">{user.experienceLevel || 'Not set'}</p>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+
+          {/* Technical Stack (Skills) */}
+          <div className="surface-1 rounded-lg p-6 sm:p-8">
+            <div className="flex items-center gap-2 mb-6">
+              <Code size={24} className="text-primary" />
+              <h2 className="headline-lg-mobile text-primary tracking-tight">Technical Stack</h2>
+            </div>
+            
+            <div className="flex flex-col sm:flex-row gap-3 mb-6">
+              <input 
+                className={`flex-1 ${inputClass}`} 
+                placeholder="Add a skill (e.g. React, Rust)" 
+                value={skillInput} 
+                onChange={e => setSkillInput(e.target.value)} 
+                onKeyDown={(e) => { if(e.key === 'Enter' && skillInput.trim()) addSkill.mutate({name: skillInput}); }} 
+              />
+              <button 
+                onClick={() => addSkill.mutate({ name: skillInput })} 
+                disabled={addSkill.isPending || !skillInput.trim()} 
+                className="btn-secondary px-6 py-3 w-full sm:w-auto disabled:opacity-50 flex items-center justify-center gap-2"
+              >
+                Add Skill
               </button>
             </div>
-          </form>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 bg-slate-950/50 p-5 sm:p-6 rounded-2xl border border-slate-800/80">
-            <div><p className="text-[10px] sm:text-xs text-slate-500 font-extrabold uppercase tracking-widest mb-1">Name</p><p className="font-bold text-slate-100 text-base sm:text-lg font-display">{user.name}</p></div>
-            <div><p className="text-[10px] sm:text-xs text-slate-500 font-extrabold uppercase tracking-widest mb-1">Email</p><p className="font-semibold text-slate-300 text-sm sm:text-base">{user.email}</p></div>
-            <div className="col-span-1 md:col-span-2"><p className="text-[10px] sm:text-xs text-slate-500 font-extrabold uppercase tracking-widest mb-1">Bio</p><p className="text-slate-300 text-sm leading-relaxed font-medium">{user.bio || 'No bio set.'}</p></div>
-            <div><p className="text-[10px] sm:text-xs text-slate-500 font-extrabold uppercase tracking-widest mb-1">Experience</p><p className="font-bold text-slate-200 text-sm sm:text-base font-display">{user.experienceLevel || 'Not set'}</p></div>
-            <div>
-              <p className="text-[10px] sm:text-xs text-slate-500 font-extrabold uppercase tracking-widest mb-1">Social Links</p>
-              <div className="flex gap-4 mt-1">
-                {user.githubUrl ? <a href={user.githubUrl} target="_blank" rel="noreferrer" className="text-xs font-bold text-blue-400 hover:underline">GitHub ↗</a> : <span className="text-xs text-slate-600">No GitHub</span>}
-                {user.linkedinUrl ? <a href={user.linkedinUrl} target="_blank" rel="noreferrer" className="text-xs font-bold text-blue-400 hover:underline">LinkedIn ↗</a> : <span className="text-xs text-slate-600">No LinkedIn</span>}
-              </div>
+            
+            <div className="flex flex-wrap gap-2">
+              {skills?.length === 0 && <span className="text-text-muted body-sm">No skills added yet.</span>}
+              {skills?.map(skill => (
+                <span key={skill.id} className="bg-surface text-primary px-3 py-1.5 rounded-md label-mono font-semibold border border-border-subtle flex items-center gap-2 group">
+                  {skill.name}
+                  <button 
+                    onClick={() => deleteSkill.mutate(skill.id)} 
+                    className="text-text-muted hover:text-error transition-colors cursor-pointer"
+                  >
+                    <X size={14} weight="bold" />
+                  </button>
+                </span>
+              ))}
             </div>
           </div>
-        )}
-      </div>
 
-      {/* Skills */}
-      <div className="rounded-3xl border border-slate-800/80 bg-slate-900/40 p-6 sm:p-8 md:p-10 shadow-2xl backdrop-blur-xl">
-        <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-100 font-display mb-4 sm:mb-6">Skills & Technologies</h2>
-        <div className="flex flex-col sm:flex-row gap-3 mb-6 sm:mb-8">
-          <input className="bg-slate-950/70 border border-slate-800 text-slate-100 placeholder:text-slate-600 p-3.5 px-4.5 rounded-2xl flex-1 text-sm focus:outline-none focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/10 transition-all" placeholder="Add a skill (e.g. React, Rust, GraphQL)" value={skillInput} onChange={e => setSkillInput(e.target.value)} onKeyDown={(e) => { if(e.key === 'Enter') addSkill.mutate({name: skillInput}); }} />
-          <button 
-            onClick={() => addSkill.mutate({ name: skillInput })} 
-            disabled={addSkill.isPending || !skillInput.trim()} 
-            className="bg-blue-600 hover:bg-blue-500 text-white font-bold px-6 py-3.5 rounded-2xl transition-all duration-200 disabled:opacity-50 text-sm shadow-md shadow-blue-600/20 active:scale-95 shrink-0"
-          >
-            {addSkill.isPending ? 'Adding...' : 'Add Skill'}
-          </button>
         </div>
-        <div className="flex flex-wrap gap-2.5">
-          {skills?.length === 0 && <span className="text-slate-500 text-sm font-medium">No skills added yet.</span>}
-          {skills?.map(skill => (
-            <span key={skill.id} className="bg-slate-950/80 border border-slate-800 px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-200 flex items-center gap-2.5 shadow-sm">
-              {skill.name}
-              <button onClick={() => deleteSkill.mutate(skill.id)} className="text-slate-500 hover:text-red-400 transition-colors font-bold text-base leading-none">&times;</button>
-            </span>
-          ))}
-        </div>
-      </div>
 
-      {/* Applications */}
-      <div className="rounded-3xl border border-slate-800/80 bg-slate-900/40 p-6 sm:p-8 md:p-10 shadow-2xl backdrop-blur-xl">
-        <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-100 font-display mb-4 sm:mb-6">Your Applications</h2>
-        {appsLoading ? (
-          <div className="space-y-4 animate-pulse">
-            <div className="h-24 bg-slate-900/40 rounded-2xl"></div>
-            <div className="h-24 bg-slate-900/40 rounded-2xl"></div>
+        {/* Right Column */}
+        <div className="col-span-12 lg:col-span-4 space-y-6">
+          
+          {/* Connect Links */}
+          <div className="surface-1 rounded-lg p-6 sm:p-8">
+            <div className="flex items-center gap-2 mb-4">
+              <LinkIcon size={24} className="text-primary" />
+              <h2 className="headline-lg-mobile text-primary tracking-tight">Connect</h2>
+            </div>
+            <div className="space-y-2">
+              <a 
+                href={user.githubUrl || '#'} 
+                target={user.githubUrl ? "_blank" : undefined}
+                rel="noreferrer"
+                className={`flex items-center justify-between group p-3 rounded-md transition-all border border-transparent ${user.githubUrl ? 'hover:bg-surface hover:border-border-subtle cursor-pointer' : 'opacity-50 cursor-not-allowed'}`}
+              >
+                <span className={`body-md ${user.githubUrl ? 'text-text-muted group-hover:text-primary' : 'text-text-muted'}`}>GitHub</span>
+                <ArrowUpRightIcon active={!!user.githubUrl} />
+              </a>
+              <a 
+                href={user.linkedinUrl || '#'} 
+                target={user.linkedinUrl ? "_blank" : undefined}
+                rel="noreferrer"
+                className={`flex items-center justify-between group p-3 rounded-md transition-all border border-transparent ${user.linkedinUrl ? 'hover:bg-surface hover:border-border-subtle cursor-pointer' : 'opacity-50 cursor-not-allowed'}`}
+              >
+                <span className={`body-md ${user.linkedinUrl ? 'text-text-muted group-hover:text-primary' : 'text-text-muted'}`}>LinkedIn</span>
+                <ArrowUpRightIcon active={!!user.linkedinUrl} />
+              </a>
+            </div>
           </div>
-        ) : (
-          <div className="space-y-4">
-            {applications?.length === 0 && <div className="text-slate-500 font-medium text-center py-8 text-sm">You haven't applied to any projects yet.</div>}
-            {applications?.map(app => (
-              <div key={app.id} className="bg-slate-950/50 border border-slate-800 p-5 rounded-2xl flex flex-col md:flex-row md:justify-between md:items-center gap-4 transition-all hover:border-slate-700">
-                <div>
-                  <h3 className="font-bold text-lg text-slate-100 font-display">{app.projectTitle} <span className="text-xs font-normal text-slate-400 ml-1">for {app.roleTitle}</span></h3>
-                  <p className="text-xs font-semibold text-slate-400 mt-1.5 flex items-center gap-2">
-                    Status: 
-                    <span className={`px-2.5 py-0.5 rounded-full font-bold text-[11px] border ${app.status === 'PENDING' ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' : app.status === 'ACCEPTED' ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' : 'bg-slate-800 text-slate-400 border-slate-700'}`}>
-                      {app.status}
-                    </span>
-                  </p>
-                </div>
-                {app.status !== 'WITHDRAWN' && app.status !== 'ACCEPTED' && app.status !== 'REJECTED' && (
-                  <button 
-                    onClick={() => withdrawApp.mutate(app.id)} 
-                    disabled={withdrawApp.isPending && withdrawApp.variables === app.id}
-                    className="text-xs font-bold text-red-400 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 px-4 py-2 rounded-xl transition-all duration-200 self-start md:self-auto disabled:opacity-50 active:scale-95"
-                  >
-                    {withdrawApp.isPending && withdrawApp.variables === app.id ? 'Withdrawing...' : 'Withdraw Application'}
-                  </button>
-                )}
+
+          {/* Active Applications */}
+          <div className="surface-1 rounded-lg p-6 sm:p-8">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-2">
+                <ClipboardText size={24} className="text-primary" />
+                <h2 className="headline-lg-mobile text-primary tracking-tight">Applications</h2>
               </div>
-            ))}
+              <span className="label-mono bg-primary text-surface px-2 py-0.5 rounded-sm">
+                {applications?.length || 0}
+              </span>
+            </div>
+            
+            {appsLoading ? (
+              <div className="space-y-4">
+                <div className="h-16 skeleton rounded-md"></div>
+              </div>
+            ) : applications?.length === 0 ? (
+               <p className="text-text-muted body-sm">No active applications.</p>
+            ) : (
+              <div className="space-y-4">
+                {applications?.map(app => (
+                  <div key={app.id} className="flex gap-4 group">
+                    <div className="flex flex-col items-center">
+                      <div className={`w-3 h-3 rounded-sm mt-1.5 ${
+                        app.status === 'ACCEPTED' ? 'bg-success-green' : 
+                        app.status === 'PENDING' ? 'bg-warning-amber' : 
+                        app.status === 'REJECTED' ? 'bg-error' : 'bg-border-subtle'
+                      }`}></div>
+                      <div className="w-[1px] h-full bg-border-subtle mt-1.5"></div>
+                    </div>
+                    <div className="flex-1 pb-4">
+                      <div className="flex justify-between items-start">
+                        <p className="body-md font-bold text-primary">{app.projectTitle}</p>
+                        <span className={`label-mono uppercase tracking-wider ${
+                          app.status === 'ACCEPTED' ? 'text-success-green' : 
+                          app.status === 'PENDING' ? 'text-warning-amber' : 
+                          app.status === 'REJECTED' ? 'text-error' : 'text-text-muted'
+                        }`}>
+                          {app.status}
+                        </span>
+                      </div>
+                      <p className="body-sm text-text-muted mt-0.5">{app.roleTitle}</p>
+                      
+                      {app.status === 'PENDING' && (
+                        <button 
+                          onClick={() => withdrawApp.mutate(app.id)} 
+                          disabled={withdrawApp.isPending && withdrawApp.variables === app.id}
+                          className="mt-2 label-mono text-text-muted hover:text-error transition-colors uppercase tracking-wider disabled:opacity-50 cursor-pointer"
+                        >
+                          Withdraw
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
-        )}
+        </div>
       </div>
-
-      {/* ── Profile Tabs — Created / Collaborated / Completed (M3) ── */}
-      <ProfileTabs
-        createdProjects={user?.createdProjects || []}
-        collaboratedProjects={user?.collaboratedProjects || []}
-      />
     </div>
+  );
+}
+
+function ArrowUpRightIcon({ active }) {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={active ? "text-text-muted group-hover:text-primary transition-colors" : "text-text-muted opacity-50"}>
+      <line x1="7" y1="17" x2="17" y2="7"></line>
+      <polyline points="7 7 17 7 17 17"></polyline>
+    </svg>
   );
 }

@@ -1,17 +1,10 @@
 import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { Crown, SignOut, UserMinus, WarningCircle, Users, CheckCircle, XCircle } from '@phosphor-icons/react';
-import { Badge } from '../common/Badge';
+import { SignOut, UserMinus, WarningCircle, CheckCircle, XCircle } from '@phosphor-icons/react';
 import { ConfirmDialog } from '../common/ConfirmDialog';
 import { membershipsApi } from '../../api/memberships';
 
-/**
- * Displays the team member list for a project.
- * Owner can remove members, members can leave, and the 409 ownership-transfer guard is surfaced.
- *
- * @param {{ members: object[], isOwner: boolean, currentUserId: string, projectId: string, ownerId: string }} props
- */
 export function TeamMemberList({ members = [], isOwner, currentUserId, projectId, ownerId }) {
   const queryClient = useQueryClient();
   const [confirmModal, setConfirmModal] = useState({ isOpen: false, type: null, member: null });
@@ -58,10 +51,7 @@ export function TeamMemberList({ members = [], isOwner, currentUserId, projectId
       setConfirmModal({ isOpen: false, type: null, member: null });
 
       if (status === 409) {
-        // Owner tried to leave without transferring ownership
-        setOwnerLeaveError(
-          serverMessage || 'You must transfer ownership before leaving the project.'
-        );
+        setOwnerLeaveError(serverMessage || 'You must transfer ownership before leaving the project.');
       } else {
         toast.error(serverMessage || 'Failed to submit leave request');
       }
@@ -104,40 +94,23 @@ export function TeamMemberList({ members = [], isOwner, currentUserId, projectId
     }
   };
 
-  const formatDate = (dateStr) => {
-    if (!dateStr) return '';
-    try {
-      return new Date(dateStr).toLocaleDateString('en-US', {
-        month: 'short',
-        day: 'numeric',
-        year: 'numeric',
-      });
-    } catch {
-      return '';
-    }
-  };
-
   const isPending = removeMutation.isPending || leaveMutation.isPending || approveLeaveMutation.isPending || rejectLeaveMutation.isPending;
 
   return (
-    <div className="rounded-2xl sm:rounded-3xl border border-slate-700/50 bg-slate-800/30 p-5 sm:p-8 shadow-xl backdrop-blur-sm">
-      <div className="flex items-center gap-3 mb-6">
-        <Users size={24} weight="duotone" className="text-blue-500" />
-        <h2 className="text-2xl font-bold text-slate-50 tracking-tight">Team Members</h2>
-        <Badge variant="neutral" size="sm">{members.length}</Badge>
-      </div>
+    <div className="surface-1 p-8 rounded-lg">
+      <h3 className="headline-lg tracking-[-0.02em] mb-8 text-primary">Core Team</h3>
 
       {/* Owner leave error (409) */}
       {ownerLeaveError && (
-        <div className="flex items-start gap-2.5 bg-yellow-500/10 border border-yellow-500/20 text-yellow-400 text-sm font-medium p-4 rounded-xl mb-5">
+        <div className="flex items-start gap-2.5 bg-warning-amber/10 border border-warning-amber/20 text-warning-amber body-sm p-4 rounded-sm mb-6">
           <WarningCircle size={20} weight="fill" className="shrink-0 mt-0.5" />
-          <div>
+          <div className="flex-1">
             <p className="font-bold mb-1">Cannot Leave Project</p>
-            <p className="text-yellow-400/80">{ownerLeaveError}</p>
+            <p className="opacity-80">{ownerLeaveError}</p>
           </div>
           <button
             onClick={() => setOwnerLeaveError('')}
-            className="ml-auto text-yellow-500/50 hover:text-yellow-400 text-lg font-bold"
+            className="text-warning-amber/50 hover:text-warning-amber font-bold"
           >
             &times;
           </button>
@@ -145,110 +118,99 @@ export function TeamMemberList({ members = [], isOwner, currentUserId, projectId
       )}
 
       {members.length === 0 ? (
-        <p className="text-base font-medium text-slate-500 text-center py-6">
+        <p className="body-md font-medium text-text-muted py-2">
           No team members yet.
         </p>
       ) : (
-        <div className="space-y-3">
+        <div className="space-y-6">
           {members.map((m) => {
             const isOwnerMember = m.userId === ownerId;
             const isSelf = m.userId === currentUserId;
 
             return (
-              <div
-                key={m.id}
-                className="flex items-center justify-between border border-slate-800/80 bg-slate-900/50 rounded-2xl px-4.5 py-3.5 backdrop-blur-xl transition-all duration-300 hover:border-slate-700 hover:bg-slate-900/80 hover:shadow-lg shadow-slate-950/40"
-              >
-                <div className="flex items-center gap-3.5 min-w-0">
-                  {/* Avatar placeholder with gradient */}
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600/20 via-blue-500/10 to-slate-800 border border-blue-500/30 flex items-center justify-center text-sm font-extrabold text-blue-500 shrink-0 shadow-md">
-                    {(m.userName || '?')[0].toUpperCase()}
+              <div key={m.id} className="flex flex-wrap items-center justify-between gap-4">
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 border border-border-subtle bg-surface flex items-center justify-center font-bold text-sm text-primary uppercase shrink-0">
+                    {(m.userName || '?')[0]}
                   </div>
-
-                  <div className="min-w-0">
+                  <div>
                     <div className="flex items-center gap-2">
-                      <span className="font-bold text-base text-slate-100 truncate font-display">
+                      <p className="body-md font-bold tracking-tight text-primary">
                         {m.userName}
-                        {isSelf && <span className="text-blue-500 font-normal text-xs ml-1 bg-blue-600/15 px-1.5 py-0.5 rounded-md border border-blue-500/30">(you)</span>}
-                      </span>
-                      {isOwnerMember && (
-                        <Badge variant="warning" size="sm">
-                          <Crown size={12} weight="fill" />
-                          Owner
-                        </Badge>
-                      )}
+                        {isSelf && <span className="text-text-muted font-normal text-xs ml-1">(you)</span>}
+                      </p>
                     </div>
-                    <p className="text-xs text-slate-400 truncate">
-                      {m.roleTitle || 'Contributor'}
+                    <p className="label-mono text-[9px] text-text-muted uppercase tracking-widest mt-0.5 truncate">
+                      {isOwnerMember ? 'Owner / Creator' : (m.roleTitle || 'Contributor')}
                     </p>
                   </div>
                 </div>
 
-                {/* Actions */}
-                <div className="shrink-0 ml-3 flex gap-2">
+                <div className="flex gap-2">
                   {m.status === 'LEAVE_PENDING' && isOwner && !isOwnerMember && (
                     <>
                       <button
-                        onClick={() =>
-                          setConfirmModal({ isOpen: true, type: 'approve', member: m })
-                        }
+                        onClick={() => setConfirmModal({ isOpen: true, type: 'approve', member: m })}
                         disabled={isPending}
                         title="Approve Leave"
-                        className="flex items-center justify-center text-blue-500 hover:text-blue-400 bg-blue-600/15 hover:bg-blue-600/25 border border-blue-500/30 w-9 h-9 rounded-xl transition-all duration-200 disabled:opacity-50 active:scale-95 shadow-sm"
+                        className="btn-primary w-8 h-8 !px-0 rounded-sm disabled:opacity-50"
                       >
-                        <CheckCircle size={19} weight="bold" />
+                        <CheckCircle size={16} weight="bold" />
                       </button>
                       <button
-                        onClick={() =>
-                          setConfirmModal({ isOpen: true, type: 'reject', member: m })
-                        }
+                        onClick={() => setConfirmModal({ isOpen: true, type: 'reject', member: m })}
                         disabled={isPending}
                         title="Reject Leave"
-                        className="flex items-center justify-center text-red-400 hover:text-red-300 bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 w-9 h-9 rounded-xl transition-all duration-200 disabled:opacity-50 active:scale-95 shadow-sm"
+                        className="btn-secondary text-error border-error/20 hover:bg-error-container w-8 h-8 !px-0 rounded-sm disabled:opacity-50"
                       >
-                        <XCircle size={19} weight="bold" />
+                        <XCircle size={16} weight="bold" />
                       </button>
                     </>
                   )}
 
                   {m.status !== 'LEAVE_PENDING' && isOwner && !isOwnerMember && (
                     <button
-                      onClick={() =>
-                        setConfirmModal({ isOpen: true, type: 'remove', member: m })
-                      }
+                      onClick={() => setConfirmModal({ isOpen: true, type: 'remove', member: m })}
                       disabled={isPending}
-                      className="flex items-center gap-1.5 text-xs font-bold text-red-400 hover:text-red-300 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 px-3.5 py-2 rounded-xl transition-all duration-200 disabled:opacity-50 active:scale-95"
+                      className="btn-secondary text-xs uppercase tracking-widest text-error border-error/20 hover:bg-error-container"
                     >
-                      <UserMinus size={14} weight="bold" />
+                      <UserMinus size={14} weight="bold" className="mr-1 inline-block -mt-0.5" />
                       Remove
                     </button>
                   )}
+                  
                   {isSelf && !isOwner && m.status === 'LEAVE_PENDING' && (
-                    <div className="flex items-center gap-1.5 text-xs font-bold text-amber-400 bg-amber-500/10 px-3.5 py-2 rounded-xl border border-amber-500/20">
-                      <WarningCircle size={14} weight="bold" />
+                    <div className="label-mono text-warning-amber bg-warning-amber/10 px-2 py-1 rounded-sm border border-warning-amber/20 font-bold">
                       Leave Pending
                     </div>
                   )}
+                  
                   {isSelf && !isOwner && m.status !== 'LEAVE_PENDING' && (
                     <button
-                      onClick={() =>
-                        setConfirmModal({ isOpen: true, type: 'leave', member: m })
-                      }
+                      onClick={() => setConfirmModal({ isOpen: true, type: 'leave', member: m })}
                       disabled={isPending}
-                      className="flex items-center gap-1.5 text-xs font-bold text-red-400 hover:text-red-300 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 px-3.5 py-2 rounded-xl transition-all duration-200 disabled:opacity-50 active:scale-95"
+                      className="btn-secondary text-xs uppercase tracking-widest text-error border-error/20 hover:bg-error-container"
                     >
-                      <SignOut size={14} weight="bold" />
-                      Request Leave
+                      <SignOut size={14} weight="bold" className="mr-1 inline-block -mt-0.5" />
+                      Leave
                     </button>
                   )}
                 </div>
               </div>
             );
           })}
+          
+          <div className="flex items-center gap-4 py-3 border-t border-border-subtle mt-2">
+            <div className="w-10 h-10 border border-border-subtle bg-surface-dim flex items-center justify-center font-bold text-xs text-text-muted">
+              +{members.length}
+            </div>
+            <span className="label-mono text-xs text-text-muted uppercase tracking-wider">
+              Active {members.length === 1 ? 'Contributor' : 'Contributors'}
+            </span>
+          </div>
         </div>
       )}
 
-      {/* Confirmation Dialog */}
       <ConfirmDialog
         isOpen={confirmModal.isOpen}
         title={

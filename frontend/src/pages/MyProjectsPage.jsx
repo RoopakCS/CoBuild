@@ -1,75 +1,232 @@
+import { useState, useCallback, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { projectsApi } from '../api/projects';
 import { usersApi } from '../api/users';
-import { FolderOpen, CaretRight } from '@phosphor-icons/react';
+import { membershipsApi } from '../api/memberships';
+import { applicationsApi } from '../api/applications';
+import { ProjectFilterBar } from '../components/project/ProjectFilterBar';
+import { ProjectCard } from '../components/project/ProjectCard';
 
 export function MyProjectsPage() {
+  const [activeTab, setActiveTab] = useState('owned');
+  const [filterParams, setFilterParams] = useState({});
+
+  const handleFilterChange = useCallback((params) => {
+    setFilterParams(params);
+  }, []);
+  
   const { data: user } = useQuery({ queryKey: ['users', 'me'], queryFn: usersApi.getMe });
   
-  const { data: projects, isLoading } = useQuery({
+  const { data: ownedProjects = [], isLoading: isLoadingOwned } = useQuery({
     queryKey: ['projects', 'owner', user?.id],
     queryFn: () => projectsApi.getByOwner(user.id),
     enabled: !!user?.id,
   });
 
+  const { data: memberships = [], isLoading: isLoadingMemberships } = useQuery({
+    queryKey: ['memberships', 'user', user?.id],
+    queryFn: () => membershipsApi.getUserMemberships(user.id),
+    enabled: !!user?.id,
+  });
+
+  const { data: applications = [], isLoading: isLoadingApps } = useQuery({
+    queryKey: ['applications', 'me'],
+    queryFn: applicationsApi.getMyApplications,
+    enabled: !!user?.id,
+  });
+
+  // Calculate summary stats
+  const totalContributions = memberships.filter(m => m.status === 'ACTIVE' || m.status === 'LEAVE_PENDING').length;
+  const activeProposals = applications.filter(a => a.status === 'PENDING').length;
+
+  const filteredOwnedProjects = useMemo(() => {
+    return ownedProjects.filter(p => {
+      if (filterParams.search && !p.title?.toLowerCase().includes(filterParams.search.toLowerCase())) return false;
+      if (filterParams.status && p.status !== filterParams.status) return false;
+      if (filterParams.domain && p.domain !== filterParams.domain) return false;
+      if (filterParams.experienceLevel && p.experienceLevel !== filterParams.experienceLevel) return false;
+      if (filterParams.skills) {
+        const selectedSkills = filterParams.skills.split(',').filter(Boolean);
+        if (selectedSkills.length > 0 && (!p.skills || !selectedSkills.some(s => p.skills.includes(s)))) return false;
+      }
+      return true;
+    });
+  }, [ownedProjects, filterParams]);
+
+  const filteredMemberships = useMemo(() => {
+    return memberships.filter(m => {
+      if (filterParams.search && !m.projectTitle?.toLowerCase().includes(filterParams.search.toLowerCase())) return false;
+      return true;
+    });
+  }, [memberships, filterParams]);
+
+  const filteredApplications = useMemo(() => {
+    return applications.filter(a => {
+      if (filterParams.search && !a.projectTitle?.toLowerCase().includes(filterParams.search.toLowerCase())) return false;
+      return true;
+    });
+  }, [applications, filterParams]);
+
   return (
-    <div className="max-w-5xl mx-auto pb-16 animate-fade-in">
-      <div className="mb-8 sm:mb-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-6">
+    <div className="pb-16 flex flex-col md:flex-row gap-8">
+      {/* Sidebar */}
+      <ProjectFilterBar onFilterChange={handleFilterChange} />
+      
+      {/* Main Content */}
+      <div className="flex-grow">
+      {/* Page Header */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
         <div>
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-slate-100 font-display pb-2 leading-tight">My Projects</h1>
-          <p className="mt-2 text-base sm:text-lg text-slate-400 font-medium leading-relaxed">Manage the projects you own and lead.</p>
+          <h1 className="headline-xl text-primary tracking-[-0.02em] mb-2">Project Hub</h1>
+          <p className="body-md text-text-muted max-w-2xl">Manage your initiatives and team collaborations.</p>
         </div>
-        <Link to="/projects/new" className="inline-flex shrink-0 items-center justify-center rounded-xl bg-blue-600 hover:bg-blue-500 text-white px-5 py-3 text-sm font-bold transition-all duration-200 shadow-md shadow-blue-600/20 active:scale-95">
-          Create New Project
-        </Link>
+        
+        {/* View Toggle Tabs */}
+        <div className="flex p-1 bg-surface-dim rounded-lg w-fit border border-border-subtle">
+          <button 
+            onClick={() => setActiveTab('owned')}
+            className={`px-6 py-2 rounded-md button-text transition-all ${
+              activeTab === 'owned' 
+                ? 'bg-surface shadow-sm text-primary border border-border-subtle' 
+                : 'text-text-muted hover:text-primary border border-transparent'
+            }`}
+          >
+            Owned
+          </button>
+          <button 
+            onClick={() => setActiveTab('joined')}
+            className={`px-6 py-2 rounded-md button-text transition-all ${
+              activeTab === 'joined' 
+                ? 'bg-surface shadow-sm text-primary border border-border-subtle' 
+                : 'text-text-muted hover:text-primary border border-transparent'
+            }`}
+          >
+            Joined
+          </button>
+        </div>
       </div>
 
-      {isLoading ? (
-        <div className="flex flex-col gap-4">
-          {[1, 2].map(i => (
-            <div key={i} className="h-32 animate-pulse rounded-3xl bg-slate-900/40 border border-slate-800/80"></div>
-          ))}
-        </div>
-      ) : projects?.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-slate-800 bg-slate-900/40 py-16 sm:py-24 text-center backdrop-blur-xl px-4">
-          <FolderOpen size={48} className="mb-4 text-blue-500/60" weight="duotone" />
-          <h3 className="text-lg sm:text-xl font-bold text-slate-200 font-display">You don't own any projects.</h3>
-          <p className="mt-1.5 text-sm text-slate-400 font-medium">Get started by creating your first project build.</p>
-        </div>
-      ) : (
-        <div className="flex flex-col gap-4">
-          {projects?.map(project => (
-            <Link 
-              to={`/projects/${project.id}`} 
-              key={project.id}
-              className="group flex flex-col sm:flex-row sm:items-center justify-between rounded-3xl border border-slate-800/80 bg-slate-900/40 p-6 backdrop-blur-xl transition-all duration-300 hover:border-brand-border/40 hover:bg-slate-900/70 hover:shadow-md hover:-translate-y-0.5"
-            >
-              <div className="flex-1 min-w-0 pr-4">
-                <div className="mb-2 flex items-center gap-3">
-                  <h3 className="font-bold text-xl text-slate-100 font-display tracking-tight truncate">{project.title}</h3>
-                  <span className="shrink-0 inline-flex rounded-full bg-blue-600/15 px-3 py-0.5 text-xs font-bold text-brand-text border border-brand-border/30">
-                    {project.status || 'ACTIVE'}
-                  </span>
-                </div>
-                <p className="text-sm font-medium text-slate-400 line-clamp-2 mb-4 leading-relaxed">{project.description}</p>
-                <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs font-semibold text-slate-400">
-                  <div className="flex items-center gap-1.5"><span className="text-slate-500 font-semibold">Role:</span><span className="text-brand-text font-extrabold">Owner</span></div>
-                  {project.domain && <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-slate-800/50 text-slate-300">{project.domain}</div>}
-                  {project.commitment && <div className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-brand-border/60"></span>{project.commitment}</div>}
-                  {project.experienceLevel && <div className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-slate-700"></span>{project.experienceLevel}</div>}
-                  {project.teamSize && <div className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-slate-700"></span>Team: {project.teamSize}</div>}
-                </div>
-              </div>
-              <div className="mt-4 sm:mt-0 flex items-center justify-between sm:justify-center gap-3 shrink-0 sm:border-l sm:border-slate-800/80 sm:pl-6 sm:h-full">
-                <div className="flex items-center text-brand-text font-bold text-sm gap-1.5 transition-transform group-hover:translate-x-1.5">
-                  Manage <CaretRight weight="bold" />
-                </div>
-              </div>
-            </Link>
-          ))}
+      {/* Owned Projects Section */}
+      {activeTab === 'owned' && (
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 animate-fade-in">
+          
+          {isLoadingOwned ? (
+            <>
+              {[1, 2].map(i => (
+                <div key={i} className="skeleton h-64"></div>
+              ))}
+            </>
+          ) : (
+            filteredOwnedProjects.map(project => (
+              <ProjectCard key={project.id} project={project} />
+            ))
+          )}
+
         </div>
       )}
+
+      {/* Joined Projects Section */}
+      {activeTab === 'joined' && (
+        <div className="space-y-6 animate-fade-in">
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="p-6 bg-primary text-surface rounded-lg flex items-center justify-between">
+              <div>
+                <h4 className="headline-lg font-bold mb-1">Total Contributions</h4>
+                <p className="label-mono opacity-80 uppercase tracking-widest">Across all workspaces</p>
+              </div>
+              <span className="headline-xl">{String(totalContributions).padStart(2, '0')}</span>
+            </div>
+            <div className="p-6 surface-1 rounded-lg flex items-center justify-between">
+              <div>
+                <h4 className="headline-lg font-bold mb-1 text-primary">Active Proposals</h4>
+                <p className="label-mono text-text-muted uppercase tracking-widest">Pending acceptance</p>
+              </div>
+              <span className="headline-xl text-primary">{String(activeProposals).padStart(2, '0')}</span>
+            </div>
+          </div>
+
+          <div className="surface-1 rounded-lg overflow-hidden">
+            {(isLoadingMemberships || isLoadingApps) ? (
+              <div className="p-8 text-center"><p className="body-md text-text-muted">Loading...</p></div>
+            ) : (memberships.length === 0 && applications.length === 0) ? (
+              <div className="p-12 text-center">
+                <p className="body-lg text-primary mb-2">No joined projects yet.</p>
+                <p className="body-sm text-text-muted">Explore the Dashboard to find projects to join.</p>
+                <Link to="/" className="btn-secondary mt-6 inline-block">Discover Projects</Link>
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse">
+                  <thead className="bg-surface border-b border-border-subtle">
+                    <tr>
+                      <th className="px-6 py-4 label-mono text-text-muted">PROJECT</th>
+                      <th className="px-6 py-4 label-mono text-text-muted">ROLE</th>
+                      <th className="px-6 py-4 label-mono text-text-muted">STATUS</th>
+                      <th className="px-6 py-4 label-mono text-text-muted text-right">ACTION</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border-subtle">
+                    
+                    {/* Active Memberships */}
+                    {filteredMemberships.map(m => (
+                      <tr key={`m-${m.id}`} className="hover:bg-surface transition-colors group">
+                        <td className="px-6 py-5">
+                          <div className="flex flex-col">
+                            <span className="body-md text-primary font-semibold">{m.projectTitle}</span>
+                            <span className="label-mono text-text-muted uppercase tracking-wider mt-1">Workspace</span>
+                          </div>
+                        </td>
+                        <td className="px-6 py-5 label-mono text-text-muted">{m.roleTitle || 'Contributor'}</td>
+                        <td className="px-6 py-5">
+                          <span className={m.status === 'ACTIVE' ? 'badge-success' : 'badge-warning'}>
+                            {m.status === 'ACTIVE' ? 'CONTRIBUTING' : 'LEAVING'}
+                          </span>
+                        </td>
+                        <td className="px-6 py-5 text-right">
+                          <Link to={`/projects/${m.projectId}`} className="button-text text-primary hover:underline">
+                            View Workspace
+                          </Link>
+                        </td>
+                      </tr>
+                    ))}
+
+                    {/* Pending Applications */}
+                    {filteredApplications.map(app => (
+                      <tr key={`a-${app.id}`} className="hover:bg-surface transition-colors group">
+                        <td className="px-6 py-5">
+                          <div className="flex flex-col">
+                            <span className="body-md text-primary font-semibold">{app.projectTitle}</span>
+                            <span className="label-mono text-text-muted uppercase tracking-wider mt-1">Application</span>
+                          </div>
+                        </td>
+                        <td className="px-6 py-5 label-mono text-text-muted">{app.roleTitle}</td>
+                        <td className="px-6 py-5">
+                          <span className={
+                            app.status === 'PENDING' ? 'badge-warning' : 
+                            app.status === 'REJECTED' ? 'badge-error' :
+                            'badge-neutral'
+                          }>
+                            {app.status === 'PENDING' ? 'UNDER REVIEW' : app.status}
+                          </span>
+                        </td>
+                        <td className="px-6 py-5 text-right">
+                          <Link to={`/projects/${app.projectId}`} className="button-text text-text-muted hover:text-primary">
+                            View Details
+                          </Link>
+                        </td>
+                      </tr>
+                    ))}
+
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+      </div>
     </div>
   );
 }

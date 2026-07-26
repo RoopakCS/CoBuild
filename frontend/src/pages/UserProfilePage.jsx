@@ -1,7 +1,8 @@
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { usersApi } from '../api/users';
 import { membershipsApi } from '../api/memberships';
+import { UserCircle, MapPin, Link as LinkIcon, Briefcase } from '@phosphor-icons/react';
 
 export function UserProfilePage() {
   const { id } = useParams();
@@ -17,70 +18,143 @@ export function UserProfilePage() {
   });
 
   if (userLoading) return (
-    <div className="max-w-4xl mx-auto pb-12 animate-pulse">
-      <div className="mb-6 sm:mb-10">
-        <div className="h-10 sm:h-12 w-64 bg-slate-800/80 rounded-lg mb-4"></div>
-        <div className="h-5 sm:h-6 w-32 bg-slate-800/50 rounded-lg"></div>
-      </div>
-      <div className="rounded-2xl sm:rounded-3xl border border-slate-700/50 bg-slate-800/40 p-5 sm:p-8 md:p-10 mb-8 sm:mb-12 h-64"></div>
-      <div className="h-8 w-48 bg-slate-800/80 rounded-lg mb-6"></div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="h-28 bg-slate-800/50 rounded-2xl"></div>
-        <div className="h-28 bg-slate-800/50 rounded-2xl"></div>
+    <div className="pb-16">
+      <div className="h-32 skeleton rounded-lg mb-6"></div>
+      <div className="grid grid-cols-12 gap-6">
+        <div className="col-span-12 lg:col-span-8 h-64 skeleton rounded-lg"></div>
+        <div className="col-span-12 lg:col-span-4 h-64 skeleton rounded-lg"></div>
       </div>
     </div>
   );
-  if (!user) return <div className="text-red-400 bg-red-500/10 p-8 text-center rounded-2xl border border-red-500/20">User not found</div>;
+  if (!user) return <div className="text-error bg-error-container p-8 text-center rounded-lg border border-error/20">User not found</div>;
 
   return (
-    <div className="max-w-4xl mx-auto pb-12">
-      <div className="mb-6 sm:mb-10">
-        <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tighter text-slate-50">{user.name}</h1>
-        <p className="mt-2 sm:mt-3 text-base sm:text-lg text-slate-400 font-medium">Developer Profile</p>
-      </div>
-
-      <div className="rounded-2xl sm:rounded-3xl border border-slate-700/50 bg-slate-800/40 p-5 sm:p-8 md:p-10 shadow-2xl backdrop-blur-sm mb-8 sm:mb-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-8">
-          <div>
-            <p className="text-[10px] sm:text-xs text-slate-500 font-bold uppercase tracking-widest mb-1 sm:mb-2">Email</p>
-            <p className="text-base sm:text-lg font-semibold text-slate-200">{user.email}</p>
-          </div>
-          <div>
-            <p className="text-[10px] sm:text-xs text-slate-500 font-bold uppercase tracking-widest mb-1 sm:mb-2">Experience</p>
-            <p className="text-base sm:text-lg font-semibold text-slate-200">{user.experienceLevel || 'Not specified'}</p>
-          </div>
-          <div className="col-span-1 md:col-span-2">
-            <p className="text-[10px] sm:text-xs text-slate-500 font-bold uppercase tracking-widest mb-1 sm:mb-2">Bio</p>
-            <p className="text-slate-300 leading-relaxed text-base sm:text-lg">{user.bio || 'No bio provided'}</p>
-          </div>
-          <div className="col-span-1 md:col-span-2">
-            <p className="text-[10px] sm:text-xs text-slate-500 font-bold uppercase tracking-widest mb-1 sm:mb-2">Links</p>
-            <div className="flex gap-6 mt-2">
-              {user.githubUrl ? <a href={user.githubUrl} target="_blank" rel="noreferrer" className="text-sm sm:text-base font-bold text-blue-500 hover:text-blue-400 transition-colors">GitHub ↗</a> : <span className="text-slate-600 text-sm">No GitHub</span>}
-              {user.linkedinUrl ? <a href={user.linkedinUrl} target="_blank" rel="noreferrer" className="text-sm sm:text-base font-bold text-blue-500 hover:text-blue-400 transition-colors">LinkedIn ↗</a> : <span className="text-slate-600 text-sm">No LinkedIn</span>}
+    <div className="pb-16 animate-fade-in">
+      
+      {/* Header Section */}
+      <section className="mb-6">
+        <div className="surface-1 rounded-lg p-6 sm:p-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+          <div className="flex items-center gap-6">
+            <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-md overflow-hidden bg-surface-dim border-2 border-border-subtle flex-shrink-0 flex items-center justify-center text-text-muted">
+               <UserCircle size={64} weight="light" />
+            </div>
+            <div>
+              <h1 className="headline-lg text-primary">{user.name}</h1>
+              <p className="label-mono text-text-muted uppercase mt-1 tracking-wider">{user.experienceLevel || 'Developer'} / CoBuild Member</p>
+              <div className="flex gap-4 mt-3">
+                <span className="flex items-center gap-1.5 text-text-muted body-sm">
+                  <MapPin size={16} /> Remote
+                </span>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </section>
 
-      <h2 className="text-2xl font-bold tracking-tight text-slate-50 mb-6">Projects they are in</h2>
-      {membershipsLoading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-pulse">
-          <div className="h-24 bg-slate-800/50 rounded-2xl border border-slate-700/50"></div>
-          <div className="h-24 bg-slate-800/50 rounded-2xl border border-slate-700/50"></div>
-        </div>
-      ) : memberships?.length === 0 ? (
-        <div className="text-slate-500 font-medium py-4">This user hasn't joined any projects yet.</div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {memberships?.map(mem => (
-            <div key={mem.id} className="border border-slate-700/80 bg-slate-900/40 p-6 rounded-2xl">
-              <h3 className="font-bold text-lg text-slate-200 mb-2">{mem.projectTitle}</h3>
-              <p className="text-sm font-medium text-slate-400">Role: <span className="font-bold text-blue-500">{mem.role}</span></p>
+      {/* Bento Content Grid */}
+      <div className="grid grid-cols-12 gap-6">
+        
+        {/* Left Column */}
+        <div className="col-span-12 lg:col-span-8 space-y-6">
+          
+          {/* About */}
+          <div className="surface-1 rounded-lg p-6 sm:p-8">
+            <div className="flex items-center gap-2 mb-4">
+              <UserCircle size={24} className="text-primary" />
+              <h2 className="headline-lg-mobile text-primary tracking-tight">About</h2>
             </div>
-          ))}
+            <p className="text-text-muted leading-relaxed mb-6 body-md">
+              {user.bio || 'This user has not provided a bio.'}
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="bg-surface p-4 rounded-md border border-border-subtle">
+                <p className="label-mono text-text-muted mb-1">EXPERIENCE LEVEL</p>
+                <p className="body-md font-bold text-primary">{user.experienceLevel || 'Not specified'}</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Project Highlights / Memberships */}
+          <div className="surface-1 rounded-lg p-6 sm:p-8">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-2">
+                <Briefcase size={24} className="text-primary" />
+                <h2 className="headline-lg-mobile text-primary tracking-tight">Projects</h2>
+              </div>
+            </div>
+            
+            {membershipsLoading ? (
+               <div className="space-y-4">
+                 <div className="h-16 skeleton rounded-md"></div>
+                 <div className="h-16 skeleton rounded-md"></div>
+               </div>
+            ) : memberships?.length === 0 ? (
+               <p className="text-text-muted body-sm">This user hasn't joined any projects yet.</p>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {memberships?.map(mem => (
+                  <Link 
+                    to={`/projects/${mem.projectId}`} 
+                    key={mem.id} 
+                    className="bg-surface p-5 rounded-md border border-border-subtle hover:border-primary transition-colors group block cursor-pointer"
+                  >
+                    <h3 className="body-md font-bold text-primary group-hover:text-primary mb-1 line-clamp-1">{mem.projectTitle}</h3>
+                    <p className="label-mono text-text-muted">ROLE: {mem.roleTitle}</p>
+                    <div className="mt-3 flex items-center gap-2">
+                      <span className={mem.status === 'ACTIVE' ? 'badge-success' : 'badge-neutral'}>
+                        {mem.status === 'ACTIVE' ? 'CONTRIBUTING' : mem.status}
+                      </span>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
+
         </div>
-      )}
+
+        {/* Right Column */}
+        <div className="col-span-12 lg:col-span-4 space-y-6">
+          
+          {/* Connect Links */}
+          <div className="surface-1 rounded-lg p-6 sm:p-8">
+            <div className="flex items-center gap-2 mb-4">
+              <LinkIcon size={24} className="text-primary" />
+              <h2 className="headline-lg-mobile text-primary tracking-tight">Connect</h2>
+            </div>
+            <div className="space-y-2">
+              <a 
+                href={user.githubUrl || '#'} 
+                target={user.githubUrl ? "_blank" : undefined}
+                rel="noreferrer"
+                className={`flex items-center justify-between group p-3 rounded-md transition-all border border-transparent ${user.githubUrl ? 'hover:bg-surface hover:border-border-subtle cursor-pointer' : 'opacity-50 cursor-not-allowed'}`}
+              >
+                <span className={`body-md ${user.githubUrl ? 'text-text-muted group-hover:text-primary' : 'text-text-muted'}`}>GitHub</span>
+                <ArrowUpRightIcon active={!!user.githubUrl} />
+              </a>
+              <a 
+                href={user.linkedinUrl || '#'} 
+                target={user.linkedinUrl ? "_blank" : undefined}
+                rel="noreferrer"
+                className={`flex items-center justify-between group p-3 rounded-md transition-all border border-transparent ${user.linkedinUrl ? 'hover:bg-surface hover:border-border-subtle cursor-pointer' : 'opacity-50 cursor-not-allowed'}`}
+              >
+                <span className={`body-md ${user.linkedinUrl ? 'text-text-muted group-hover:text-primary' : 'text-text-muted'}`}>LinkedIn</span>
+                <ArrowUpRightIcon active={!!user.linkedinUrl} />
+              </a>
+            </div>
+          </div>
+
+        </div>
+      </div>
     </div>
+  );
+}
+
+function ArrowUpRightIcon({ active }) {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={active ? "text-text-muted group-hover:text-primary transition-colors" : "text-text-muted opacity-50"}>
+      <line x1="7" y1="17" x2="17" y2="7"></line>
+      <polyline points="7 7 17 7 17 17"></polyline>
+    </svg>
   );
 }
