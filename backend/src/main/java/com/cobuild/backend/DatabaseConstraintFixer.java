@@ -22,9 +22,9 @@ public class DatabaseConstraintFixer implements CommandLineRunner {
             // Re-add it with LEAVE_PENDING
             jdbcTemplate.execute("ALTER TABLE memberships ADD CONSTRAINT memberships_status_check CHECK (status IN ('ACTIVE', 'LEFT', 'REMOVED', 'LEAVE_PENDING'))");
             
-            System.out.println("✅ Successfully updated memberships_status_check constraint!");
+            System.out.println("Successfully updated memberships_status_check constraint!");
         } catch (Exception e) {
-            System.err.println("⚠️ Could not update database constraint: " + e.getMessage());
+            System.err.println("Could not update database constraint: " + e.getMessage());
         }
     }
 }

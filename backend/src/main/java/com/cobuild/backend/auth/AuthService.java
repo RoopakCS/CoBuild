@@ -17,6 +17,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.cobuild.backend.auth.dto.request.SendCodeRequest;
+
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -25,6 +27,14 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    private final EmailService emailService;
+
+    public void sendVerificationCode(SendCodeRequest request) {
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new DuplicateResourceException("Email already exists");
+        }
+        emailService.sendVerificationCode(request.getEmail(), request.getCode());
+    }
 
     @Transactional
     public AuthResponse register(RegisterRequest request) {
