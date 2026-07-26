@@ -18,7 +18,20 @@ public class EmailService {
     @Value("${spring.mail.username:dharsan@gmail.com}")
     private String fromEmail;
 
+    @Value("${resend.api.key:${RESEND_API_KEY:}}")
+    private String resendApiKey;
+
     public void sendVerificationCode(String toEmail, String code) {
+        String htmlContent = buildVerificationEmailHtml(code);
+
+        // 1. Try Resend HTTPS API if API Key is configured (Works 100% on Render/Cloud hosts without SMTP port blocks)
+        if (resendApiKey != null && !resendApiKey.trim().isEmpty()) {
+            if (sendViaResendApi(toEmail, code, htmlContent)) {
+                return;
+            }
+        }
+
+        // 2. Fallback to JavaMailSender SMTP
         try {
             MimeMessage mimeMessage = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
@@ -33,7 +46,6 @@ public class EmailService {
             mimeMessage.setHeader("X-Auto-Response-Suppress", "OOF, AutoReply");
             mimeMessage.setHeader("X-Priority", "1");
 
-            String htmlContent = buildVerificationEmailHtml(code);
             String textFallback = "Welcome to CoBuild!\n\n" +
                     "Your 6-digit authentication code for registration is: " + code + "\n\n" +
                     "This code will expire in 10 minutes. If you did not request this verification, please ignore this email.\n\n" +
@@ -46,6 +58,39 @@ public class EmailService {
         } catch (Exception e) {
             log.warn("Email delivery attempt to {} encountered an exception: {}", toEmail, e.getMessage());
         }
+    }
+
+    private boolean sendViaResendApi(String toEmail, String code, String htmlContent) {
+        try {
+            java.net.http.HttpClient client = java.net.http.HttpClient.newHttpClient();
+            String from = "CoBuild <onboarding@resend.dev>";
+            
+            // Format JSON body for Resend API
+            String jsonPayload = "{"
+                    + "\"from\":\"" + from + "\","
+                    + "\"to\":[\"" + toEmail + "\"],"
+                    + "\"subject\":\"Your CoBuild verification code: " + code + "\","
+                    + "\"html\":\"" + htmlContent.replace("\"", "\\\"").replace("\n", "") + "\""
+                    + "}";
+
+            java.net.http.HttpRequest request = java.net.http.HttpRequest.newBuilder()
+                    .uri(java.net.URI.create("https://api.resend.com/emails"))
+                    .header("Authorization", "Bearer " + resendApiKey.trim())
+                    .header("Content-Type", "application/json")
+                    .POST(java.net.http.HttpRequest.BodyPublishers.ofString(jsonPayload))
+                    .build();
+
+            java.net.http.HttpResponse<String> response = client.send(request, java.net.http.HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() >= 200 && response.statusCode() < 300) {
+                log.info("Resend HTTPS email successfully delivered to {}", toEmail);
+                return true;
+            } else {
+                log.warn("Resend API returned status {}: {}", response.statusCode(), response.body());
+            }
+        } catch (Exception e) {
+            log.warn("Failed to send email via Resend HTTPS API: {}", e.getMessage());
+        }
+        return false;
     }
 
     private String buildVerificationEmailHtml(String code) {
