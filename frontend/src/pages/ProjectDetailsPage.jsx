@@ -11,6 +11,8 @@ import { ConfirmDialog } from '../components/common/ConfirmDialog';
 import { RoleList } from '../components/project/RoleList';
 import { ApplyRoleModal } from '../components/application/ApplyRoleModal';
 import { TeamMemberList } from '../components/team/TeamMemberList';
+import { GitHubStatsCard } from '../components/github/GitHubStatsCard';
+
 
 export function ProjectDetailsPage() {
   const { id } = useParams();
@@ -205,6 +207,9 @@ export function ProjectDetailsPage() {
               </div>
             </div>
           </div>
+
+          {/* GitHub Activity & Health Card */}
+          <GitHubStatsCard projectId={id} repositoryUrl={project.repositoryUrl} />
 
           {/* Roles Section */}
           <RoleList
