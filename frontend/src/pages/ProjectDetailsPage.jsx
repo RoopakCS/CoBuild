@@ -11,6 +11,7 @@ import { ConfirmDialog } from '../components/common/ConfirmDialog';
 import { RoleList } from '../components/project/RoleList';
 import { ApplyRoleModal } from '../components/application/ApplyRoleModal';
 import { TeamMemberList } from '../components/team/TeamMemberList';
+import { ProjectActivityTimeline } from '../components/project/ProjectActivityTimeline';
 
 export function ProjectDetailsPage() {
   const { id } = useParams();
@@ -265,6 +266,15 @@ export function ProjectDetailsPage() {
               </div>
             </div>
           )}
+          
+          {/* Project Timeline */}
+          <ProjectActivityTimeline 
+            projectId={id} 
+            isOwner={isOwner} 
+            isMember={isMember} 
+            currentUserId={user?.id} 
+          />
+          
         </div>
 
         {/* Right Column */}
