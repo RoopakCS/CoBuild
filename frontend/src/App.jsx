@@ -9,6 +9,7 @@ import { EditProjectPage } from './pages/EditProjectPage';
 import { MyProjectsPage } from './pages/MyProjectsPage';
 import { UserProfilePage } from './pages/UserProfilePage';
 import { HomePage } from './pages/HomePage';
+import { ProtectedRoute } from './components/common/ProtectedRoute';
 
 import { Toaster } from 'sonner';
 
@@ -22,14 +23,16 @@ function App() {
         
         <Route path="/" element={<HomePage />} />
         
-        <Route element={<Layout />}>
-          <Route path="/discover" element={<DashboardPage />} />
-          <Route path="/projects/new" element={<CreateProjectPage />} />
-          <Route path="/projects/:id" element={<ProjectDetailsPage />} />
-          <Route path="/projects/:id/edit" element={<EditProjectPage />} />
-          <Route path="/my-projects" element={<MyProjectsPage />} />
-          <Route path="/profile" element={<ProfilePage />} />
-          <Route path="/users/:id" element={<UserProfilePage />} />
+        <Route element={<ProtectedRoute />}>
+          <Route element={<Layout />}>
+            <Route path="/discover" element={<DashboardPage />} />
+            <Route path="/projects/new" element={<CreateProjectPage />} />
+            <Route path="/projects/:id" element={<ProjectDetailsPage />} />
+            <Route path="/projects/:id/edit" element={<EditProjectPage />} />
+            <Route path="/my-projects" element={<MyProjectsPage />} />
+            <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/users/:id" element={<UserProfilePage />} />
+          </Route>
         </Route>
         
         <Route path="*" element={<Navigate to="/" replace />} />
