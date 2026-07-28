@@ -5,12 +5,14 @@ import { applicationsApi } from '../api/applications';
 import { usersApi } from '../api/users';
 import { membershipsApi } from '../api/memberships';
 import { useState } from 'react';
-import { ArrowLeft, CheckCircle, Clock } from '@phosphor-icons/react';
+import { ArrowLeft, CheckCircle, Clock, LockKey } from '@phosphor-icons/react';
 import { toast } from 'sonner';
 import { ConfirmDialog } from '../components/common/ConfirmDialog';
 import { RoleList } from '../components/project/RoleList';
 import { ApplyRoleModal } from '../components/application/ApplyRoleModal';
 import { TeamMemberList } from '../components/team/TeamMemberList';
+import { GitHubStatsCard } from '../components/github/GitHubStatsCard';
+import { ActivityFeed } from '../components/project/ActivityFeed';
 
 export function ProjectDetailsPage() {
   const { id } = useParams();
@@ -165,6 +167,14 @@ export function ProjectDetailsPage() {
                 <Clock size={18} weight="fill" /> Application Sent
               </span>
             )}
+            {(isOwner || isMember) && (
+              <button 
+                onClick={() => navigate(`/projects/${id}/workspace`)}
+                className="btn-primary btn-sm flex items-center gap-2 uppercase tracking-widest px-5 py-2 shadow-sm"
+              >
+                <LockKey size={18} weight="bold" /> Workspace
+              </button>
+            )}
           </div>
         </div>
       </section>
@@ -205,6 +215,14 @@ export function ProjectDetailsPage() {
               </div>
             </div>
           </div>
+
+          {/* Activity Feed */}
+          <ActivityFeed 
+            projectId={id} 
+            isOwner={isOwner} 
+            isMember={isMember} 
+            currentUserId={user?.id} 
+          />
 
           {/* Roles Section */}
           <RoleList
@@ -290,6 +308,9 @@ export function ProjectDetailsPage() {
               </div>
             </div>
           </div>
+
+          {/* GitHub Stats Card */}
+          <GitHubStatsCard projectId={id} repositoryUrl={project.repositoryUrl} />
 
           {/* Team Card */}
           <TeamMemberList

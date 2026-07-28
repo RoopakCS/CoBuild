@@ -174,7 +174,7 @@ export function RoleFormModal({ isOpen, onClose, projectId, existingRole }) {
               type="button"
               onClick={addSkill}
               disabled={!skillInput.trim()}
-              className="shrink-0 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold px-4 py-3 rounded-xl transition-colors border border-slate-700 disabled:opacity-40 text-sm"
+              className="shrink-0 btn-secondary px-4 py-2"
             >
               Add
             </button>
@@ -187,7 +187,7 @@ export function RoleFormModal({ isOpen, onClose, projectId, existingRole }) {
                   <button
                     type="button"
                     onClick={() => removeSkill(skill)}
-                    className="text-slate-400 hover:text-red-400 transition-colors ml-1"
+                    className="text-text-muted hover:text-error transition-colors ml-1"
                   >
                     <X size={12} weight="bold" />
                   </button>
@@ -202,14 +202,14 @@ export function RoleFormModal({ isOpen, onClose, projectId, existingRole }) {
             type="button"
             onClick={onClose}
             disabled={isPending}
-            className="px-4 py-2.5 rounded-xl text-sm font-bold text-slate-300 hover:text-slate-100 hover:bg-slate-800 transition-colors disabled:opacity-50"
+            className="px-4 py-2.5 rounded-xl text-sm font-bold text-text-muted hover:text-text-main hover:bg-surface-dim transition-colors disabled:opacity-50"
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={isPending}
-            className="bg-blue-600 hover:bg-blue-500 text-white font-bold px-6 py-2.5 rounded-xl transition-all shadow-md shadow-blue-600/20 disabled:opacity-50 text-sm"
+            className="btn-primary px-6 py-2.5"
           >
             {isPending ? 'Saving...' : isEdit ? 'Save Changes' : 'Create Role'}
           </button>
