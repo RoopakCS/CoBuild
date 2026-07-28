@@ -68,9 +68,9 @@ export function ApplyRoleModal({ isOpen, onClose, role, projectId }) {
   return (
     <Modal isOpen={isOpen} onClose={handleClose} title="Apply for Role" maxWidth="max-w-md">
       {/* Role Summary */}
-      <div className="bg-slate-800/60 border border-slate-700/40 rounded-xl p-4 mb-6">
+      <div className="bg-surface-dim border border-border-subtle rounded-lg p-4 mb-6">
         <div className="flex items-start justify-between mb-2">
-          <h4 className="font-bold text-base text-slate-100">{role.title}</h4>
+          <h4 className="font-bold text-base text-primary">{role.title}</h4>
           {isFull ? (
             <Badge variant="danger" size="sm">Full</Badge>
           ) : (
@@ -80,14 +80,14 @@ export function ApplyRoleModal({ isOpen, onClose, role, projectId }) {
           )}
         </div>
         {role.description && (
-          <p className="text-sm text-slate-400 leading-relaxed mb-3">{role.description}</p>
+          <p className="text-sm text-text-muted leading-relaxed mb-3">{role.description}</p>
         )}
         {role.skills && role.skills.length > 0 && (
           <div className="flex flex-wrap gap-1.5">
             {role.skills.map((skill) => (
               <span
                 key={skill}
-                className="text-xs font-medium bg-slate-900 border border-slate-700/50 text-slate-300 px-2 py-0.5 rounded-md"
+                className="text-xs font-medium bg-surface border border-border-subtle text-text-muted px-2 py-0.5 rounded-md"
               >
                 {skill}
               </span>
@@ -98,7 +98,7 @@ export function ApplyRoleModal({ isOpen, onClose, role, projectId }) {
 
       {/* Inline Error */}
       {inlineError && (
-        <div className="flex items-start gap-2 bg-red-500/10 border border-red-500/20 text-red-400 text-sm font-medium p-3 rounded-xl mb-4">
+        <div className="flex items-start gap-2 bg-error-container border border-error/20 text-error text-sm font-medium p-3 rounded-lg mb-4">
           <WarningCircle size={18} weight="fill" className="shrink-0 mt-0.5" />
           <span>{inlineError}</span>
         </div>
@@ -115,7 +115,7 @@ export function ApplyRoleModal({ isOpen, onClose, role, projectId }) {
             onChange={(e) => setMessage(e.target.value)}
             maxLength={1000}
           />
-          <p className="text-xs text-slate-500 mt-1.5 text-right">
+          <p className="text-xs text-text-muted mt-1.5 text-right">
             {message.length}/1000
           </p>
         </FormField>
@@ -125,14 +125,14 @@ export function ApplyRoleModal({ isOpen, onClose, role, projectId }) {
             type="button"
             onClick={handleClose}
             disabled={applyMutation.isPending}
-            className="px-4 py-2.5 rounded-xl text-sm font-bold text-slate-300 hover:text-slate-100 hover:bg-slate-800 transition-colors disabled:opacity-50"
+            className="btn-ghost rounded-lg px-4 py-2.5 text-sm font-semibold disabled:opacity-50"
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={applyMutation.isPending || isFull}
-            className="bg-blue-600 hover:bg-blue-500 text-white font-bold px-6 py-2.5 rounded-xl transition-all shadow-md shadow-blue-600/20 disabled:opacity-50 text-sm"
+            className="btn-primary rounded-lg px-6 py-2.5 text-sm font-semibold shadow-sm disabled:opacity-50"
           >
             {applyMutation.isPending ? 'Submitting...' : 'Submit Application'}
           </button>

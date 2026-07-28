@@ -1,7 +1,7 @@
 import { forwardRef } from 'react';
 
 const baseClasses =
-  'w-full bg-slate-900/50 border border-slate-700 text-slate-100 placeholder-slate-500 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all';
+  'w-full bg-surface-dim border border-border-subtle text-primary placeholder-text-muted rounded-lg focus:outline-none focus:border-primary focus:ring-2 focus:ring-tertiary/15 transition-all';
 
 /**
  * Styled text input with consistent theming.
@@ -51,13 +51,13 @@ export function FormField({ label, htmlFor, required, error, children }) {
   return (
     <div>
       {label && (
-        <label htmlFor={htmlFor} className="block text-sm font-bold text-slate-300 mb-2">
+        <label htmlFor={htmlFor} className="block text-sm font-semibold text-primary mb-2">
           {label}
-          {required && <span className="text-red-400 ml-1">*</span>}
+          {required && <span className="text-error ml-1">*</span>}
         </label>
       )}
       {children}
-      {error && <p className="mt-1.5 text-xs font-medium text-red-400">{error}</p>}
+      {error && <p className="mt-1.5 text-xs font-medium text-error">{error}</p>}
     </div>
   );
 }

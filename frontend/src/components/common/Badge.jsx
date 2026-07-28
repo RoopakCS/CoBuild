@@ -5,11 +5,11 @@
  */
 export function Badge({ variant = 'neutral', size = 'sm', children, className = '' }) {
   const variants = {
-    success: 'bg-blue-600/15 text-blue-500 border-blue-500/30',
-    warning: 'bg-amber-500/15 text-amber-400 border-amber-500/25',
-    danger:  'bg-red-500/15 text-red-400 border-red-500/25',
-    neutral: 'bg-slate-700/50 text-slate-300 border-slate-600/50',
-    info:    'bg-blue-600/15 text-blue-500 border-blue-500/30',
+    success: 'bg-success-green/10 text-success-green border-success-green/25',
+    warning: 'bg-warning-amber/10 text-warning-amber border-warning-amber/25',
+    danger:  'bg-error/10 text-error border-error/25',
+    neutral: 'bg-surface-dim text-text-muted border-border-subtle',
+    info:    'bg-tertiary/10 text-tertiary border-tertiary/25',
   };
 
   const sizes = {
