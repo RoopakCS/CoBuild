@@ -1,7 +1,7 @@
 import { forwardRef } from 'react';
 
 const baseClasses =
-  'w-full bg-surface-dim border border-border-subtle text-primary placeholder-text-muted rounded-lg focus:outline-none focus:border-primary focus:ring-2 focus:ring-tertiary/15 transition-all';
+  'w-full bg-surface-dim border border-border-subtle text-primary placeholder-text-muted rounded-md focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all';
 
 /**
  * Styled text input with consistent theming.
@@ -10,7 +10,7 @@ export const Input = forwardRef(function Input({ className = '', ...props }, ref
   return (
     <input
       ref={ref}
-      className={`${baseClasses} p-3 sm:p-4 text-sm sm:text-base ${className}`}
+      className={`${baseClasses} px-4 py-3 text-sm sm:text-base ${className}`}
       {...props}
     />
   );
@@ -23,7 +23,7 @@ export const Textarea = forwardRef(function Textarea({ className = '', ...props 
   return (
     <textarea
       ref={ref}
-      className={`${baseClasses} p-3 sm:p-4 text-sm sm:text-base resize-none ${className}`}
+      className={`${baseClasses} px-4 py-3 text-sm sm:text-base resize-none ${className}`}
       {...props}
     />
   );
@@ -36,7 +36,7 @@ export const Select = forwardRef(function Select({ className = '', children, ...
   return (
     <select
       ref={ref}
-      className={`${baseClasses} p-3 sm:p-4 text-sm sm:text-base appearance-none ${className}`}
+      className={`${baseClasses} px-4 py-3 text-sm sm:text-base appearance-none ${className}`}
       {...props}
     >
       {children}

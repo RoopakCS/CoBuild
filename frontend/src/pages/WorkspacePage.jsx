@@ -63,15 +63,15 @@ export function WorkspacePage() {
   // ── Loading State ──
   if (projectLoading || announcementsLoading) {
     return (
-      <div className="max-w-5xl mx-auto pb-12 animate-pulse">
-        <div className="h-6 w-32 bg-surface-dim rounded mb-8"></div>
-        <div className="rounded-2xl border border-border-subtle bg-surface p-8 h-24 mb-6"></div>
-        <div className="flex gap-3 mb-8">
-          <div className="h-10 w-36 bg-surface rounded-xl"></div>
-          <div className="h-10 w-28 bg-surface rounded-xl"></div>
-          <div className="h-10 w-36 bg-surface rounded-xl"></div>
+      <div className="max-w-5xl mx-auto pb-12 space-y-8 animate-pulse">
+        <div className="h-6 w-32 bg-border-subtle rounded mb-8"></div>
+        <div className="h-10 w-64 bg-border-subtle rounded mb-4"></div>
+        <div className="flex gap-6 border-b border-border-subtle pb-4">
+          <div className="h-6 w-24 bg-border-subtle rounded"></div>
+          <div className="h-6 w-24 bg-border-subtle rounded"></div>
+          <div className="h-6 w-32 bg-border-subtle rounded"></div>
         </div>
-        <div className="rounded-2xl border border-border-subtle bg-surface-dim p-8 h-64"></div>
+        <div className="h-64 w-full bg-border-subtle rounded-lg"></div>
       </div>
     );
   }
@@ -82,17 +82,15 @@ export function WorkspacePage() {
       <div className="max-w-5xl mx-auto pb-16 animate-fade-in">
         <button
           onClick={() => navigate(-1)}
-          className="flex items-center gap-2 text-text-muted hover:text-primary transition-all font-semibold text-sm group mb-8"
+          className="flex items-center gap-2 text-text-muted hover:text-primary transition-colors font-medium text-sm mb-12"
         >
-          <ArrowLeft weight="bold" className="group-hover:-translate-x-1 transition-transform" /> Back
+          <ArrowLeft weight="bold" /> Back
         </button>
 
-        <div className="rounded-3xl border border-error/20 bg-error-container p-12 text-center backdrop-blur-xl">
-          <div className="w-16 h-16 mx-auto mb-6 rounded-2xl bg-error/10 border border-error/20 flex items-center justify-center">
-            <ShieldWarning weight="duotone" className="w-8 h-8 text-error" />
-          </div>
-          <h2 className="headline-lg tracking-[-0.02em] mb-3">Access Denied</h2>
-          <p className="text-base text-text-muted font-medium max-w-md mx-auto leading-relaxed">
+        <div className="py-16 text-center border border-border-subtle rounded-lg bg-surface flex flex-col items-center">
+          <ShieldWarning weight="duotone" className="w-12 h-12 text-text-muted mb-4 opacity-50" />
+          <h2 className="headline-lg tracking-[-0.02em] mb-2">Access Denied</h2>
+          <p className="body-md text-text-muted max-w-md">
             This workspace is restricted to active team members. You must be part of this project to view its private workspace.
           </p>
           <button
@@ -111,32 +109,20 @@ export function WorkspacePage() {
       {/* ── Back Navigation ── */}
       <button
         onClick={() => navigate(`/projects/${projectId}`)}
-        className="flex items-center gap-2 text-text-muted hover:text-primary transition-all font-semibold text-sm group mb-6"
+        className="flex items-center gap-2 text-text-muted hover:text-primary transition-colors font-medium text-sm mb-8 group"
       >
         <ArrowLeft weight="bold" className="group-hover:-translate-x-1 transition-transform" /> Back to Project
       </button>
 
       {/* ── Workspace Header ── */}
-      <div className="rounded-3xl border border-border-subtle bg-surface-dim p-6 sm:p-8 shadow-2xl backdrop-blur-xl mb-8 relative overflow-hidden">
-        {/* Background glow */}
-        <div className="absolute -top-16 -right-16 w-64 h-64 bg-primary/10 rounded-full blur-3xl pointer-events-none"></div>
-        <div className="absolute -bottom-16 -left-16 w-64 h-64 bg-success-green/10 rounded-full blur-3xl pointer-events-none"></div>
-
-        <div className="relative z-10 flex items-center gap-4">
-          <div className="p-3 bg-primary/10 rounded-2xl border border-primary/20 shadow-inner">
-            <LockKey weight="duotone" className="w-7 h-7 text-primary" />
-          </div>
-          <div>
-            <p className="text-xs text-text-muted font-extrabold uppercase tracking-widest mb-1">Private Workspace</p>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-text-main tracking-tight font-display">
-              {project?.title || 'Project Workspace'}
-            </h1>
-          </div>
-        </div>
+      <div className="mb-10">
+        <h1 className="headline-xl tracking-[-0.03em] text-primary">
+          Workspace
+        </h1>
       </div>
 
       {/* ── Tab Navigation ── */}
-      <div className="flex gap-2 mb-8 p-1 bg-surface-dim rounded-2xl border border-border-subtle backdrop-blur-md">
+      <div className="flex gap-8 border-b border-border-subtle mb-8 overflow-x-auto hide-scrollbar">
         {TABS.map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.key;
@@ -144,13 +130,13 @@ export function WorkspacePage() {
             <button
               key={tab.key}
               onClick={() => setActiveTab(tab.key)}
-              className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-bold transition-all ${
+              className={`flex items-center gap-2 pb-4 text-sm font-semibold border-b-2 transition-colors whitespace-nowrap ${
                 isActive
-                  ? 'bg-primary/10 text-primary border border-primary/20 shadow-md'
-                  : 'text-text-muted hover:text-text-main hover:bg-surface border border-transparent'
+                  ? 'border-primary text-primary'
+                  : 'border-transparent text-text-muted hover:text-primary'
               }`}
             >
-              <Icon weight={isActive ? 'duotone' : 'regular'} className="w-4.5 h-4.5" />
+              <Icon weight={isActive ? 'bold' : 'regular'} className="w-4.5 h-4.5" />
               {tab.label}
             </button>
           );
@@ -158,7 +144,7 @@ export function WorkspacePage() {
       </div>
 
       {/* ── Tab Content ── */}
-      <div className="rounded-3xl border border-border-subtle bg-surface p-6 sm:p-8 shadow-xl backdrop-blur-sm">
+      <div className="animate-fade-in">
         {activeTab === 'announcements' && (
           <AnnouncementsList
             announcements={announcements || []}
@@ -170,11 +156,11 @@ export function WorkspacePage() {
 
         {activeTab === 'resources' && (
           linksLoading ? (
-            <div className="animate-pulse space-y-4">
-              <div className="h-6 w-40 bg-surface-dim rounded"></div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="h-28 bg-surface rounded-2xl"></div>
-                <div className="h-28 bg-surface rounded-2xl"></div>
+            <div className="space-y-4 animate-pulse">
+              <div className="h-6 w-40 bg-border-subtle rounded mb-6"></div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="h-32 bg-border-subtle rounded-lg"></div>
+                <div className="h-32 bg-border-subtle rounded-lg"></div>
               </div>
             </div>
           ) : (
@@ -189,12 +175,12 @@ export function WorkspacePage() {
 
         {activeTab === 'team' && (
           teamLoading ? (
-            <div className="animate-pulse space-y-4">
-              <div className="h-6 w-40 bg-surface-dim rounded"></div>
-              <div className="grid grid-cols-3 gap-4">
-                <div className="h-40 bg-surface rounded-2xl"></div>
-                <div className="h-40 bg-surface rounded-2xl"></div>
-                <div className="h-40 bg-surface rounded-2xl"></div>
+            <div className="space-y-4 animate-pulse">
+              <div className="h-6 w-40 bg-border-subtle rounded mb-6"></div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="h-24 bg-border-subtle rounded-lg"></div>
+                <div className="h-24 bg-border-subtle rounded-lg"></div>
+                <div className="h-24 bg-border-subtle rounded-lg"></div>
               </div>
             </div>
           ) : (

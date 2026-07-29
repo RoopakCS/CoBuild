@@ -2,54 +2,49 @@ import { Users, Crown, EnvelopeSimple, GithubLogo, LinkedinLogo } from '@phospho
 
 export function TeamDirectory({ members }) {
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Header */}
-      <div className="flex items-center gap-3">
-        <div className="p-2.5 bg-success-green/10 rounded-xl border border-success-green/20">
-          <Users weight="duotone" className="w-5 h-5 text-success-green" />
-        </div>
+      <div className="flex items-center justify-between mb-4">
         <div>
-          <h3 className="headline-lg tracking-[-0.02em]">Team Directory</h3>
-          <p className="text-xs text-text-muted font-medium">{members?.length || 0} members</p>
+          <p className="body-md text-text-muted font-medium">{members?.length || 0} members</p>
         </div>
       </div>
 
       {/* Members Grid */}
       {(!members || members.length === 0) ? (
-        <div className="text-center py-12 text-text-muted bg-surface-dim/30 border border-dashed border-border-subtle rounded-lg">
-          <Users weight="duotone" className="w-12 h-12 mx-auto mb-3 opacity-40" />
-          <p className="text-base font-bold text-text-main">No team members found</p>
+        <div className="py-12">
+          <p className="body-md text-text-muted">No team members found.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {members.map((member) => (
             <div
               key={member.userId}
-              className="rounded-2xl border border-border-subtle bg-surface p-5 transition-all hover:border-primary/40 group"
+              className="p-5 border border-border-subtle rounded-lg bg-surface group transition-colors hover:border-text-muted flex flex-col"
             >
               {/* Avatar & Name */}
-              <div className="flex items-center gap-3 mb-4">
+              <div className="flex items-center gap-4 mb-4">
                 {member.profilePhotoUrl ? (
                   <img
                     src={member.profilePhotoUrl}
                     alt={member.userName}
-                    className="w-11 h-11 rounded-full object-cover ring-2 ring-border-subtle group-hover:ring-primary/40 transition-colors"
+                    className="w-12 h-12 rounded-full object-cover border border-border-subtle"
                   />
                 ) : (
-                  <div className="w-11 h-11 rounded-full bg-surface-dim flex items-center justify-center text-sm font-bold text-text-muted border-2 border-border-subtle">
+                  <div className="w-12 h-12 rounded-full bg-surface-dim border border-border-subtle flex items-center justify-center text-sm font-bold text-text-muted">
                     {member.userName?.charAt(0)?.toUpperCase() || '?'}
                   </div>
                 )}
                 <div className="min-w-0 flex-1">
-                  <p className="text-sm font-bold text-text-main truncate">{member.userName}</p>
-                  <div className="flex items-center gap-2 mt-0.5">
+                  <p className="body-md font-bold text-primary truncate">{member.userName}</p>
+                  <div className="flex items-center gap-2 mt-1">
                     {member.membershipRole === 'OWNER' ? (
-                      <span className="inline-flex items-center gap-1 text-[10px] font-extrabold text-warning-amber bg-warning-amber/10 px-2 py-0.5 rounded-full border border-warning-amber/20 uppercase tracking-wider">
-                        <Crown weight="fill" className="w-3 h-3" /> Owner
+                      <span className="label-mono text-tertiary bg-tertiary/10 px-1.5 py-0.5 rounded-sm flex items-center gap-1">
+                        <Crown weight="fill" className="w-3 h-3" /> OWNER
                       </span>
                     ) : (
-                      <span className="text-[10px] font-extrabold text-primary bg-primary/10 px-2 py-0.5 rounded-full border border-primary/20 uppercase tracking-wider">
-                        Member
+                      <span className="label-mono text-text-muted bg-surface-dim px-1.5 py-0.5 rounded-sm border border-border-subtle">
+                        MEMBER
                       </span>
                     )}
                   </div>
@@ -58,50 +53,52 @@ export function TeamDirectory({ members }) {
 
               {/* Role Badge */}
               {member.projectRoleTitle && (
-                <div className="mb-3">
-                  <span className="label-mono text-[11px] bg-surface-dim px-2.5 py-1 rounded-lg border border-border-subtle text-text-main">
+                <div className="mb-4">
+                  <span className="label-mono text-text-main">
                     {member.projectRoleTitle}
                   </span>
                 </div>
               )}
 
-              {/* Contact Info */}
-              <div className="space-y-2 pt-3 border-t border-border-subtle">
-                <a
-                  href={`mailto:${member.email}`}
-                  className="flex items-center gap-2 text-xs text-text-muted hover:text-primary font-medium transition-colors truncate"
-                >
-                  <EnvelopeSimple weight="bold" className="w-3.5 h-3.5 shrink-0" />
-                  <span className="truncate">{member.email}</span>
-                </a>
-                {member.githubUrl && (
+              <div className="mt-auto">
+                {/* Contact Info */}
+                <div className="space-y-3 pt-4 border-t border-border-subtle">
                   <a
-                    href={member.githubUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2 text-xs text-text-muted hover:text-primary font-medium transition-colors truncate"
+                    href={`mailto:${member.email}`}
+                    className="flex items-center gap-2 body-sm text-text-muted hover:text-primary transition-colors truncate"
                   >
-                    <GithubLogo weight="bold" className="w-3.5 h-3.5 shrink-0" />
-                    <span className="truncate">GitHub</span>
+                    <EnvelopeSimple weight="bold" className="w-4 h-4 shrink-0" />
+                    <span className="truncate">{member.email}</span>
                   </a>
-                )}
-                {member.linkedinUrl && (
-                  <a
-                    href={member.linkedinUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2 text-xs text-text-muted hover:text-primary font-medium transition-colors truncate"
-                  >
-                    <LinkedinLogo weight="bold" className="w-3.5 h-3.5 shrink-0" />
-                    <span className="truncate">LinkedIn</span>
-                  </a>
-                )}
-              </div>
+                  {member.githubUrl && (
+                    <a
+                      href={member.githubUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 body-sm text-text-muted hover:text-primary transition-colors truncate"
+                    >
+                      <GithubLogo weight="bold" className="w-4 h-4 shrink-0" />
+                      <span className="truncate">GitHub</span>
+                    </a>
+                  )}
+                  {member.linkedinUrl && (
+                    <a
+                      href={member.linkedinUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 body-sm text-text-muted hover:text-primary transition-colors truncate"
+                    >
+                      <LinkedinLogo weight="bold" className="w-4 h-4 shrink-0" />
+                      <span className="truncate">LinkedIn</span>
+                    </a>
+                  )}
+                </div>
 
-              {/* Joined */}
-              <p className="text-[11px] text-text-muted mt-3 font-medium">
-                Joined {new Date(member.joinedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-              </p>
+                {/* Joined */}
+                <p className="label-mono text-text-muted lowercase mt-4">
+                  Joined {new Date(member.joinedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                </p>
+              </div>
             </div>
           ))}
         </div>

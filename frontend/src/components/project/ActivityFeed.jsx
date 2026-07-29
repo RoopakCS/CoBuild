@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { activitiesApi } from '../../api/activities';
 import { Textarea, FormField } from '../common/Input';
-import { Trash, PaperPlaneRight, UserCircle, Lightning } from '@phosphor-icons/react';
 import { toast } from 'sonner';
 import { formatDistanceToNow } from 'date-fns';
 
@@ -49,126 +48,119 @@ export function ActivityFeed({ projectId, isOwner, isMember, currentUserId }) {
 
   return (
     <div className="surface-1 p-6 md:p-8 rounded-lg">
-      <div className="flex items-center gap-2 mb-6 border-b border-border-subtle pb-4">
-        <Lightning size={24} className="text-tertiary" weight="duotone" />
+      <div className="mb-8">
         <h3 className="headline-lg tracking-[-0.02em]">Project Activity</h3>
       </div>
 
-      {/* Post Box (Only for Team Members and Owners) */}
-      {(isOwner || isMember) && (
-        <form onSubmit={handleSubmit} className="mb-8 p-4 bg-surface-dim rounded-lg border border-border-subtle">
-          <FormField htmlFor="post-activity">
-            <Textarea
-              id="post-activity"
-              rows={3}
-              placeholder="Share an update, milestone, or request with the community..."
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              className="bg-surface text-sm border-transparent focus:border-border-subtle shadow-sm mb-3"
-            />
-          </FormField>
-          <div className="flex justify-between items-center">
-            <p className="text-xs text-text-muted">Supports plain text formatting.</p>
-            <button
-              type="submit"
-              disabled={postMutation.isPending || !content.trim()}
-              className="btn-primary btn-sm flex items-center gap-2 px-5 py-2 shadow-sm rounded-full disabled:opacity-50"
-            >
-              {postMutation.isPending ? 'Posting...' : 'Post Update'}
-              <PaperPlaneRight size={16} weight="bold" />
-            </button>
-          </div>
-        </form>
-      )}
-
-      {/* Loading State */}
-      {isLoading && (
-        <div className="space-y-4 animate-pulse">
-          {[1, 2, 3].map(i => (
-            <div key={i} className="flex gap-4 p-4 rounded-lg border border-border-subtle/50 bg-surface-dim/30">
-              <div className="w-10 h-10 bg-border-subtle rounded-full shrink-0"></div>
-              <div className="flex-1 space-y-2">
-                <div className="h-4 w-32 bg-border-subtle rounded"></div>
-                <div className="h-3 w-full bg-border-subtle rounded"></div>
-                <div className="h-3 w-3/4 bg-border-subtle rounded"></div>
+      <div className="relative">
+        {/* Post Box (Only for Team Members and Owners) */}
+        {(isOwner || isMember) && (
+          <div className="relative z-10 mb-10">
+            <form onSubmit={handleSubmit} className="space-y-3">
+              <Textarea
+                rows={3}
+                placeholder="Share an update, milestone, or request..."
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                className="w-full text-sm"
+              />
+              <div className="flex justify-end items-center">
+                <button
+                  type="submit"
+                  disabled={postMutation.isPending || !content.trim()}
+                  className="btn-primary btn-sm px-5 py-1.5 disabled:opacity-50"
+                >
+                  {postMutation.isPending ? 'Posting...' : 'Post'}
+                </button>
               </div>
-            </div>
-          ))}
-        </div>
-      )}
+            </form>
+          </div>
+        )}
 
-      {/* Empty State */}
-      {!isLoading && activities.length === 0 && (
-        <div className="text-center py-10 px-4 bg-surface-dim/30 border border-dashed border-border-subtle rounded-lg">
-          <Lightning size={32} weight="duotone" className="text-text-muted mx-auto mb-3 opacity-50" />
-          <h4 className="text-sm font-semibold text-primary mb-1">No activities yet</h4>
-          <p className="text-sm text-text-muted">
-            {(isOwner || isMember) 
-              ? "Be the first to post an update to show project momentum." 
-              : "This project hasn't posted any public updates yet."}
-          </p>
-        </div>
-      )}
-
-      {/* Activity List */}
-      {!isLoading && activities.length > 0 && (
-        <div className="space-y-5">
-          {activities.map((activity) => {
-            const canDelete = isOwner || activity.authorId === currentUserId;
-            
-            return (
-              <div key={activity.id} className="group flex gap-4 p-4 rounded-lg bg-surface border border-border-subtle hover:border-tertiary/40 transition-colors shadow-sm">
-                
-                {/* Avatar */}
-                <div className="shrink-0">
-                  {activity.authorProfileImageUrl ? (
-                    <img 
-                      src={activity.authorProfileImageUrl} 
-                      alt={activity.authorName} 
-                      className="w-10 h-10 rounded-full object-cover ring-2 ring-surface-dim"
-                    />
-                  ) : (
-                    <UserCircle size={40} weight="light" className="text-text-muted" />
-                  )}
+        {/* Loading State */}
+        {isLoading && (
+          <div className="space-y-8 relative z-10 animate-pulse">
+            {[1, 2, 3].map(i => (
+              <div key={i} className="flex gap-4">
+                <div className="flex-1 space-y-3 pt-2">
+                  <div className="h-4 w-32 bg-border-subtle rounded"></div>
+                  <div className="h-3 w-full bg-border-subtle rounded"></div>
+                  <div className="h-3 w-3/4 bg-border-subtle rounded"></div>
                 </div>
+              </div>
+            ))}
+          </div>
+        )}
 
-                {/* Content Area */}
-                <div className="flex-1 min-w-0">
-                  <div className="flex justify-between items-start mb-1">
-                    <div className="truncate pr-4">
-                      <span className="font-bold text-primary text-sm mr-2">{activity.authorName}</span>
-                      <span className="text-xs text-text-muted font-medium">
-                        {formatDistanceToNow(new Date(activity.createdAt), { addSuffix: true })}
-                      </span>
+        {/* Empty State */}
+        {!isLoading && activities.length === 0 && (
+          <div className="relative z-10">
+            <p className="text-sm font-medium text-text-muted">
+              {(isOwner || isMember) 
+                ? "Be the first to post an update." 
+                : "No public updates yet."}
+            </p>
+          </div>
+        )}
+
+        {/* Activity List */}
+        {!isLoading && activities.length > 0 && (
+          <div className="space-y-8 relative z-10">
+            {activities.map((activity) => {
+              const canDelete = isOwner || activity.authorId === currentUserId;
+              
+              return (
+                <div key={activity.id} className="group">
+                  {/* Content Area */}
+                  <div className="min-w-0 pt-1">
+                    <div className="flex justify-between items-start mb-2">
+                      <div className="truncate pr-4 flex items-center gap-2">
+                        {activity.authorProfileImageUrl ? (
+                          <img 
+                            src={activity.authorProfileImageUrl} 
+                            alt={activity.authorName} 
+                            className="w-5 h-5 rounded-full object-cover border border-border-subtle"
+                          />
+                        ) : (
+                          <div className="w-5 h-5 rounded-full bg-surface-dim border border-border-subtle flex items-center justify-center text-[9px] font-bold text-text-muted">
+                            {activity.authorName?.charAt(0)?.toUpperCase()}
+                          </div>
+                        )}
+                        <span className="body-sm font-bold text-primary">{activity.authorName}</span>
+                        <span className="text-[5px] text-border-subtle">•</span>
+                        <span className="label-mono text-text-muted lowercase">
+                          {formatDistanceToNow(new Date(activity.createdAt), { addSuffix: true })}
+                        </span>
+                      </div>
+                      
+                      {/* Delete Action (Hidden by default, shown on group hover) */}
+                      {canDelete && (
+                        <button
+                          onClick={() => {
+                            if (window.confirm('Delete this activity?')) {
+                              deleteMutation.mutate({ projectId, activityId: activity.id });
+                            }
+                          }}
+                          disabled={deleteMutation.isPending}
+                          className="text-xs font-bold text-text-muted hover:text-error opacity-0 group-hover:opacity-100 transition-all uppercase tracking-widest"
+                        >
+                          Delete
+                        </button>
+                      )}
                     </div>
                     
-                    {/* Delete Action (Hidden by default, shown on group hover) */}
-                    {canDelete && (
-                      <button
-                        onClick={() => {
-                          if (window.confirm('Are you sure you want to delete this activity?')) {
-                            deleteMutation.mutate({ projectId, activityId: activity.id });
-                          }
-                        }}
-                        disabled={deleteMutation.isPending}
-                        className="p-1.5 text-text-muted hover:text-error hover:bg-error-container rounded-md opacity-0 group-hover:opacity-100 transition-all shrink-0"
-                        title="Delete activity"
-                      >
-                        <Trash size={16} weight="bold" />
-                      </button>
-                    )}
-                  </div>
-                  
-                  {/* Message Body */}
-                  <div className="text-sm text-primary leading-relaxed whitespace-pre-wrap break-words">
-                    {activity.content}
+                    {/* Message Body */}
+                    <div className="body-sm text-primary leading-relaxed whitespace-pre-wrap break-words">
+                      {activity.content}
+                    </div>
                   </div>
                 </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
+              );
+            })}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
+

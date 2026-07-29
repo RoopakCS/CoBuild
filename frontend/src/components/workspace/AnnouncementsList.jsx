@@ -3,6 +3,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { workspaceApi } from '../../api/workspace';
 import { PushPin, Trash, Plus, X, Megaphone } from '@phosphor-icons/react';
 import { toast } from 'sonner';
+import { Input, Textarea } from '../common/Input';
 
 export function AnnouncementsList({ announcements, projectId, currentUserId, isOwner }) {
   const queryClient = useQueryClient();
@@ -15,7 +16,7 @@ export function AnnouncementsList({ announcements, projectId, currentUserId, isO
       queryClient.invalidateQueries({ queryKey: ['workspace', 'announcements', projectId] });
       setForm({ title: '', content: '', isPinned: false });
       setShowForm(false);
-      toast.success('Announcement posted!');
+      toast.success('Announcement posted');
     },
     onError: (e) => toast.error(e.response?.data?.message || 'Failed to create announcement'),
   });
@@ -36,62 +37,56 @@ export function AnnouncementsList({ announcements, projectId, currentUserId, isO
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="p-2.5 bg-warning-amber/10 rounded-xl border border-warning-amber/20">
-            <Megaphone weight="duotone" className="w-5 h-5 text-warning-amber" />
-          </div>
-          <div>
-            <h3 className="headline-lg tracking-[-0.02em]">Announcements</h3>
-            <p className="text-xs text-text-muted font-medium">{announcements?.length || 0} posted</p>
-          </div>
+      <div className="flex items-center justify-between mb-4">
+        <div>
+          <p className="body-md text-text-muted font-medium">{announcements?.length || 0} posted updates</p>
         </div>
-        <button
-          onClick={() => setShowForm(!showForm)}
-          className="btn-primary btn-sm flex items-center gap-2 uppercase tracking-widest px-4 py-2"
-        >
-          {showForm ? <X weight="bold" className="w-4 h-4" /> : <Plus weight="bold" className="w-4 h-4" />}
-          {showForm ? 'Cancel' : 'New Announcement'}
-        </button>
+        {(isOwner || currentUserId) && (
+          <button
+            onClick={() => setShowForm(!showForm)}
+            className="btn-primary btn-sm flex items-center gap-2"
+          >
+            {showForm ? <X weight="bold" /> : <Plus weight="bold" />}
+            {showForm ? 'Cancel' : 'New Post'}
+          </button>
+        )}
       </div>
 
       {/* Create Form */}
       {showForm && (
-        <form onSubmit={handleSubmit} className="rounded-2xl border border-border-subtle bg-surface-dim p-5 space-y-4 animate-fade-in">
-          <input
+        <form onSubmit={handleSubmit} className="border border-border-subtle bg-surface p-6 space-y-4 animate-fade-in rounded-lg shadow-sm">
+          <Input
             type="text"
-            placeholder="Announcement title..."
+            placeholder="Announcement Title"
             value={form.title}
             onChange={(e) => setForm({ ...form, title: e.target.value })}
             maxLength={200}
-            className="w-full bg-surface border border-border-subtle rounded-xl px-4 py-3 text-sm text-text-main placeholder-text-muted font-medium focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20"
+            className="font-bold text-lg"
           />
-          <textarea
-            placeholder="Write your announcement..."
+          <Textarea
+            placeholder="Write the announcement details..."
             value={form.content}
             onChange={(e) => setForm({ ...form, content: e.target.value })}
-            rows={4}
-            className="w-full bg-surface border border-border-subtle rounded-xl px-4 py-3 text-sm text-text-main placeholder-text-muted font-medium focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 resize-none"
+            rows={5}
           />
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <label className="flex items-center gap-2 text-sm text-text-muted font-medium cursor-pointer select-none">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-2">
+            <label className="flex items-center gap-2 text-sm text-text-muted font-medium cursor-pointer select-none group">
               <input
                 type="checkbox"
                 checked={form.isPinned}
                 onChange={(e) => setForm({ ...form, isPinned: e.target.checked })}
                 className="w-4 h-4 rounded border-border-subtle bg-surface text-primary focus:ring-primary/30"
               />
-              <PushPin weight="fill" className="w-3.5 h-3.5 text-warning-amber" />
-              Pin this announcement
+              <span className="group-hover:text-primary transition-colors">Pin announcement</span>
             </label>
             <button
               type="submit"
               disabled={createMutation.isPending || !form.title.trim() || !form.content.trim()}
-              className="btn-primary btn-sm px-5 py-2"
+              className="btn-primary px-6"
             >
-              {createMutation.isPending ? 'Posting...' : 'Post Announcement'}
+              {createMutation.isPending ? 'Posting...' : 'Post'}
             </button>
           </div>
         </form>
@@ -99,61 +94,62 @@ export function AnnouncementsList({ announcements, projectId, currentUserId, isO
 
       {/* Announcements List */}
       {(!announcements || announcements.length === 0) ? (
-        <div className="text-center py-12 text-text-muted bg-surface-dim/30 border border-dashed border-border-subtle rounded-lg">
-          <Megaphone weight="duotone" className="w-12 h-12 mx-auto mb-3 opacity-40" />
-          <p className="text-base font-bold text-text-main">No announcements yet</p>
-          <p className="text-sm mt-1">Team updates and important notices will appear here.</p>
+        <div className="py-12">
+          <p className="body-md text-text-muted">No announcements have been posted yet.</p>
         </div>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-6">
           {announcements.map((a) => (
             <div
               key={a.id}
-              className={`rounded-2xl border p-5 relative group transition-all ${
-                a.pinned
-                  ? 'border-warning-amber/30 bg-warning-amber/5'
-                  : 'border-border-subtle bg-surface'
+              className={`p-6 relative group transition-all border border-border-subtle rounded-lg ${
+                a.isPinned ? 'bg-surface-dim' : 'bg-surface'
               }`}
             >
-              {/* Pinned badge */}
-              {a.pinned && (
-                <div className="absolute top-4 right-4 flex items-center gap-1.5 text-[10px] font-extrabold text-warning-amber bg-warning-amber/10 px-2.5 py-1 rounded-full border border-warning-amber/20 uppercase tracking-wider">
-                  <PushPin weight="fill" className="w-3 h-3" /> Pinned
-                </div>
-              )}
-
-              {/* Author */}
-              <div className="flex items-center gap-3 mb-3">
-                {a.authorPhotoUrl ? (
-                  <img src={a.authorPhotoUrl} alt={a.authorName} className="w-8 h-8 rounded-full object-cover ring-1 ring-border-subtle" />
-                ) : (
-                  <div className="w-8 h-8 rounded-full bg-surface-dim flex items-center justify-center text-xs font-bold text-text-muted border border-border-subtle">
-                    {a.authorName?.charAt(0)?.toUpperCase() || '?'}
+              {/* Header */}
+              <div className="flex items-start justify-between mb-4">
+                <div className="flex items-center gap-3">
+                  {a.authorPhotoUrl ? (
+                    <img src={a.authorPhotoUrl} alt={a.authorName} className="w-10 h-10 rounded-full object-cover border border-border-subtle" />
+                  ) : (
+                    <div className="w-10 h-10 rounded-full bg-surface border border-border-subtle flex items-center justify-center text-sm font-bold text-text-muted">
+                      {a.authorName?.charAt(0)?.toUpperCase() || '?'}
+                    </div>
+                  )}
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="body-md font-bold text-primary">{a.authorName}</span>
+                      {a.isPinned && (
+                        <span className="label-mono text-tertiary bg-tertiary/10 px-1.5 py-0.5 rounded-sm flex items-center gap-1">
+                          <PushPin weight="fill" className="w-3 h-3" /> PINNED
+                        </span>
+                      )}
+                    </div>
+                    <p className="label-mono text-text-muted lowercase mt-0.5">
+                      {new Date(a.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                    </p>
                   </div>
-                )}
-                <div>
-                  <p className="text-sm font-bold text-text-main">{a.authorName}</p>
-                  <p className="text-[11px] text-text-muted font-medium">
-                    {new Date(a.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
-                  </p>
                 </div>
+
+                {/* Delete button */}
+                {(a.authorId === currentUserId || isOwner) && (
+                  <button
+                    onClick={() => {
+                      if (window.confirm('Delete this announcement?')) {
+                        deleteMutation.mutate(a.id);
+                      }
+                    }}
+                    disabled={deleteMutation.isPending}
+                    className="text-xs font-bold text-text-muted hover:text-error opacity-0 group-hover:opacity-100 transition-all uppercase tracking-widest"
+                  >
+                    Delete
+                  </button>
+                )}
               </div>
 
               {/* Content */}
-              <h4 className="text-base font-bold text-text-main mb-2">{a.title}</h4>
-              <p className="text-sm text-text-muted leading-relaxed whitespace-pre-wrap">{a.content}</p>
-
-              {/* Delete button (author or owner) */}
-              {(a.authorId === currentUserId || isOwner) && (
-                <button
-                  onClick={() => deleteMutation.mutate(a.id)}
-                  disabled={deleteMutation.isPending}
-                  className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 text-text-muted hover:text-error transition-all p-1.5 rounded-lg hover:bg-error-container"
-                  title="Delete announcement"
-                >
-                  <Trash weight="bold" className="w-4 h-4" />
-                </button>
-              )}
+              <h4 className="headline-lg tracking-[-0.02em] text-primary mb-2">{a.title}</h4>
+              <div className="body-md text-primary leading-relaxed whitespace-pre-wrap">{a.content}</div>
             </div>
           ))}
         </div>

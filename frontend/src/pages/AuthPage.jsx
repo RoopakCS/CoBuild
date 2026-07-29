@@ -192,7 +192,7 @@ export function AuthPage({ mode }) {
         </div>
 
         {/* Auth Card */}
-        <div className="surface-1 rounded-2xl p-8 shadow-xl border border-border-subtle/60 backdrop-blur-sm">
+        <div className="surface-1 rounded-lg p-8 shadow-[0px_4px_12px_rgba(0,0,0,0.05)] border border-border-subtle/60 backdrop-blur-sm">
           
           {/* Card Header & Stepper */}
           <div className="mb-6">
@@ -274,7 +274,7 @@ export function AuthPage({ mode }) {
               <button 
                 type="submit" 
                 disabled={loading}
-                className="w-full btn-primary py-3.5 rounded-lg font-semibold flex items-center justify-center group disabled:opacity-50 shadow-md"
+                className="w-full btn-primary py-3.5 rounded-md font-semibold flex items-center justify-center group disabled:opacity-50"
               >
                 {loading ? 'Signing in...' : 'Sign In'}
                 {!loading && <ArrowRight size={18} weight="bold" className="ml-2 group-hover:translate-x-1 transition-transform" />}
@@ -393,7 +393,7 @@ export function AuthPage({ mode }) {
               <button 
                 type="submit" 
                 disabled={loading}
-                className="w-full btn-primary py-3.5 rounded-lg font-semibold flex items-center justify-center group disabled:opacity-50 shadow-md mt-2"
+                className="w-full btn-primary py-3.5 rounded-md font-semibold flex items-center justify-center group disabled:opacity-50 mt-2"
               >
                 <span>{loading ? 'Sending Verification Code...' : 'Continue to Verification'}</span>
                 {!loading && <ArrowRight size={18} weight="bold" className="ml-2 group-hover:translate-x-1 transition-transform" />}
@@ -453,7 +453,7 @@ export function AuthPage({ mode }) {
                     required
                     maxLength={6}
                     autoFocus
-                    className="w-full pl-11 pr-4 py-3.5 bg-surface border border-border-subtle rounded-lg font-mono text-xl font-bold text-center tracking-[0.4em] text-primary placeholder:text-text-muted/40 placeholder:tracking-normal focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary transition-all"
+                    className="w-full pl-11 pr-4 py-3.5 bg-surface border border-border-subtle rounded-md font-mono text-xl font-bold text-center tracking-[0.4em] text-primary placeholder:text-text-muted/40 placeholder:tracking-normal focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary transition-all"
                     value={authCode} 
                     onChange={e => setAuthCode(e.target.value.replace(/\D/g, ''))} 
                     placeholder="123456"
@@ -470,7 +470,7 @@ export function AuthPage({ mode }) {
               <button 
                 type="submit" 
                 disabled={loading || authCode.length < 6}
-                className="w-full btn-primary py-3.5 rounded-lg font-semibold flex items-center justify-center group disabled:opacity-50 shadow-md"
+                className="w-full btn-primary py-3.5 rounded-md font-semibold flex items-center justify-center group disabled:opacity-50"
               >
                 {loading ? 'Verifying & Registering...' : 'Verify & Create Account'}
                 {!loading && <CheckCircle size={18} weight="bold" className="ml-2" />}

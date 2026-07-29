@@ -73,7 +73,7 @@ export function ProjectFilters() {
             placeholder="Search projects by title or keywords..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-12 pr-10 py-3 bg-surface border border-border-subtle rounded-lg body-md focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all shadow-sm"
+            className="w-full pl-12 pr-10 py-3 bg-surface border border-border-subtle rounded-md body-md focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all shadow-sm"
           />
           {search && (
             <button 
@@ -87,7 +87,7 @@ export function ProjectFilters() {
         
         <button 
           onClick={() => setIsFiltersOpen(!isFiltersOpen)}
-          className={`p-3 rounded-lg border transition-all flex items-center justify-center relative shadow-sm hover:shadow-md ${
+          className={`p-3 rounded-md border transition-all flex items-center justify-center relative shadow-sm hover:shadow-md ${
             isFiltersOpen || hasActiveFilters
               ? 'bg-primary text-surface border-primary' 
               : 'bg-surface border-border-subtle text-text-muted hover:text-primary'
@@ -103,7 +103,7 @@ export function ProjectFilters() {
 
       {/* Expanded Filters Panel */}
       {isFiltersOpen && (
-        <div className="p-6 bg-surface border border-border-subtle rounded-xl shadow-sm animate-fade-in">
+        <div className="p-6 bg-surface border border-border-subtle rounded-lg shadow-sm animate-fade-in">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             
             {/* Domain */}
@@ -175,7 +175,7 @@ export function ProjectFilters() {
             <button 
               onClick={clearAll}
               disabled={!hasActiveFilters && !search}
-              className="px-6 py-2 border border-border-subtle text-text-muted font-semibold button-text rounded-lg hover:bg-surface-dim hover:text-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-6 py-2 border border-border-subtle text-text-muted font-semibold button-text rounded-md hover:bg-surface-dim hover:text-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Reset All
             </button>

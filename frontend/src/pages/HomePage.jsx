@@ -33,7 +33,7 @@ export function HomePage() {
         </p>
 
         <div className="mt-8 sm:mt-10 flex flex-col sm:flex-row gap-4 animate-slide-up" style={{ animationDelay: '0.4s', animationFillMode: 'both' }}>
-          <Link to="/register" className="btn-primary btn-lg flex items-center justify-center group h-12 sm:h-14 px-8 rounded-lg text-[16px] font-semibold">
+          <Link to="/register" className="btn-primary btn-lg flex items-center justify-center group px-8 rounded-md text-[16px] font-semibold">
             Start Building for Free
           </Link>
         </div>
