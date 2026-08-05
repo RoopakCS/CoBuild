@@ -3,6 +3,7 @@ package com.cobuild.backend.project.specification;
 import com.cobuild.backend.project.ExperienceLevel;
 import com.cobuild.backend.project.Project;
 import com.cobuild.backend.project.ProjectStatus;
+import com.cobuild.backend.project.ProjectType;
 import com.cobuild.backend.role.ProjectRole;
 import com.cobuild.backend.role.RoleSkill;
 import jakarta.persistence.criteria.Join;
@@ -95,19 +96,30 @@ public class ProjectSpecification {
         };
     }
 
+    public static Specification<Project> hasProjectType(ProjectType projectType) {
+        return (root, query, cb) -> {
+            if (projectType == null) {
+                return null;
+            }
+            return cb.equal(root.get("projectType"), projectType);
+        };
+    }
+
     public static Specification<Project> withFilters(
             String search,
             String domain,
             ExperienceLevel level,
             ProjectStatus status,
-            List<String> skills) {
+            List<String> skills,
+            ProjectType projectType) {
 
         return Specification
                 .where(hasSearch(search))
                 .and(hasDomain(domain))
                 .and(hasExperienceLevel(level))
                 .and(hasStatus(status))
-                .and(hasSkills(skills));
+                .and(hasSkills(skills))
+                .and(hasProjectType(projectType));
     }
 
 }

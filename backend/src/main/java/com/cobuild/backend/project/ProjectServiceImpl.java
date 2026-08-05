@@ -46,6 +46,15 @@ public class ProjectServiceImpl implements ProjectService {
                 .commitment(request.getCommitment())
                 .repositoryUrl(request.getRepositoryUrl())
                 .status(ProjectStatus.OPEN)
+                .projectType(request.getProjectType() != null
+                        ? request.getProjectType()
+                        : ProjectType.SIDE_PROJECT)
+                .eventStartDate(request.getEventStartDate())
+                .eventEndDate(request.getEventEndDate())
+                .registrationDeadline(request.getRegistrationDeadline())
+                .prizePool(request.getPrizePool())
+                .organizerName(request.getOrganizerName())
+                .hackathonUrl(request.getHackathonUrl())
                 .build();
 
         Project savedProject = projectRepository.save(project);
@@ -70,6 +79,7 @@ public class ProjectServiceImpl implements ProjectService {
             ExperienceLevel experienceLevel,
             ProjectStatus status,
             List<String> skills,
+            ProjectType projectType,
             Pageable pageable) {
 
         return projectRepository.findAll(
@@ -78,7 +88,8 @@ public class ProjectServiceImpl implements ProjectService {
                                 domain,
                                 experienceLevel,
                                 status,
-                                skills
+                                skills,
+                                projectType
                         ),
                         pageable
                 )
@@ -124,6 +135,27 @@ public class ProjectServiceImpl implements ProjectService {
 
         if (request.getRepositoryUrl() != null)
             project.setRepositoryUrl(request.getRepositoryUrl());
+
+        if (request.getProjectType() != null)
+            project.setProjectType(request.getProjectType());
+
+        if (request.getEventStartDate() != null)
+            project.setEventStartDate(request.getEventStartDate());
+
+        if (request.getEventEndDate() != null)
+            project.setEventEndDate(request.getEventEndDate());
+
+        if (request.getRegistrationDeadline() != null)
+            project.setRegistrationDeadline(request.getRegistrationDeadline());
+
+        if (request.getPrizePool() != null)
+            project.setPrizePool(request.getPrizePool());
+
+        if (request.getOrganizerName() != null)
+            project.setOrganizerName(request.getOrganizerName());
+
+        if (request.getHackathonUrl() != null)
+            project.setHackathonUrl(request.getHackathonUrl());
 
         Project updatedProject = projectRepository.save(project);
 

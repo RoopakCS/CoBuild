@@ -5,6 +5,10 @@ export const projectsApi = {
     const { data } = await apiClient.get('/projects', { params });
     return data;
   },
+  getHackathons: async (params) => {
+    const { data } = await apiClient.get('/projects', { params: { ...params, projectType: 'HACKATHON' } });
+    return data;
+  },
   getById: async (id) => {
     const { data } = await apiClient.get(`/projects/${id}`);
     return data;
@@ -26,3 +30,4 @@ export const projectsApi = {
     return data;
   },
 };
+

@@ -4,7 +4,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { projectsApi } from '../api/projects';
 import { rolesApi } from '../api/roles';
-import { Plus, Trash } from '@phosphor-icons/react';
+import { Plus, Trash, Wrench, Trophy } from '@phosphor-icons/react';
 
 export function CreateProjectPage() {
   const navigate = useNavigate();
@@ -18,7 +18,14 @@ export function CreateProjectPage() {
     teamSize: 1,
     commitment: 'PART_TIME',
     repositoryUrl: '',
-    skills: []
+    skills: [],
+    projectType: 'SIDE_PROJECT',
+    eventStartDate: '',
+    eventEndDate: '',
+    registrationDeadline: '',
+    prizePool: '',
+    organizerName: '',
+    hackathonUrl: '',
   });
 
   const [skillsInput, setSkillsInput] = useState('');
@@ -77,6 +84,28 @@ export function CreateProjectPage() {
       <div className="mb-8">
         <h1 className="headline-xl text-primary tracking-[-0.02em] mb-2">Create New Project</h1>
         <p className="body-md text-text-muted">Define your idea and find the right collaborators for your build.</p>
+      </div>
+
+      {/* Project Type Toggle */}
+      <div className="mb-8 p-1 rounded-xl flex gap-1"
+        style={{ background: 'rgba(15,23,42,0.06)', border: '1px solid var(--color-border-subtle)' }}>
+        {[
+          { value: 'SIDE_PROJECT', label: <span className="flex items-center gap-1.5"><Wrench weight="fill" /> Side Project</span>, sub: 'Ongoing collaboration' },
+          { value: 'HACKATHON', label: <span className="flex items-center gap-1.5"><Trophy weight="fill" /> Hackathon</span>, sub: 'Time-boxed event' },
+        ].map(({ value, label, sub }) => (
+          <button
+            key={value}
+            type="button"
+            onClick={() => setFormData({ ...formData, projectType: value })}
+            className={`flex-1 py-3 px-4 rounded-lg transition-all duration-200 text-left ${
+              formData.projectType === value
+                ? 'bg-surface shadow-sm border border-border-subtle'
+                : 'hover:bg-surface/60'
+            }`}>
+            <div className={`body-md font-semibold ${formData.projectType === value ? 'text-primary' : 'text-text-muted'}`}>{label}</div>
+            <div className="text-xs text-text-muted mt-0.5">{sub}</div>
+          </button>
+        ))}
       </div>
       
       <div className="surface-1 rounded-lg p-6 sm:p-10 shadow-sm">
@@ -168,6 +197,58 @@ export function CreateProjectPage() {
               placeholder="React, TypeScript, Python, PostgreSQL"
             />
           </div>
+
+          {/* ── Hackathon-specific fields ─────────────────────────── */}
+          {formData.projectType === 'HACKATHON' && (
+            <div className="space-y-5 animate-fade-in pt-4 mt-2">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="label-mono uppercase px-2 py-1 rounded-sm text-tertiary bg-tertiary/10">
+                  Hackathon Details
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div>
+                  <label className="block label-mono text-primary mb-2">EVENT START DATE</label>
+                  <input type="date" className={inputClass} value={formData.eventStartDate}
+                    onChange={e => setFormData({ ...formData, eventStartDate: e.target.value })} />
+                </div>
+                <div>
+                  <label className="block label-mono text-primary mb-2">EVENT END DATE</label>
+                  <input type="date" className={inputClass} value={formData.eventEndDate}
+                    onChange={e => setFormData({ ...formData, eventEndDate: e.target.value })} />
+                </div>
+              </div>
+
+              <div>
+                <label className="block label-mono text-primary mb-2">REGISTRATION DEADLINE</label>
+                <input type="date" className={inputClass} value={formData.registrationDeadline}
+                  onChange={e => setFormData({ ...formData, registrationDeadline: e.target.value })} />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div>
+                  <label className="block label-mono text-primary mb-2">PRIZE POOL <span className="text-text-muted normal-case font-normal">(optional)</span></label>
+                  <input className={inputClass} value={formData.prizePool}
+                    onChange={e => setFormData({ ...formData, prizePool: e.target.value })}
+                    placeholder="e.g. $10,000 in prizes" />
+                </div>
+                <div>
+                  <label className="block label-mono text-primary mb-2">ORGANIZER <span className="text-text-muted normal-case font-normal">(optional)</span></label>
+                  <input className={inputClass} value={formData.organizerName}
+                    onChange={e => setFormData({ ...formData, organizerName: e.target.value })}
+                    placeholder="e.g. MLH, Devfolio" />
+                </div>
+              </div>
+
+              <div>
+                <label className="block label-mono text-primary mb-2">HACKATHON URL <span className="text-text-muted normal-case font-normal">(optional)</span></label>
+                <input type="url" className={inputClass} value={formData.hackathonUrl}
+                  onChange={e => setFormData({ ...formData, hackathonUrl: e.target.value })}
+                  placeholder="https://hackathon.example.com" />
+              </div>
+            </div>
+          )}
 
           <div className="border-t border-border-subtle pt-8 mt-8">
             <div className="flex items-center justify-between mb-4">

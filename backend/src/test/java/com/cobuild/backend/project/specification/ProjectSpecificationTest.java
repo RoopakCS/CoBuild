@@ -108,7 +108,8 @@ class ProjectSpecificationTest {
                 "Web Development",
                 ExperienceLevel.INTERMEDIATE,
                 ProjectStatus.OPEN,
-                List.of("Java", "Spring")
+                List.of("Java", "Spring"),
+                null
         );
         assertThat(spec).isNotNull();
     }
@@ -117,7 +118,7 @@ class ProjectSpecificationTest {
     @DisplayName("withFilters handles all nulls gracefully (no filter)")
     void withFilters_allNulls() {
         Specification<Project> spec = ProjectSpecification.withFilters(
-                null, null, null, null, null
+                null, null, null, null, null, null
         );
         assertThat(spec).isNotNull();
     }
@@ -130,7 +131,8 @@ class ProjectSpecificationTest {
                 "Web Development",
                 ExperienceLevel.INTERMEDIATE,
                 ProjectStatus.OPEN,
-                List.of("React", "Tailwind")
+                List.of("React", "Tailwind"),
+                null
         );
         assertThat(spec).isNotNull();
     }

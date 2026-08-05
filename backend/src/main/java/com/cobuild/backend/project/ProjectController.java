@@ -52,6 +52,9 @@ public class ProjectController {
             @RequestParam(required = false)
             List<String> skills,
 
+            @RequestParam(required = false)
+            ProjectType projectType,
+
             Pageable pageable) {
 
         return ResponseEntity.ok(
@@ -61,6 +64,7 @@ public class ProjectController {
                         experienceLevel,
                         status,
                         skills,
+                        projectType,
                         pageable
                 )
         );

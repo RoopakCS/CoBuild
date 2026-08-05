@@ -21,6 +21,7 @@ public interface ProjectService {
             ExperienceLevel experienceLevel,
             ProjectStatus status,
             List<String> skills,
+            ProjectType projectType,
             Pageable pageable);
 
     ProjectResponse updateProject(UUID id,
@@ -30,4 +31,4 @@ public interface ProjectService {
 
     List<ProjectResponse> getProjectsByOwner(UUID ownerId);
 
-}
+}

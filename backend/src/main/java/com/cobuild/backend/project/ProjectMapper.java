@@ -64,6 +64,14 @@ public class ProjectMapper {
                 )
                 .roles(roleResponses)
                 .isFull(isFull)
+                // hackathon fields
+                .projectType(project.getProjectType())
+                .eventStartDate(project.getEventStartDate())
+                .eventEndDate(project.getEventEndDate())
+                .registrationDeadline(project.getRegistrationDeadline())
+                .prizePool(project.getPrizePool())
+                .organizerName(project.getOrganizerName())
+                .hackathonUrl(project.getHackathonUrl())
                 .createdAt(project.getCreatedAt())
                 .updatedAt(project.getUpdatedAt())
                 .build();

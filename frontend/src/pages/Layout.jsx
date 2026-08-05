@@ -13,6 +13,7 @@ export function Layout() {
 
   const navItems = [
     { name: 'Discover', path: '/discover' },
+    { name: 'Hackathons', path: '/hackathons' },
     { name: 'My Projects', path: '/my-projects' },
     { name: 'Profile', path: '/profile' },
   ];

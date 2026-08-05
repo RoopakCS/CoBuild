@@ -10,6 +10,7 @@ import { MyProjectsPage } from './pages/MyProjectsPage';
 import { UserProfilePage } from './pages/UserProfilePage';
 import { HomePage } from './pages/HomePage';
 import { WorkspacePage } from './pages/WorkspacePage';
+import { HackathonsPage } from './pages/HackathonsPage';
 import { ProtectedRoute } from './components/common/ProtectedRoute';
 
 import { Toaster } from 'sonner';
@@ -27,6 +28,7 @@ function App() {
         <Route element={<ProtectedRoute />}>
           <Route element={<Layout />}>
             <Route path="/discover" element={<DashboardPage />} />
+            <Route path="/hackathons" element={<HackathonsPage />} />
             <Route path="/projects/new" element={<CreateProjectPage />} />
             <Route path="/projects/:id" element={<ProjectDetailsPage />} />
             <Route path="/projects/:id/workspace" element={<WorkspacePage />} />

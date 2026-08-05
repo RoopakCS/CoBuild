@@ -5,7 +5,7 @@ import { applicationsApi } from '../api/applications';
 import { usersApi } from '../api/users';
 import { membershipsApi } from '../api/memberships';
 import { useState } from 'react';
-import { ArrowLeft, CheckCircle, Clock, LockKey } from '@phosphor-icons/react';
+import { ArrowLeft, CheckCircle, Clock, LockKey, Trophy, Calendar, Timer, Buildings, Link as LinkIcon } from '@phosphor-icons/react';
 import { toast } from 'sonner';
 import { ConfirmDialog } from '../components/common/ConfirmDialog';
 import { RoleList } from '../components/project/RoleList';
@@ -13,6 +13,21 @@ import { ApplyRoleModal } from '../components/application/ApplyRoleModal';
 import { TeamMemberList } from '../components/team/TeamMemberList';
 import { GitHubStatsCard } from '../components/github/GitHubStatsCard';
 import { ActivityFeed } from '../components/project/ActivityFeed';
+
+function formatDate(dateStr) {
+  if (!dateStr) return null;
+  return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+function DaysUntil({ dateStr }) {
+  if (!dateStr) return null;
+  const diff = Math.ceil((new Date(dateStr) - new Date()) / (1000 * 60 * 60 * 24));
+  if (diff < 0) return <span className="text-error font-semibold">Registration Closed</span>;
+  if (diff === 0) return <span className="text-warning-amber font-semibold">Closes Today!</span>;
+  if (diff <= 7) return <span className="text-warning-amber font-semibold">{diff}d left</span>;
+  return <span className="text-success-green font-semibold">{diff} days left</span>;
+}
+
 
 export function ProjectDetailsPage() {
   const { id } = useParams();
@@ -100,6 +115,70 @@ export function ProjectDetailsPage() {
           <ArrowLeft weight="bold" className="group-hover:-translate-x-1 transition-transform" /> Back
         </button>
       </div>
+
+      {/* ── Hackathon Banner (only for HACKATHON type) ─────────────── */}
+      {project.projectType === 'HACKATHON' && (
+        <div className="mb-8 rounded-xl overflow-hidden surface-1 shadow-sm border border-border-subtle relative">
+          <div className="absolute left-0 top-0 bottom-0 w-1 bg-tertiary" />
+          <div className="p-6 pl-8">
+            <div className="flex flex-wrap items-center gap-2 mb-4">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-sm label-mono text-tertiary bg-tertiary/10 border border-tertiary/20 uppercase">
+                Hackathon Event
+              </span>
+              {project.prizePool && (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-sm label-mono text-warning-amber bg-warning-amber/10 border border-warning-amber/20 uppercase">
+                  <Trophy size={14} weight="fill" /> {project.prizePool}
+                </span>
+              )}
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
+              {project.eventStartDate && (
+                <div className="flex flex-col gap-1.5">
+                  <div className="flex items-center gap-1.5 text-text-muted label-mono uppercase">
+                    <Calendar size={16} /> Event Dates
+                  </div>
+                  <span className="body-md font-semibold text-primary">
+                    {formatDate(project.eventStartDate)}
+                    {project.eventEndDate && <> – {formatDate(project.eventEndDate)}</>}
+                  </span>
+                </div>
+              )}
+              {project.registrationDeadline && (
+                <div className="flex flex-col gap-1.5">
+                  <div className="flex items-center gap-1.5 text-text-muted label-mono uppercase">
+                    <Timer size={16} /> Reg. Deadline
+                  </div>
+                  <div className="body-md">
+                    <span className="font-semibold text-primary">{formatDate(project.registrationDeadline)}</span>
+                    <span className="text-border-subtle mx-2">·</span>
+                    <DaysUntil dateStr={project.registrationDeadline} />
+                  </div>
+                </div>
+              )}
+              {project.organizerName && (
+                <div className="flex flex-col gap-1.5">
+                  <div className="flex items-center gap-1.5 text-text-muted label-mono uppercase">
+                    <Buildings size={16} /> Organizer
+                  </div>
+                  <span className="body-md font-semibold text-primary">{project.organizerName}</span>
+                </div>
+              )}
+              {project.hackathonUrl && (
+                <div className="flex flex-col gap-1.5">
+                  <div className="flex items-center gap-1.5 text-text-muted label-mono uppercase">
+                    <LinkIcon size={16} /> Official Site
+                  </div>
+                  <a href={project.hackathonUrl} target="_blank" rel="noopener noreferrer"
+                    className="body-md font-semibold text-tertiary hover:opacity-80 transition-opacity truncate">
+                    Visit site ↗
+                  </a>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Hero Section */}
       <section className="mb-8 border-b border-border-subtle pb-8">

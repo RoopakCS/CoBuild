@@ -1,7 +1,5 @@
 package com.cobuild.backend.project;
 
-
-
 import com.cobuild.backend.role.ProjectRole;
 import java.util.List;
 
@@ -12,6 +10,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.BatchSize;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -58,6 +57,27 @@ public class Project {
 
     private String repositoryUrl;
 
+    // ── Project type ─────────────────────────────────────────
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    @Builder.Default
+    private ProjectType projectType = ProjectType.SIDE_PROJECT;
+
+    // ── Hackathon-specific fields (null for SIDE_PROJECT) ────
+    private LocalDate eventStartDate;
+
+    private LocalDate eventEndDate;
+
+    private LocalDate registrationDeadline;
+
+    private String prizePool;
+
+    private String organizerName;
+
+    @Column(length = 500)
+    private String hackathonUrl;
+
+    // ─────────────────────────────────────────────────────────
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
