@@ -68,11 +68,20 @@ public class ProjectActivityService {
     }
 
     public Page<ProjectActivityResponse> getProjectActivities(UUID projectId, Pageable pageable) {
-        if (!projectRepository.existsById(projectId)) {
-            throw new ResourceNotFoundException("Project not found");
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new ResourceNotFoundException("Project not found"));
+
+        // Authorization: only active members or the owner can read the activity feed
+        User currentUser = getCurrentUser();
+        boolean isOwner = project.getOwner().getId().equals(currentUser.getId());
+        if (!isOwner) {
+            membershipRepository.findByProjectIdAndUserId(projectId, currentUser.getId())
+                    .filter(m -> m.getStatus() == MembershipStatus.ACTIVE
+                            || m.getStatus() == MembershipStatus.LEAVE_PENDING)
+                    .orElseThrow(() -> new ForbiddenException(
+                            "You must be an active team member to view project activities"));
         }
 
-        // Fetch from DB and map each Entity to our Response DTO
         return activityRepository.findByProjectIdOrderByCreatedAtDesc(projectId, pageable)
                 .map(this::mapToResponse);
     }

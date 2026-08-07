@@ -23,9 +23,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.security.SecureRandom;
 import java.time.Instant;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -52,7 +55,7 @@ public class AuthService {
         Bucket bucket = rateLimitingService.resolveOtpBucket(request.getEmail());
         if (!bucket.tryConsume(1)) {
             throw new TooManyRequestsException(
-                    "Too many verification requests. Please wait 15 minutes before requesting a new code.");
+                    "Too many verification requests. Please wait a minute before requesting a new code.");
         }
 
         String plainCode = generateSixDigitCode();
@@ -81,6 +84,7 @@ public class AuthService {
             throw new BadRequestException("Verification code has expired. Please request a new one");
         }
         if (verification.getAttempts() >= MAX_VERIFY_ATTEMPTS) {
+            log.warn("OTP lockout | Email: {} | Attempts: {}", request.getEmail(), verification.getAttempts());
             throw new BadRequestException(
                     "Too many failed attempts. Please request a new verification code");
         }
@@ -89,9 +93,12 @@ public class AuthService {
             verification.setAttempts(verification.getAttempts() + 1);
             emailVerificationRepository.save(verification);
             int remaining = MAX_VERIFY_ATTEMPTS - verification.getAttempts();
+            log.warn("OTP verification failed | Email: {} | Remaining Attempts: {}", request.getEmail(), remaining);
             throw new BadRequestException(
                     "Invalid verification code. " + remaining + " attempt(s) remaining");
         }
+
+        log.info("OTP verification successful | Email: {}", request.getEmail());
 
         verification.setVerified(true);
         emailVerificationRepository.save(verification);
@@ -132,12 +139,17 @@ public class AuthService {
     }
 
     public AuthResponse login(LoginRequest request) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.getEmail(),
-                        request.getPassword()
-                )
-        );
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            request.getEmail(),
+                            request.getPassword()
+                    )
+            );
+        } catch (org.springframework.security.core.AuthenticationException e) {
+            log.warn("Failed login attempt | Email: {} | Reason: {}", request.getEmail(), e.getMessage());
+            throw e;
+        }
 
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));

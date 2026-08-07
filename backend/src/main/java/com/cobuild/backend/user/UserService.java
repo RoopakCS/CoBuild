@@ -1,5 +1,7 @@
 package com.cobuild.backend.user;
 
+import com.cobuild.backend.exception.ForbiddenException;
+import com.cobuild.backend.exception.ResourceNotFoundException;
 import com.cobuild.backend.membership.MembershipRepository;
 import com.cobuild.backend.project.ProjectMapper;
 import com.cobuild.backend.project.ProjectRepository;
@@ -76,7 +78,7 @@ public class UserService {
     public UserProfileResponse getUserProfile(UUID id) {
 
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         return mapToProfileResponse(user);
     }
@@ -91,24 +93,24 @@ public class UserService {
                 SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication == null || !authentication.isAuthenticated()) {
-            throw new RuntimeException("User is not authenticated");
+            throw new ForbiddenException("User is not authenticated");
         }
 
         Object principal = authentication.getPrincipal();
 
         if (!(principal instanceof UserPrincipal userPrincipal)) {
-            throw new RuntimeException("Invalid authentication principal");
+            throw new ForbiddenException("Invalid authentication principal");
         }
 
         User principalUser = userPrincipal.getUser();
 
         if (principalUser == null || principalUser.getId() == null) {
-            throw new RuntimeException("Authenticated user not found");
+            throw new ForbiddenException("Authenticated user not found");
         }
 
         // Re-fetch from DB so the entity is attached to the current session
         return userRepository.findById(principalUser.getId())
-                .orElseThrow(() -> new RuntimeException("Authenticated user not found in database"));
+                .orElseThrow(() -> new ForbiddenException("Authenticated user not found in database"));
     }
 
     /**

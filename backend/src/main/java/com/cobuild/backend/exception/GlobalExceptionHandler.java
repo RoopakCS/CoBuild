@@ -6,11 +6,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -162,6 +164,9 @@ public class GlobalExceptionHandler {
             TooManyRequestsException ex,
             HttpServletRequest request) {
 
+        String ip = getClientIp(request);
+        log.warn("Rate limit exceeded | IP: {} | URI: {}", ip, request.getRequestURI());
+
         ApiError error = ApiError.builder()
                 .timestamp(LocalDateTime.now())
                 .status(HttpStatus.TOO_MANY_REQUESTS.value())
@@ -181,6 +186,9 @@ public class GlobalExceptionHandler {
             Exception ex,
             HttpServletRequest request) {
 
+        String ip = getClientIp(request);
+        log.error("Internal Server Error (5xx) | IP: {} | URI: {} | Message: {}", ip, request.getRequestURI(), ex.getMessage(), ex);
+
         ApiError error = ApiError.builder()
                 .timestamp(LocalDateTime.now())
                 .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
@@ -190,5 +198,13 @@ public class GlobalExceptionHandler {
                 .build();
 
         return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    private String getClientIp(HttpServletRequest request) {
+        String xfHeader = request.getHeader("X-Forwarded-For");
+        if (xfHeader == null) {
+            return request.getRemoteAddr();
+        }
+        return xfHeader.split(",")[0].trim();
     }
 }
