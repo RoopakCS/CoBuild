@@ -9,8 +9,12 @@ export const authApi = {
     const { data } = await apiClient.post('/auth/register', credentials);
     return data;
   },
-  sendCode: async (email, code) => {
-    const { data } = await apiClient.post('/auth/send-code', { email, code });
+  sendCode: async (email) => {
+    const { data } = await apiClient.post('/auth/send-code', { email });
+    return data;
+  },
+  verifyCode: async (email, code) => {
+    const { data } = await apiClient.post('/auth/verify-code', { email, code });
     return data;
   },
 };

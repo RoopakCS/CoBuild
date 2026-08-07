@@ -21,6 +21,9 @@ public class EmailService {
     @Value("${resend.api.key:${RESEND_API_KEY:}}")
     private String resendApiKey;
 
+    @Value("${cobuild.resend.from-email:CoBuild <onboarding@resend.dev>}")
+    private String resendFromEmail;
+
     public void sendVerificationCode(String toEmail, String code) {
         String htmlContent = buildVerificationEmailHtml(code);
 
@@ -63,7 +66,7 @@ public class EmailService {
     private boolean sendViaResendApi(String toEmail, String code, String htmlContent) {
         try {
             java.net.http.HttpClient client = java.net.http.HttpClient.newHttpClient();
-            String from = "CoBuild <onboarding@resend.dev>";
+            String from = resendFromEmail;
             
             // Format JSON body for Resend API
             String jsonPayload = "{"

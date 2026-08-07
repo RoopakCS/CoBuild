@@ -43,18 +43,6 @@ export function AuthPage({ mode }) {
   });
 
   const [authCode, setAuthCode] = useState('');
-  const [generatedCode, setGeneratedCode] = useState(() => {
-    const saved = sessionStorage.getItem('pendingRegistration');
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        if (Date.now() - parsed.timestamp < 10 * 60 * 1000 && parsed.generatedCode) {
-          return parsed.generatedCode;
-        }
-      } catch (e) {}
-    }
-    return '';
-  });
 
   const [resendCountdown, setResendCountdown] = useState(0);
 
@@ -99,32 +87,24 @@ export function AuthPage({ mode }) {
     }
 
     setLoading(true);
-    const code = Math.floor(100000 + Math.random() * 900000).toString();
-
-    setGeneratedCode(code);
-    setStep(2);
-    setResendCountdown(60);
-
-    // Save pending state to sessionStorage so reload stays on Step 2
-    sessionStorage.setItem('pendingRegistration', JSON.stringify({
-      formData,
-      step: 2,
-      generatedCode: code,
-      timestamp: Date.now()
-    }));
-
     try {
-      // Dispatch verification code to user's email via Gmail SMTP
-      await authApi.sendCode(formData.email, code);
+      await authApi.sendCode(formData.email);
+      setStep(2);
+      setResendCountdown(60);
+      // Save pending state to sessionStorage so reload stays on Step 2
+      sessionStorage.setItem('pendingRegistration', JSON.stringify({
+        formData,
+        step: 2,
+        timestamp: Date.now()
+      }));
     } catch (err) {
-      console.warn('Background email delivery notice:', err.message);
-      // If email is duplicate, return to Step 1 and show validation error
-      if (err.response?.data?.message?.includes('already exists')) {
-        setError(err.response.data.message);
+      const msg = err.response?.data?.message || err.message || 'Failed to send verification code';
+      // Duplicate email — go back to Step 1 so the user can correct it
+      if (msg.includes('already exists')) {
         setStep(1);
         sessionStorage.removeItem('pendingRegistration');
       }
-      // Network timeouts/502 Bad Gateway are treated as background exceptions without showing red error boxes
+      setError(msg);
     } finally {
       setLoading(false);
     }
@@ -133,14 +113,11 @@ export function AuthPage({ mode }) {
   const handleVerifyAndSubmit = async (e) => {
     e.preventDefault();
     setError('');
-
-    if (authCode.trim() !== generatedCode) {
-      setError('Invalid authentication code. Please check and try again.');
-      return;
-    }
-
     setLoading(true);
     try {
+      // Step 1: validate OTP server-side
+      await authApi.verifyCode(formData.email, authCode);
+      // Step 2: proceed with registration now that email is verified
       const data = await authApi.register({
         name: formData.name,
         email: formData.email,
@@ -150,7 +127,7 @@ export function AuthPage({ mode }) {
       localStorage.setItem('token', data.token);
       navigate('/discover');
     } catch (err) {
-      setError(err.response?.data?.message || err.message || 'Registration failed');
+      setError(err.response?.data?.message || err.message || 'Verification failed');
     } finally {
       setLoading(false);
     }
