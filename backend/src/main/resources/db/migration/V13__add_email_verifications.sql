@@ -1,4 +1,4 @@
-CREATE TABLE email_verifications (
+CREATE TABLE IF NOT EXISTS email_verifications (
     id          BIGSERIAL PRIMARY KEY,
     email       VARCHAR(255)             NOT NULL,
     code_hash   VARCHAR(255)             NOT NULL,
@@ -8,4 +8,4 @@ CREATE TABLE email_verifications (
     created_at  TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
 );
 
-CREATE INDEX idx_email_verifications_email ON email_verifications (email);
+CREATE INDEX IF NOT EXISTS idx_email_verifications_email ON email_verifications (email);
