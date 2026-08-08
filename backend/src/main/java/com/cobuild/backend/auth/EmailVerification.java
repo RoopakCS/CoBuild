@@ -41,4 +41,7 @@ public class EmailVerification {
     @Column(name = "created_at", nullable = false, updatable = false)
     @Builder.Default
     private Instant createdAt = Instant.now();
+
+    @jakarta.persistence.Version
+    private Long version;
 }

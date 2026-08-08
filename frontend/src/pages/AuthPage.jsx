@@ -127,7 +127,18 @@ export function AuthPage({ mode }) {
       localStorage.setItem('token', data.token);
       navigate('/discover');
     } catch (err) {
-      setError(err.response?.data?.message || err.message || 'Verification failed');
+      const msg = err.response?.data?.message || err.message || 'Verification failed';
+      if (msg.toLowerCase().includes('expired')) {
+        setError('Your verification code has expired. Please click "Resend Code" to get a new one.');
+        setAuthCode('');
+        setResendCountdown(0);
+      } else if (msg.toLowerCase().includes('already been used')) {
+        setError('This code has already been used. Please request a new one.');
+        setAuthCode('');
+        setResendCountdown(0);
+      } else {
+        setError(msg);
+      }
     } finally {
       setLoading(false);
     }

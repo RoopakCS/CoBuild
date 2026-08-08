@@ -28,6 +28,7 @@ public interface ProjectRepository
     @EntityGraph(attributePaths = {"owner", "roles"})
     Optional<Project> findWithDetailsById(UUID id);
 
+    @EntityGraph(attributePaths = {"owner", "roles"})
     List<Project> findByOwner(User owner);
 
     Page<Project> findByDomainIgnoreCase(

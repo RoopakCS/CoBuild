@@ -17,6 +17,7 @@ import com.cobuild.backend.user.User;
 import com.cobuild.backend.user.UserRepository;
 import io.github.bucket4j.Bucket;
 import lombok.RequiredArgsConstructor;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -73,35 +74,40 @@ public class AuthService {
 
     @Transactional
     public void verifyCode(VerifyCodeRequest request) {
-        EmailVerification verification = emailVerificationRepository
-                .findTopByEmailOrderByCreatedAtDesc(request.getEmail())
-                .orElseThrow(() -> new BadRequestException("No verification code found for this email"));
+        try {
+            EmailVerification verification = emailVerificationRepository
+                    .findTopByEmailOrderByCreatedAtDesc(request.getEmail())
+                    .orElseThrow(() -> new BadRequestException("No verification code found for this email"));
 
-        if (verification.isVerified()) {
-            throw new BadRequestException("This code has already been used");
-        }
-        if (Instant.now().isAfter(verification.getExpiresAt())) {
-            throw new BadRequestException("Verification code has expired. Please request a new one");
-        }
-        if (verification.getAttempts() >= MAX_VERIFY_ATTEMPTS) {
-            log.warn("OTP lockout | Email: {} | Attempts: {}", request.getEmail(), verification.getAttempts());
-            throw new BadRequestException(
-                    "Too many failed attempts. Please request a new verification code");
-        }
+            if (verification.isVerified()) {
+                throw new BadRequestException("This code has already been used");
+            }
+            if (Instant.now().isAfter(verification.getExpiresAt())) {
+                throw new BadRequestException("Verification code has expired. Please request a new one");
+            }
+            if (verification.getAttempts() >= MAX_VERIFY_ATTEMPTS) {
+                log.warn("OTP lockout | Email: {} | Attempts: {}", request.getEmail(), verification.getAttempts());
+                throw new BadRequestException(
+                        "Too many failed attempts. Please request a new verification code");
+            }
 
-        if (!passwordEncoder.matches(request.getCode(), verification.getCodeHash())) {
-            verification.setAttempts(verification.getAttempts() + 1);
+            if (!passwordEncoder.matches(request.getCode(), verification.getCodeHash())) {
+                verification.setAttempts(verification.getAttempts() + 1);
+                emailVerificationRepository.save(verification);
+                int remaining = MAX_VERIFY_ATTEMPTS - verification.getAttempts();
+                log.warn("OTP verification failed | Email: {} | Remaining Attempts: {}", request.getEmail(), remaining);
+                throw new BadRequestException(
+                        "Invalid verification code. " + remaining + " attempt(s) remaining");
+            }
+
+            log.info("OTP verification successful | Email: {}", request.getEmail());
+
+            verification.setVerified(true);
             emailVerificationRepository.save(verification);
-            int remaining = MAX_VERIFY_ATTEMPTS - verification.getAttempts();
-            log.warn("OTP verification failed | Email: {} | Remaining Attempts: {}", request.getEmail(), remaining);
-            throw new BadRequestException(
-                    "Invalid verification code. " + remaining + " attempt(s) remaining");
+        } catch (ObjectOptimisticLockingFailureException e) {
+            log.warn("OTP concurrent verification conflict | Email: {}", request.getEmail());
+            throw new BadRequestException("Verification conflict. Please try again.");
         }
-
-        log.info("OTP verification successful | Email: {}", request.getEmail());
-
-        verification.setVerified(true);
-        emailVerificationRepository.save(verification);
     }
 
     @Transactional

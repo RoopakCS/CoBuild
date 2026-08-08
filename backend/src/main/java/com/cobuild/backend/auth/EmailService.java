@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -24,6 +25,7 @@ public class EmailService {
     @Value("${cobuild.resend.from-email:CoBuild <onboarding@resend.dev>}")
     private String resendFromEmail;
 
+    @Async
     public void sendVerificationCode(String toEmail, String code) {
         String htmlContent = buildVerificationEmailHtml(code);
 

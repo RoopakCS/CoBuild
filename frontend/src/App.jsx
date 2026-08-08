@@ -1,4 +1,5 @@
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
 import { Layout } from './pages/Layout';
 import { AuthPage } from './pages/AuthPage';
 import { DashboardPage } from './pages/DashboardPage';
@@ -16,6 +17,14 @@ import { ProtectedRoute } from './components/common/ProtectedRoute';
 import { Toaster } from 'sonner';
 
 function App() {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const onAuthExpired = () => navigate('/login', { replace: true });
+    window.addEventListener('auth:expired', onAuthExpired);
+    return () => window.removeEventListener('auth:expired', onAuthExpired);
+  }, [navigate]);
+
   return (
     <>
       <Toaster theme="dark" position="top-right" />
