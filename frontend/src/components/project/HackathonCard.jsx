@@ -28,10 +28,7 @@ export function HackathonCard({ project }) {
   const totalOpenings = openRoles.reduce((sum, r) => sum + (r.openingsCount - r.filledCount), 0);
 
   return (
-    <div className="group surface-1 rounded-lg overflow-hidden flex flex-col hover:border-tertiary transition-all duration-200 cursor-pointer hover:shadow-[0_4px_20px_rgba(59,130,246,0.08)]">
-
-      {/* Top accent strip — indigo, distinguishes from ProjectCard's plain surface */}
-      <div className="h-0.5 w-full bg-tertiary opacity-60 group-hover:opacity-100 transition-opacity" />
+    <div className="group surface-1 rounded-lg overflow-hidden flex flex-col hover:border-text-muted transition-all duration-200 cursor-pointer">
 
       <div className="p-6 space-y-4">
         {/* Badges row */}
@@ -54,9 +51,8 @@ export function HackathonCard({ project }) {
           <h2 className="headline-lg-mobile text-primary group-hover:text-tertiary transition-colors tracking-[-0.02em] line-clamp-2 flex-1">
             {project.title}
           </h2>
-          {/* Organizer avatar */}
-          <div className="w-9 h-9 rounded-full flex-shrink-0 flex items-center justify-center text-white font-bold text-xs bg-tertiary">
-            {(project.organizerName || project.ownerName || 'CX').substring(0, 2).toUpperCase()}
+          <div className="w-8 h-8 rounded-full border-2 border-surface flex-shrink-0 flex items-center justify-center text-text-muted font-bold text-xs bg-surface-dim uppercase">
+            {(project.organizerName || project.ownerName || 'CX').substring(0, 2)}
           </div>
         </div>
 
