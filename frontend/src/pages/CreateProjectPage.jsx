@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { projectsApi } from '../api/projects';
@@ -8,6 +8,8 @@ import { Plus, Trash, Wrench, Trophy } from '@phosphor-icons/react';
 
 export function CreateProjectPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const queryType = searchParams.get('type') === 'HACKATHON' ? 'HACKATHON' : 'SIDE_PROJECT';
   const queryClient = useQueryClient();
 
   const [formData, setFormData] = useState({
@@ -19,7 +21,7 @@ export function CreateProjectPage() {
     commitment: 'PART_TIME',
     repositoryUrl: '',
     skills: [],
-    projectType: 'SIDE_PROJECT',
+    projectType: queryType,
     eventStartDate: '',
     eventEndDate: '',
     registrationDeadline: '',
@@ -80,10 +82,16 @@ export function CreateProjectPage() {
   const inputClass = "w-full rounded-md bg-surface-dim border border-border-subtle px-4 py-3 body-md text-primary placeholder:text-text-muted focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary transition-all";
 
   return (
-    <div className="max-w-3xl mx-auto pb-16 animate-fade-in">
-      <div className="mb-8">
-        <h1 className="headline-xl text-primary tracking-[-0.02em] mb-2">Create New Project</h1>
-        <p className="body-md text-text-muted">Define your idea and find the right collaborators for your build.</p>
+    <div className="mx-auto max-w-3xl pb-16">
+      <div className="flex flex-col gap-2 mb-8">
+        <h1 className="headline-xl text-primary tracking-[-0.02em]">
+          {formData.projectType === 'HACKATHON' ? 'Post a Hackathon' : 'Create a Project'}
+        </h1>
+        <p className="body-md text-text-muted">
+          {formData.projectType === 'HACKATHON' 
+            ? 'List an upcoming hackathon to help developers find teammates and build.'
+            : 'Start something new and find the right people to build it with.'}
+        </p>
       </div>
 
       {/* Project Type Toggle */}
