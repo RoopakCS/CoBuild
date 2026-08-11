@@ -4,7 +4,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { projectsApi } from '../api/projects';
 import { rolesApi } from '../api/roles';
-import { Plus, Trash, Wrench, Trophy } from '@phosphor-icons/react';
+import { Plus, Trash } from '@phosphor-icons/react';
 
 export function CreateProjectPage() {
   const navigate = useNavigate();
@@ -98,17 +98,17 @@ export function CreateProjectPage() {
       <div className="mb-8 p-1 rounded-xl flex gap-1"
         style={{ background: 'rgba(15,23,42,0.06)', border: '1px solid var(--color-border-subtle)' }}>
         {[
-          { value: 'SIDE_PROJECT', label: <span className="flex items-center gap-1.5"><Wrench weight="fill" /> Side Project</span>, sub: 'Ongoing collaboration' },
-          { value: 'HACKATHON', label: <span className="flex items-center gap-1.5"><Trophy weight="fill" /> Hackathon</span>, sub: 'Time-boxed event' },
+          { value: 'SIDE_PROJECT', label: 'Side Project', sub: 'Ongoing collaboration' },
+          { value: 'HACKATHON', label: 'Hackathon', sub: 'Time-boxed event' },
         ].map(({ value, label, sub }) => (
           <button
             key={value}
             type="button"
             onClick={() => setFormData({ ...formData, projectType: value })}
-            className={`flex-1 py-3 px-4 rounded-lg transition-all duration-200 text-left ${
+            className={`flex-1 py-3 px-4 rounded-lg transition-all duration-200 text-left focus:outline-none ${
               formData.projectType === value
                 ? 'bg-surface shadow-sm border border-border-subtle'
-                : 'hover:bg-surface/60'
+                : 'hover:bg-surface/60 border border-transparent'
             }`}>
             <div className={`body-md font-semibold ${formData.projectType === value ? 'text-primary' : 'text-text-muted'}`}>{label}</div>
             <div className="text-xs text-text-muted mt-0.5">{sub}</div>
