@@ -1,4 +1,5 @@
 import { Link, Navigate } from 'react-router-dom';
+import { ThemeToggle } from '../components/common/ThemeToggle';
 
 export function HomePage() {
   if (localStorage.getItem('token')) {
@@ -12,7 +13,8 @@ export function HomePage() {
         <div className="flex items-center gap-2">
           <span className="text-xl font-bold tracking-tight text-primary">CoBuild</span>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
+          <ThemeToggle />
           <Link to="/login" className="btn-ghost hidden sm:block">Sign In</Link>
           <Link to="/register" className="btn-primary font-semibold">Get Started</Link>
         </div>

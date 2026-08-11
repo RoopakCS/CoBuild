@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { List, X } from '@phosphor-icons/react';
+import { ThemeToggle } from '../components/common/ThemeToggle';
 
 export function Layout() {
   const location = useLocation();
@@ -51,8 +52,10 @@ export function Layout() {
             </div>
           </div>
           
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             
+            <ThemeToggle />
+
             <Link
               to="/projects/new"
               className="btn-primary hidden sm:flex items-center justify-center px-4 py-2"
@@ -98,7 +101,11 @@ export function Layout() {
               ))}
             </nav>
 
-            <div className="pt-6 border-t border-border-subtle">
+            <div className="pt-6 border-t border-border-subtle space-y-4">
+              <div className="flex items-center justify-between px-4">
+                <span className="body-sm text-text-muted font-medium">Appearance</span>
+                <ThemeToggle />
+              </div>
               <Link
                 to="/projects/new"
                 className="btn-primary w-full flex items-center justify-center py-3"

@@ -27,7 +27,7 @@ function App() {
 
   return (
     <>
-      <Toaster theme="dark" position="top-right" />
+      <Toaster theme="system" position="top-right" />
       <Routes>
         <Route path="/login" element={<AuthPage mode="login" />} />
         <Route path="/register" element={<AuthPage mode="register" />} />

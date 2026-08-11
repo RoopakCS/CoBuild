@@ -17,6 +17,8 @@
 }
 
 :root {
+  color-scheme: light;
+
   /* CoBuild MVP Product Design System */
   
   /* Colors */
@@ -33,6 +35,30 @@
   --color-warning-amber: #f59e0b;
   --color-error: #ba1a1a;
   --color-error-container: #ffdad6;
+  --color-shimmer-mid: #e8edf3;
+  --color-on-primary: #ffffff;
+  --color-on-tertiary: #ffffff;
+}
+
+.dark {
+  color-scheme: dark;
+
+  --color-primary: #e2e8f0;
+  --color-secondary: #94a3b8;
+  --color-tertiary: #60a5fa;
+  --color-background: #000000;
+  --color-surface: #0a0a0a;
+  --color-surface-dim: #141414;
+  --color-border-subtle: #232323;
+  --color-text-main: #e8eaed;
+  --color-text-muted: #8892a4;
+  --color-success-green: #34d399;
+  --color-warning-amber: #fbbf24;
+  --color-error: #f87171;
+  --color-error-container: #3b1c1c;
+  --color-shimmer-mid: #1e1e1e;
+  --color-on-primary: #0a0a0a;
+  --color-on-tertiary: #0a0a0a;
 }
 
 @theme {
@@ -133,7 +159,8 @@ body {
    3 sizes: sm (28px), md (36px), lg (44px)
    ═══════════════════════════════════════════════════ */
 .btn-primary {
-  @apply bg-primary text-white rounded-md px-4 py-2 transition-all button-text cursor-pointer;
+  @apply bg-primary rounded-md px-4 py-2 transition-all button-text cursor-pointer;
+  color: var(--color-on-primary);
 }
 .btn-primary:hover {
   @apply bg-secondary;
@@ -162,7 +189,8 @@ body {
 }
 
 .btn-tertiary {
-  @apply bg-tertiary text-white rounded-md px-4 py-2 transition-all button-text cursor-pointer;
+  @apply bg-tertiary rounded-md px-4 py-2 transition-all button-text cursor-pointer;
+  color: var(--color-on-tertiary);
 }
 .btn-tertiary:hover {
   @apply opacity-90;
@@ -223,7 +251,7 @@ body {
    ═══════════════════════════════════════════════════ */
 @utility skeleton {
   @apply bg-surface-dim rounded-md;
-  background: linear-gradient(90deg, var(--color-surface-dim) 25%, #e8edf3 50%, var(--color-surface-dim) 75%);
+  background: linear-gradient(90deg, var(--color-surface-dim) 25%, var(--color-shimmer-mid) 50%, var(--color-surface-dim) 75%);
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
 }
@@ -265,6 +293,16 @@ button:focus-visible {
   --error-bg: var(--color-error-container);
   --error-border: #fca5a5;
   --error-text: #991b1b;
+}
+.dark [data-sonner-toaster] [data-sonner-toast][data-type="success"] {
+  --success-bg: #0d2818;
+  --success-border: #166534;
+  --success-text: #86efac;
+}
+.dark [data-sonner-toaster] [data-sonner-toast][data-type="error"] {
+  --error-bg: var(--color-error-container);
+  --error-border: #991b1b;
+  --error-text: #fca5a5;
 }
 
 /* ═══════════════════════════════════════════════════
