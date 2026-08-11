@@ -163,10 +163,10 @@ export function AuthPage({ mode }) {
     }
   };
 
-  const inputClass = "w-full pl-10 pr-10 py-3 bg-surface border border-border-subtle rounded-md body-md text-primary placeholder:text-text-muted focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary transition-all";
+  const inputClass = "w-full pl-10 pr-10 py-3 bg-surface-dim border border-border-subtle rounded-md body-md text-primary placeholder:text-text-muted focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary transition-all";
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-surface-dim selection:bg-primary selection:text-surface relative overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-background selection:bg-primary selection:text-surface relative overflow-hidden">
       {/* Background glow effects */}
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-tertiary/10 rounded-full blur-[120px] pointer-events-none" />
 
@@ -441,7 +441,7 @@ export function AuthPage({ mode }) {
                     required
                     maxLength={6}
                     autoFocus
-                    className="w-full pl-11 pr-4 py-3.5 bg-surface border border-border-subtle rounded-md font-mono text-xl font-bold text-center tracking-[0.4em] text-primary placeholder:text-text-muted/40 placeholder:tracking-normal focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary transition-all"
+                    className="w-full pl-11 pr-4 py-3.5 bg-surface-dim border border-border-subtle rounded-md font-mono text-xl font-bold text-center tracking-[0.4em] text-primary placeholder:text-text-muted/40 placeholder:tracking-normal focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary transition-all"
                     value={authCode} 
                     onChange={e => setAuthCode(e.target.value.replace(/\D/g, ''))} 
                     placeholder="123456"

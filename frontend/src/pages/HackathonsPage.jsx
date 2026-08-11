@@ -67,8 +67,8 @@ export function HackathonsPage() {
               <p className="body-md text-text-muted mt-2 mb-6">
                 {hasFilters ? 'Try adjusting your filters.' : 'Be the first to post a hackathon!'}
               </p>
-              <Link to="/projects/new?type=HACKATHON" className="btn-primary flex items-center gap-2">
-                <Rocket size={15} weight="fill" /> Post a Hackathon
+              <Link to="/projects/new?type=HACKATHON" className="btn-primary flex items-center justify-center">
+                Post a Hackathon
               </Link>
             </div>
           ) : (
